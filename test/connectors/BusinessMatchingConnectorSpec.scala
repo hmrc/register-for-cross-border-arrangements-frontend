@@ -21,7 +21,7 @@ import com.github.tomakehurst.wiremock.client.WireMock.{aResponse, post, urlEqua
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import generators.Generators
 import helpers.WireMockServerHandler
-import models.IndividualMatchingSubmission
+import models.{IndividualMatchingSubmission, UniqueTaxpayerReference}
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import play.api.Application
@@ -45,39 +45,66 @@ class BusinessMatchingConnectorSpec extends SpecBase
   lazy val connector: BusinessMatchingConnector = app.injector.instanceOf[BusinessMatchingConnector]
 
   "BusinessMatchingConnector" - {
-    "must return status as OK for submission of valid Individual Matching Submission" in {
+    "when calling sendIndividualMatchingInformation" - {
+      "must return status as OK for submission of valid Individual Matching Submission" in {
 
 
-      forAll(arbitrary[Nino], arbitrary[IndividualMatchingSubmission]) {
-        (nino, ims) =>
-          stubResponse(s"/register-for-cross-border-arrangements/matching/individual/$nino", OK)
+        forAll(arbitrary[Nino], arbitrary[IndividualMatchingSubmission]) {
+          (nino, ims) =>
+            stubResponse(s"/register-for-cross-border-arrangements/matching/individual/$nino", OK)
 
-          val result = connector.sendIndividualMatchingInformation(nino, ims)
-          result.futureValue.status mustBe OK
+            val result = connector.sendIndividualMatchingInformation(nino, ims)
+            result.futureValue.status mustBe OK
+        }
+      }
+
+      "must return status as BAD_REQUEST for submission of invalid arrival notification" in {
+
+
+        forAll(arbitrary[Nino], arbitrary[IndividualMatchingSubmission]) {
+          (nino, ims) =>
+            stubResponse(s"/register-for-cross-border-arrangements/matching/individual/$nino", BAD_REQUEST)
+
+            val result = connector.sendIndividualMatchingInformation(nino, ims)
+            result.futureValue.status mustBe BAD_REQUEST
+        }
+      }
+
+      "must return status as INTERNAL_SERVER_ERROR for technical error incurred" in {
+
+
+        forAll(arbitrary[Nino], arbitrary[IndividualMatchingSubmission]) {
+          (nino, ims) =>
+            stubResponse(s"/register-for-cross-border-arrangements/matching/individual/$nino", INTERNAL_SERVER_ERROR)
+
+            val result = connector.sendIndividualMatchingInformation(nino, ims)
+            result.futureValue.status mustBe INTERNAL_SERVER_ERROR
+        }
       }
     }
 
-    "must return status as BAD_REQUEST for submission of invalid arrival notification" in {
+    "when calling sendBusinessMatchingInformation" - {
+      "must return status as OK for submission of valid Business Matching Submission" in {
 
+        forAll(arbitraryBusinessMatchingSubmission.arbitrary) {
+          bms =>
+            val utr = UniqueTaxpayerReference("0123456789")
+            stubResponse(s"/register-for-cross-border-arrangements/registration/organisation/utr/$utr", OK)
 
-      forAll(arbitrary[Nino], arbitrary[IndividualMatchingSubmission]) {
-        (nino, ims) =>
-          stubResponse(s"/register-for-cross-border-arrangements/matching/individual/$nino", BAD_REQUEST)
-
-          val result = connector.sendIndividualMatchingInformation(nino, ims)
-          result.futureValue.status mustBe BAD_REQUEST
+            val result = connector.sendBusinessMatchingInformation(utr, bms)
+            result.futureValue.status mustBe OK
+        }
       }
-    }
 
-    "must return status as INTERNAL_SERVER_ERROR for technical error incurred" in {
+      "must return status as BAD_REQUEST for submission of invalid UTR" in {
+        forAll(arbitraryBusinessMatchingSubmission.arbitrary) {
+          bms =>
+            val invalidUTR = UniqueTaxpayerReference("01234567891")
+            stubResponse(s"/register-for-cross-border-arrangements/registration/organisation/utr/$invalidUTR", BAD_REQUEST)
 
-
-      forAll(arbitrary[Nino], arbitrary[IndividualMatchingSubmission]) {
-        (nino, ims) =>
-          stubResponse(s"/register-for-cross-border-arrangements/matching/individual/$nino", INTERNAL_SERVER_ERROR)
-
-          val result = connector.sendIndividualMatchingInformation(nino, ims)
-          result.futureValue.status mustBe INTERNAL_SERVER_ERROR
+            val result = connector.sendBusinessMatchingInformation(invalidUTR, bms)
+            result.futureValue.status mustBe BAD_REQUEST
+        }
       }
     }
   }
