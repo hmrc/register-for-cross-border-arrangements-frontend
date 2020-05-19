@@ -18,8 +18,8 @@ package services
 
 import connectors.BusinessMatchingConnector
 import javax.inject.Inject
-import models.{IndividualMatchingSubmission, UserAnswers}
-import pages.NinoPage
+import models.{BusinessMatchingSubmission, IndividualMatchingSubmission, UserAnswers}
+import pages.{NinoPage, UniqueTaxpayerReferencePage}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -32,6 +32,16 @@ class BusinessMatchingService @Inject()(businessMatchingConnector: BusinessMatch
     (IndividualMatchingSubmission(userAnswers), userAnswers.get(NinoPage)) match {
       case (Some(individualSubmission), Some(nino)) =>
         businessMatchingConnector.sendIndividualMatchingInformation(nino, individualSubmission).map(Some(_))
+      case _ => Future.successful(None)
+    }
+  }
+
+  def sendBusinessMatchingInformation(userAnswers: UserAnswers)
+                                     (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[HttpResponse]] = {
+
+    (userAnswers.get(UniqueTaxpayerReferencePage), BusinessMatchingSubmission(userAnswers)) match {
+      case (Some(utr), Some(organisationSubmission)) =>
+        businessMatchingConnector.sendBusinessMatchingInformation(utr, organisationSubmission).map(Some(_))
       case _ => Future.successful(None)
     }
   }
