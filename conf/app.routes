@@ -59,7 +59,8 @@ POST       /register/individual/with-id/date-of-birth   controllers.DateOfBirthC
 GET        /changeDateOfBirth                           controllers.DateOfBirthController.onPageLoad(mode: Mode = CheckMode)
 POST       /changeDateOfBirth                           controllers.DateOfBirthController.onSubmit(mode: Mode = CheckMode)
 
-GET        /match-business  controllers.BusinessMatchingController.matchIndividual(mode: Mode = NormalMode)
+GET        /match-individual                            controllers.BusinessMatchingController.matchIndividual(mode: Mode = NormalMode)
+GET        /match-business                              controllers.BusinessMatchingController.matchBusiness(mode: Mode = NormalMode)
 
 GET        /register/business-type                        controllers.BusinessTypeController.onPageLoad(mode: Mode = NormalMode)
 POST       /register/business-type                        controllers.BusinessTypeController.onSubmit(mode: Mode = NormalMode)

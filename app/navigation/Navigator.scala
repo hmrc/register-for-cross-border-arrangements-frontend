@@ -37,6 +37,7 @@ class Navigator @Inject()() {
     case BusinessTypePage => _ => Some(routes.UniqueTaxpayerReferenceController.onPageLoad(NormalMode))
     case UniqueTaxpayerReferencePage => _ => Some(routes.PostCodeController.onPageLoad(NormalMode))
     case NonUkNamePage => _ => Some(routes.DateOfBirthController.onPageLoad(NormalMode))
+    case IsThisYourBusinessPage => _ => Some(routes.DateOfBirthController.onPageLoad(NormalMode))//TODO Redirect to /is-this-your-business and add tests when it's ready
     case _ => _ => Some(routes.IndexController.onPageLoad())
   }
 

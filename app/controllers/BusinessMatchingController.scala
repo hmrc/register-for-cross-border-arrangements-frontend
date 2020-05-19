@@ -18,9 +18,12 @@ package controllers
 
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
 import javax.inject.Inject
-import models.{Mode, NormalMode}
+import models.{BusinessAddress, Mode, NormalMode}
 import navigation.Navigator
+import pages.IsThisYourBusinessPage
 import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.libs.json.JsResult.Exception
+import play.api.libs.json.{JsError, JsSuccess}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import renderer.Renderer
 import repositories.SessionRepository
@@ -28,7 +31,7 @@ import services.BusinessMatchingService
 import uk.gov.hmrc.play.bootstrap.controller.FrontendBaseController
 import uk.gov.hmrc.viewmodels.NunjucksSupport
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 class BusinessMatchingController @Inject()(
                                             override val messagesApi: MessagesApi,
@@ -53,6 +56,28 @@ class BusinessMatchingController @Inject()(
 
         //we are missing a name or a date of birth take them back to fill it in
         case None => Redirect(routes.NameController.onPageLoad(NormalMode))
+      }
+  }
+
+  def matchBusiness(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
+    implicit request =>
+      businessMatchingService.sendBusinessMatchingInformation(request.userAnswers) flatMap {
+        case Some(response) => response.status match {
+          case OK =>
+            val address: BusinessAddress = response.json.validate[BusinessAddress] match {
+              case JsSuccess(address, _) => address
+              case JsError(_) => throw Exception(JsError("Business address validation failed"))
+            }
+
+            for {
+              updatedAnswers <- Future.fromTry(request.userAnswers.set(IsThisYourBusinessPage, address))
+              _              <- sessionRepository.set(updatedAnswers)
+            } yield Redirect(navigator.nextPage(IsThisYourBusinessPage, mode, updatedAnswers))
+          case NOT_FOUND => Future.successful(Redirect(routes.IdentityController.couldntConfirmIdentity()))
+          case _ => Future.successful(Redirect(routes.IndexController.onPageLoad()))
+        }
+
+        case None => Future.successful(Redirect(routes.BusinessTypeController.onPageLoad(NormalMode)))
       }
   }
 }
