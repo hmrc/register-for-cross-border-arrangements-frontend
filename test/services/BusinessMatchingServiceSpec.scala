@@ -27,14 +27,14 @@ import org.mockito.Mockito.{reset, _}
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
-import pages.{BusinessNamePage, BusinessTypePage, DateOfBirthPage, NamePage, NinoPage, UniqueTaxpayerReferencePage}
+import pages._
 import play.api.Application
 import play.api.inject._
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.{JsValue, Json}
+import play.api.test.Helpers._
 import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.http.HttpResponse
-import play.api.test.Helpers._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future

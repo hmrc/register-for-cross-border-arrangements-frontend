@@ -22,11 +22,14 @@ import base.SpecBase
 import generators.Generators
 import matchers.JsonMatchers
 import models.{BusinessAddress, BusinessType, Name, UniqueTaxpayerReference, UserAnswers}
+import models.{BusinessType, Name, UniqueTaxpayerReference, UserAnswers}
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatestplus.mockito.MockitoSugar
 import pages._
+import pages.{BusinessNamePage, BusinessTypePage, DateOfBirthPage, NamePage, NinoPage, UniqueTaxpayerReferencePage}
 import play.api.inject._
+import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
@@ -259,7 +262,6 @@ class BusinessMatchingControllerSpec extends SpecBase
         redirectLocation(result) mustBe Some("/register-for-cross-border-arrangements-frontend/register/could-not-confirm-identity")
       }
     }
-
   }
 
 }
