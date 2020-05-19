@@ -26,6 +26,8 @@ import uk.gov.hmrc.domain.Nino
 trait ModelGenerators {
   self: Generators =>
 
+  val regime = "DACSIX"
+
   implicit lazy val arbitraryCountry: Arbitrary[Country] = {
     Arbitrary {
       for {
@@ -70,10 +72,21 @@ trait ModelGenerators {
       name <- arbitrary[Name]
       dob <- arbitrary[LocalDate]
     } yield
-      IndividualMatchingSubmission("Don't know",
+      IndividualMatchingSubmission(regime,
         requiresNameMatch = true,
         isAnAgent = false,
         Individual(name, dob))
+  }
+
+  implicit val arbitraryBusinessMatchingSubmission: Arbitrary[BusinessMatchingSubmission] = Arbitrary {
+    for {
+      businessName <- arbitrary[String]
+      businessType <- arbitraryBusinessType.arbitrary
+    } yield
+      BusinessMatchingSubmission(regime,
+        requiresNameMatch = true,
+        isAnAgent = false,
+        Organisation(businessName, businessType))
   }
 
   implicit lazy val arbitraryUniqueTaxpayerReference: Arbitrary[UniqueTaxpayerReference] =

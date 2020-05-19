@@ -21,18 +21,19 @@ import java.time.LocalDate
 import base.SpecBase
 import connectors.BusinessMatchingConnector
 import generators.Generators
-import models.{Name, UserAnswers}
+import models.{BusinessType, Name, UniqueTaxpayerReference, UserAnswers}
 import org.mockito.Matchers._
 import org.mockito.Mockito.{reset, _}
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
-import pages.{DateOfBirthPage, NamePage, NinoPage}
+import pages.{BusinessNamePage, BusinessTypePage, DateOfBirthPage, NamePage, NinoPage, UniqueTaxpayerReferencePage}
 import play.api.Application
 import play.api.inject._
 import play.api.inject.guice.GuiceApplicationBuilder
 import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.http.HttpResponse
+import play.api.test.Helpers._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -42,7 +43,7 @@ class BusinessMatchingServiceSpec extends SpecBase
   with Generators
   with ScalaCheckPropertyChecks {
 
-  val mockBusinessMatchingConnector = mock[BusinessMatchingConnector]
+  val mockBusinessMatchingConnector: BusinessMatchingConnector = mock[BusinessMatchingConnector]
 
   override lazy val app: Application = new GuiceApplicationBuilder()
     .overrides(
@@ -50,7 +51,7 @@ class BusinessMatchingServiceSpec extends SpecBase
     )
     .build()
 
-  val businessMatchingService = app.injector.instanceOf[BusinessMatchingService]
+  val businessMatchingService: BusinessMatchingService = app.injector.instanceOf[BusinessMatchingService]
 
   override def beforeEach: Unit =
     reset(
@@ -75,12 +76,12 @@ class BusinessMatchingServiceSpec extends SpecBase
 
             when(mockBusinessMatchingConnector.sendIndividualMatchingInformation(any(), any())(any(), any()))
               .thenReturn(
-                Future.successful(HttpResponse(200, None))
+                Future.successful(HttpResponse(OK, None))
               )
             val result = businessMatchingService.sendIndividualMatchingInformation(answers)
 
             whenReady(result){
-              _.map(_.status) mustBe Some(200)
+              _.map(_.status) mustBe Some(OK)
             }
         }
       }
@@ -106,8 +107,52 @@ class BusinessMatchingServiceSpec extends SpecBase
       }
     }
 
+    "when able to construct a business/organisation matching submission" - {
+      "should send a request to the business matching connector" in {
+        forAll(arbitrary[UserAnswers], arbitrary[BusinessType], arbitrary[UniqueTaxpayerReference], arbitrary[String]){
+          (userAnswers, businessType, utr, businessName) =>
+            val answers = userAnswers
+              .set(BusinessTypePage, businessType)
+              .success
+              .value
+              .set(UniqueTaxpayerReferencePage, utr)
+              .success
+              .value
+              .set(BusinessNamePage, businessName)
+              .success
+              .value
 
+            when(mockBusinessMatchingConnector.sendBusinessMatchingInformation(any(), any())(any(), any()))
+              .thenReturn(
+                Future.successful(HttpResponse(OK, None))
+              )
+            val result = businessMatchingService.sendBusinessMatchingInformation(answers)
 
+            whenReady(result){
+              _.map(_.status) mustBe Some(OK)
+            }
+        }
+      }
+    }
+
+    "when unable to construct a business/organisation matching submission" - {
+      "should return a future None if business name and type are missing" in {
+        forAll(arbitrary[UserAnswers], arbitrary[UniqueTaxpayerReference]){
+          (userAnswers, utr) =>
+            val answers = userAnswers
+              .set(UniqueTaxpayerReferencePage, utr)
+              .success
+              .value
+
+            val result = businessMatchingService.sendBusinessMatchingInformation(answers)
+
+            whenReady(result){
+              _ mustBe None
+            }
+
+        }
+      }
+    }
 
   }
 }
