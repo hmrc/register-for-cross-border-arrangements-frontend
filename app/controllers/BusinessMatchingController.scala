@@ -18,12 +18,10 @@ package controllers
 
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
 import javax.inject.Inject
-import models.{BusinessAddress, Mode, NormalMode}
+import models.{Mode, NormalMode}
 import navigation.Navigator
-import pages.IsThisYourBusinessPage
+import pages.{BusinessNamePage, BusinessTypePage, IsThisYourBusinessPage, UniqueTaxpayerReferencePage}
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.libs.json.JsResult.Exception
-import play.api.libs.json.{JsError, JsSuccess}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import renderer.Renderer
 import repositories.SessionRepository
@@ -61,23 +59,31 @@ class BusinessMatchingController @Inject()(
 
   def matchBusiness(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
-      businessMatchingService.sendBusinessMatchingInformation(request.userAnswers) flatMap {
-        case Some(response) => response.status match {
-          case OK =>
-            val address: BusinessAddress = response.json.validate[BusinessAddress] match {
-              case JsSuccess(address, _) => address
-              case JsError(_) => throw Exception(JsError("Business address validation failed"))
-            }
 
-            for {
-              updatedAnswers <- Future.fromTry(request.userAnswers.set(IsThisYourBusinessPage, address))
-              _              <- sessionRepository.set(updatedAnswers)
-            } yield Redirect(navigator.nextPage(IsThisYourBusinessPage, mode, updatedAnswers))
-          case NOT_FOUND => Future.successful(Redirect(routes.IdentityController.couldntConfirmIdentity()))
-          case _ => Future.successful(Redirect(routes.IndexController.onPageLoad()))
-        }
+      val pagesToCheck = Tuple3(
+        request.userAnswers.get(BusinessTypePage),
+        request.userAnswers.get(UniqueTaxpayerReferencePage),
+        request.userAnswers.get(BusinessNamePage)
+      )
 
-        case None => Future.successful(Redirect(routes.BusinessTypeController.onPageLoad(NormalMode)))
+      pagesToCheck match {
+        case (Some(_), Some(_), Some(_)) =>
+          businessMatchingService.sendBusinessMatchingInformation(request.userAnswers) flatMap {
+            case Some(address) =>
+              for {
+                updatedAnswers <- Future.fromTry(request.userAnswers.set(IsThisYourBusinessPage, address))
+                _              <- sessionRepository.set(updatedAnswers)
+              } yield {
+                Redirect(navigator.nextPage(IsThisYourBusinessPage, mode, updatedAnswers))
+              }
+            case None => Future.successful(Redirect(routes.IdentityController.couldntConfirmIdentity()))
+          } recover {
+            case _ => Redirect(routes.IdentityController.couldntConfirmIdentity()) //TODO Redirect to error page when it's ready
+          }
+        case (None, _, _) => Future.successful(Redirect(routes.BusinessTypeController.onPageLoad(NormalMode)))
+        case (Some(_), None, _) => Future.successful(Redirect(routes.UniqueTaxpayerReferenceController.onPageLoad(NormalMode)))
+        case (Some(_), Some(_), None) => Future.successful(Redirect(routes.IdentityController.couldntConfirmIdentity())) //TODO Redirect to business name controller when it's ready
       }
   }
+
 }
