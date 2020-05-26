@@ -56,7 +56,7 @@ class BusinessMatchingService @Inject()(businessMatchingConnector: BusinessMatch
   private def validateJsonForBusiness(value: JsValue): Option[BusinessAddress] = {
       value.validate[BusinessAddress] match {
         case JsSuccess(address, _) => Some(address)
-        case JsError(_) => throw Exception(JsError(s"Error encountered retrieving business matching record: "))
+        case JsError(_) => throw Exception(JsError(s"Error encountered retrieving business matching record."))
       }
   }
 }

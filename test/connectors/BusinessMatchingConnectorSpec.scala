@@ -106,6 +106,17 @@ class BusinessMatchingConnectorSpec extends SpecBase
             result.futureValue.status mustBe BAD_REQUEST
         }
       }
+
+      "must return status as INTERNAL_SERVER_ERROR for technical error incurred" in {
+        forAll(arbitraryBusinessMatchingSubmission.arbitrary) {
+          bms =>
+            val utr = UniqueTaxpayerReference("0123456789")
+            stubResponse(s"/register-for-cross-border-arrangements/registration/organisation/utr/$utr", INTERNAL_SERVER_ERROR)
+
+            val result = connector.sendBusinessMatchingInformation(utr, bms)
+            result.futureValue.status mustBe INTERNAL_SERVER_ERROR
+        }
+      }
     }
   }
 
