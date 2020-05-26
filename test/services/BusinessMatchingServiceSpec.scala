@@ -61,7 +61,7 @@ class BusinessMatchingServiceSpec extends SpecBase
       mockBusinessMatchingConnector
     )
 
-  "Business Matching Servce" - {
+  "Business Matching Service" - {
     "when able to construct an individual matching submission" - {
       "should send a request to the business matching connector" in {
         forAll(arbitrary[UserAnswers], arbitrary[Name], arbitrary[LocalDate], arbitrary[Nino]){
