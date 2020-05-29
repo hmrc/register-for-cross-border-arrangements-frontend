@@ -35,7 +35,7 @@ class BusinessMatchingConnector @Inject()(val config: FrontendAppConfig, val htt
 
   def sendBusinessMatchingInformation(utr: UniqueTaxpayerReference, businessSubmission: BusinessMatchingSubmission)
                                      (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] = {
-    val submissionUrl = s"${config.businessMatchingUrl}/registration/organisation/utr/$utr"
+    val submissionUrl = s"${config.businessMatchingUrl}/matching/organisation/${utr.uniqueTaxPayerReference}"
     http.POST[BusinessMatchingSubmission, HttpResponse](submissionUrl, businessSubmission)
   }
 

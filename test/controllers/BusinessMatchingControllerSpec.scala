@@ -166,7 +166,7 @@ class BusinessMatchingControllerSpec extends SpecBase
         val result = route(application, getRequest(businessMatchingRoute)).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result) mustBe Some("/register-for-cross-border-arrangements-frontend/register/could-not-confirm-identity")
+        redirectLocation(result) mustBe Some("/register-for-cross-border-arrangements-frontend/register/business-identity-not-confirmed")
       }
     }
 
@@ -186,7 +186,7 @@ class BusinessMatchingControllerSpec extends SpecBase
 
         status(result) mustEqual SEE_OTHER
         //TODO Redirect to error page when it's ready
-        redirectLocation(result) mustBe Some("/register-for-cross-border-arrangements-frontend/register/could-not-confirm-identity")
+        redirectLocation(result) mustBe Some("/register-for-cross-border-arrangements-frontend/register/business-identity-not-confirmed")
       }
     }
 
@@ -240,28 +240,35 @@ class BusinessMatchingControllerSpec extends SpecBase
         redirectLocation(result) mustBe Some("/register-for-cross-border-arrangements-frontend/register/business/with-id/utr")
       }
 
-      "must redirect the user to the business name page if it's missing" in {
+      "must redirect the user to the missing business name page if the business type is:" - {
 
-        val businessUserAnswers: UserAnswers = UserAnswers(userAnswersId)
-          .set(BusinessTypePage, BusinessType.CorporateBody)
-          .success
-          .value
-          .set(UniqueTaxpayerReferencePage, UniqueTaxpayerReference("0123456789"))
-          .success
-          .value
+//        "NotSpecified" in {
+//
+//        }
 
-        val application = applicationBuilder(userAnswers = Some(businessUserAnswers))
-          .overrides(
-            bind[BusinessMatchingService].toInstance(mockBusinessMatchingService)
-          ).build()
+        "CorporateBody" in {
+          val businessUserAnswers: UserAnswers = UserAnswers(userAnswersId)
+            .set(BusinessTypePage, BusinessType.CorporateBody)
+            .success
+            .value
+            .set(UniqueTaxpayerReferencePage, UniqueTaxpayerReference("0123456789"))
+            .success
+            .value
 
-        when(mockBusinessMatchingService.sendBusinessMatchingInformation(any())(any(), any()))
-          .thenReturn(Future.successful(None))
+          val application = applicationBuilder(userAnswers = Some(businessUserAnswers))
+            .overrides(
+              bind[BusinessMatchingService].toInstance(mockBusinessMatchingService)
+            ).build()
 
-        val result = route(application, getRequest(businessMatchingRoute)).value
+          when(mockBusinessMatchingService.sendBusinessMatchingInformation(any())(any(), any()))
+            .thenReturn(Future.successful(None))
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result) mustBe Some("/register-for-cross-border-arrangements-frontend/register/could-not-confirm-identity")
+          val result = route(application, getRequest(businessMatchingRoute)).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result) mustBe Some("/register-for-cross-border-arrangements-frontend/register/registered-business-name")
+        }
+
       }
     }
   }

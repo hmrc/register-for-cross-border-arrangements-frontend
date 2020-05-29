@@ -33,8 +33,8 @@ class Navigator @Inject()() {
     case DoYouHaveANationalInsuranceNumberPage =>   doYouHaveANationalInsuranceNumberRoutes
     case NinoPage => _ => Some(routes.NameController.onPageLoad(NormalMode))
     case NamePage => _ => Some(routes.DateOfBirthController.onPageLoad(NormalMode))
-    case BusinessNamePage => _ => Some(routes.IndexController.onPageLoad()) //Some(routes.BusinessMatchingController.matchBusiness()) TODO Add when ready
-    case SoleTraderNamePage => _ => Some(routes.IndexController.onPageLoad()) //Some(routes.BusinessMatchingController.matchBusiness()) TODO Add when ready
+    case BusinessNamePage => _ => Some(routes.BusinessMatchingController.matchBusiness())
+    case SoleTraderNamePage => _ => Some(routes.BusinessMatchingController.matchBusiness())
     case DateOfBirthPage => dateOfBirthRoutes
     case DoYouLiveInTheUKPage => doYouLiveInTheUKRoutes
     case BusinessTypePage => _ => Some(routes.UniqueTaxpayerReferenceController.onPageLoad(NormalMode))
@@ -42,7 +42,7 @@ class Navigator @Inject()() {
     case NonUkNamePage => _ => Some(routes.DateOfBirthController.onPageLoad(NormalMode))
     case BusinessAddressPage => _ =>   Some(routes.CheckYourAnswersController.onPageLoad())
     case BusinessWithoutIDNamePage => _ => Some(routes.BusinessAddressController.onPageLoad(NormalMode))
-    case IsThisYourBusinessPage => _ => Some(routes.DateOfBirthController.onPageLoad(NormalMode))//TODO Redirect to /is-this-your-business and add tests when it's ready
+    case IsThisYourBusinessPage => _ => Some(routes.DateOfBirthController.onPageLoad(NormalMode))
     case _ => _ => Some(routes.IndexController.onPageLoad())
   }
 
