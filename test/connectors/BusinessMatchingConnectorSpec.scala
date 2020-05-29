@@ -89,7 +89,7 @@ class BusinessMatchingConnectorSpec extends SpecBase
         forAll(arbitraryBusinessMatchingSubmission.arbitrary) {
           bms =>
             val utr = UniqueTaxpayerReference("0123456789")
-            stubResponse(s"/register-for-cross-border-arrangements/registration/organisation/utr/$utr", OK)
+            stubResponse(s"/register-for-cross-border-arrangements/matching/organisation/${utr.uniqueTaxPayerReference}", OK)
 
             val result = connector.sendBusinessMatchingInformation(utr, bms)
             result.futureValue.status mustBe OK
@@ -100,7 +100,7 @@ class BusinessMatchingConnectorSpec extends SpecBase
         forAll(arbitraryBusinessMatchingSubmission.arbitrary) {
           bms =>
             val invalidUTR = UniqueTaxpayerReference("01234567891")
-            stubResponse(s"/register-for-cross-border-arrangements/registration/organisation/utr/$invalidUTR", BAD_REQUEST)
+            stubResponse(s"/register-for-cross-border-arrangements/matching/organisation/${invalidUTR.uniqueTaxPayerReference}", BAD_REQUEST)
 
             val result = connector.sendBusinessMatchingInformation(invalidUTR, bms)
             result.futureValue.status mustBe BAD_REQUEST
@@ -111,7 +111,7 @@ class BusinessMatchingConnectorSpec extends SpecBase
         forAll(arbitraryBusinessMatchingSubmission.arbitrary) {
           bms =>
             val utr = UniqueTaxpayerReference("0123456789")
-            stubResponse(s"/register-for-cross-border-arrangements/registration/organisation/utr/$utr", INTERNAL_SERVER_ERROR)
+            stubResponse(s"/register-for-cross-border-arrangements/matching/organisation/${utr.uniqueTaxPayerReference}", INTERNAL_SERVER_ERROR)
 
             val result = connector.sendBusinessMatchingInformation(utr, bms)
             result.futureValue.status mustBe INTERNAL_SERVER_ERROR

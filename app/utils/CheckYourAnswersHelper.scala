@@ -19,7 +19,7 @@ package utils
 import java.time.format.DateTimeFormatter
 
 import controllers.routes
-import models.{BusinessType, CheckMode, NormalMode, UserAnswers}
+import models.{BusinessType, CheckMode, UserAnswers}
 import pages._
 import uk.gov.hmrc.viewmodels.SummaryList._
 import uk.gov.hmrc.viewmodels.Text.Literal

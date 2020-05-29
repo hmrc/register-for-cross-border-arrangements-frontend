@@ -18,11 +18,11 @@ package controllers
 
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
 import javax.inject.Inject
-import models.{Mode, NormalMode}
+import models.{BusinessType, Mode, NormalMode}
 import navigation.Navigator
 import pages.{BusinessNamePage, BusinessTypePage, IsThisYourBusinessPage, UniqueTaxpayerReferencePage}
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
 import renderer.Renderer
 import repositories.SessionRepository
 import services.BusinessMatchingService
@@ -76,14 +76,22 @@ class BusinessMatchingController @Inject()(
               } yield {
                 Redirect(navigator.nextPage(IsThisYourBusinessPage, mode, updatedAnswers))
               }
-            case None => Future.successful(Redirect(routes.IdentityController.couldntConfirmIdentity()))
+            case None => Future.successful(Redirect(routes.BusinessNotConfirmedController.onPageLoad()))
           } recover {
-            case _ => Redirect(routes.IdentityController.couldntConfirmIdentity()) //TODO Redirect to error page when it's ready
+            case _ => Redirect(routes.BusinessNotConfirmedController.onPageLoad()) //TODO Redirect to error page when it's ready
           }
         case (None, _, _) => Future.successful(Redirect(routes.BusinessTypeController.onPageLoad(NormalMode)))
         case (Some(_), None, _) => Future.successful(Redirect(routes.UniqueTaxpayerReferenceController.onPageLoad(NormalMode)))
-        case (Some(_), Some(_), None) => Future.successful(Redirect(routes.IdentityController.couldntConfirmIdentity())) //TODO Redirect to business name controller when it's ready
+        case (Some(businessType), Some(_), None) => Future.successful(Redirect(businessTypeRoute(businessType)))
       }
   }
 
+  private def businessTypeRoute(businessType: BusinessType): Call = {
+    businessType match {
+      case BusinessType.NotSpecified => routes.SoleTraderNameController.onPageLoad(NormalMode)
+      case BusinessType.Partnership => routes.BusinessNamePartnershipController.onPageLoad(NormalMode)
+      case BusinessType.LimitedLiability | BusinessType.CorporateBody => routes.BusinessNameRegisteredBusinessController.onPageLoad(NormalMode)
+      case BusinessType.UnIncorporatedBody => routes.BusinessNameOrganisationController.onPageLoad(NormalMode)
+    }
+  }
 }
