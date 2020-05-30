@@ -19,6 +19,7 @@ package connectors
 import config.FrontendAppConfig
 import javax.inject.Inject
 import models.{BusinessMatchingSubmission, IndividualMatchingSubmission, UniqueTaxpayerReference}
+import play.api.libs.json.Json
 import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
@@ -30,12 +31,14 @@ class BusinessMatchingConnector @Inject()(val config: FrontendAppConfig, val htt
   def sendIndividualMatchingInformation(nino: Nino, individualSubmission: IndividualMatchingSubmission)
                                        (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] = {
       val submissionUrl = s"${config.businessMatchingUrl}/matching/individual/$nino"
+      println(s"json: ${Json.toJson(individualSubmission)}")
       http.POST[IndividualMatchingSubmission, HttpResponse](submissionUrl, individualSubmission)
   }
 
   def sendBusinessMatchingInformation(utr: UniqueTaxpayerReference, businessSubmission: BusinessMatchingSubmission)
                                      (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] = {
     val submissionUrl = s"${config.businessMatchingUrl}/matching/organisation/${utr.uniqueTaxPayerReference}"
+    println(s"json: ${Json.toJson(businessSubmission)}")
     http.POST[BusinessMatchingSubmission, HttpResponse](submissionUrl, businessSubmission)
   }
 
