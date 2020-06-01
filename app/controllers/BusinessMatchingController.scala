@@ -20,7 +20,7 @@ import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierA
 import javax.inject.Inject
 import models.{BusinessType, Mode, NormalMode}
 import navigation.Navigator
-import pages.{BusinessNamePage, BusinessTypePage, IsThisYourBusinessPage, UniqueTaxpayerReferencePage}
+import pages.{BusinessAddressPage, BusinessNamePage, BusinessTypePage, IsThisYourBusinessPage, UniqueTaxpayerReferencePage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
 import renderer.Renderer
@@ -68,10 +68,10 @@ class BusinessMatchingController @Inject()(
           businessMatchingService.sendBusinessMatchingInformation(request.userAnswers) flatMap {
             case Some(address) =>
               for {
-                updatedAnswers <- Future.fromTry(request.userAnswers.set(IsThisYourBusinessPage, address))
+                updatedAnswers <- Future.fromTry(request.userAnswers.set(BusinessAddressPage, address.toAddress))
                 _              <- sessionRepository.set(updatedAnswers)
               } yield {
-                Redirect(navigator.nextPage(IsThisYourBusinessPage, mode, updatedAnswers))
+                Redirect(routes.ConfirmBusinessController.onPageLoad(NormalMode))
               }
             case None => Future.successful(Redirect(routes.BusinessNotConfirmedController.onPageLoad()))
           } recover {
