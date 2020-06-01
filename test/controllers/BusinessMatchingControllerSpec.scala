@@ -90,7 +90,7 @@ class BusinessMatchingControllerSpec extends SpecBase
         val result = route(application, getRequest(individualMatchingRoute)).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result) mustBe Some("/register-for-cross-border-arrangements-frontend/check-your-answers")
+        redirectLocation(result) mustBe Some("/register-for-cross-border-arrangements-frontend/register/identity-confirmed")
       }
     }
 
@@ -187,30 +187,6 @@ class BusinessMatchingControllerSpec extends SpecBase
 
     "when a correct submission can't be created due to missing data required to business match" - {
 
-      "must redirect the user to the business type page if it's missing" in {
-
-        val businessUserAnswers: UserAnswers = UserAnswers(userAnswersId)
-          .set(UniqueTaxpayerReferencePage, UniqueTaxpayerReference("0123456789"))
-          .success
-          .value
-          .set(BusinessNamePage, "Business Name")
-          .success
-          .value
-
-        val application = applicationBuilder(userAnswers = Some(businessUserAnswers))
-          .overrides(
-            bind[BusinessMatchingService].toInstance(mockBusinessMatchingService)
-          ).build()
-
-        when(mockBusinessMatchingService.sendBusinessMatchingInformation(any())(any(), any()))
-          .thenReturn(Future.successful(None))
-
-        val result = route(application, getRequest(businessMatchingRoute)).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result) mustBe Some("/register-for-cross-border-arrangements-frontend/register/business/with-id/type")
-      }
-
       "must redirect the user to the utr page if it's missing" in {
 
         val businessUserAnswers: UserAnswers = UserAnswers(userAnswersId)
@@ -233,37 +209,6 @@ class BusinessMatchingControllerSpec extends SpecBase
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result) mustBe Some("/register-for-cross-border-arrangements-frontend/register/business/with-id/utr")
-      }
-
-      "must redirect the user to the missing business name page if the business type is:" - {
-
-//        "NotSpecified" in {
-//
-//        }
-
-        "CorporateBody" in {
-          val businessUserAnswers: UserAnswers = UserAnswers(userAnswersId)
-            .set(BusinessTypePage, BusinessType.CorporateBody)
-            .success
-            .value
-            .set(UniqueTaxpayerReferencePage, UniqueTaxpayerReference("0123456789"))
-            .success
-            .value
-
-          val application = applicationBuilder(userAnswers = Some(businessUserAnswers))
-            .overrides(
-              bind[BusinessMatchingService].toInstance(mockBusinessMatchingService)
-            ).build()
-
-          when(mockBusinessMatchingService.sendBusinessMatchingInformation(any())(any(), any()))
-            .thenReturn(Future.successful(None))
-
-          val result = route(application, getRequest(businessMatchingRoute)).value
-
-          status(result) mustEqual SEE_OTHER
-          redirectLocation(result) mustBe Some("/register-for-cross-border-arrangements-frontend/register/registered-business-name")
-        }
-
       }
     }
   }

@@ -47,7 +47,7 @@ class BusinessMatchingController @Inject()(
     implicit request =>
       businessMatchingService.sendIndividualMatchingInformation(request.userAnswers) map {
         case Some(response) => response.status match {
-          case OK => Redirect(routes.CheckYourAnswersController.onPageLoad()) //TODO: may need more data collected for Cardiff team
+          case OK => Redirect(routes.IdentityConfirmedController.onPageLoad()) //TODO: may need more data collected for Cardiff team
           case NOT_FOUND => Redirect(routes.IndividualNotConfirmedController.onPageLoad())
           case _ => Redirect(routes.IndexController.onPageLoad())
         }
@@ -60,14 +60,11 @@ class BusinessMatchingController @Inject()(
   def matchBusiness(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
 
-      val pagesToCheck = Tuple3(
-        request.userAnswers.get(BusinessTypePage),
-        request.userAnswers.get(UniqueTaxpayerReferencePage),
-        request.userAnswers.get(BusinessNamePage)
-      )
-
-      pagesToCheck match {
-        case (Some(_), Some(_), Some(_)) =>
+      /*Note: Needs business type, name and utr to business match
+      * Checking UTR page only because /registered-business-name uses the business type before calling this method
+      */
+      request.userAnswers.get(UniqueTaxpayerReferencePage) match {
+        case Some(_) =>
           businessMatchingService.sendBusinessMatchingInformation(request.userAnswers) flatMap {
             case Some(address) =>
               for {
@@ -80,18 +77,7 @@ class BusinessMatchingController @Inject()(
           } recover {
             case _ => Redirect(routes.BusinessNotConfirmedController.onPageLoad()) //TODO Redirect to error page when it's ready
           }
-        case (None, _, _) => Future.successful(Redirect(routes.BusinessTypeController.onPageLoad(NormalMode)))
-        case (Some(_), None, _) => Future.successful(Redirect(routes.UniqueTaxpayerReferenceController.onPageLoad(NormalMode)))
-        case (Some(businessType), Some(_), None) => Future.successful(Redirect(businessTypeRoute(businessType)))
+        case _ => Future.successful(Redirect(routes.UniqueTaxpayerReferenceController.onPageLoad(NormalMode)))
       }
-  }
-
-  private def businessTypeRoute(businessType: BusinessType): Call = {
-    businessType match {
-      case BusinessType.NotSpecified => routes.SoleTraderNameController.onPageLoad(NormalMode)
-      case BusinessType.Partnership => routes.BusinessNamePartnershipController.onPageLoad(NormalMode)
-      case BusinessType.LimitedLiability | BusinessType.CorporateBody => routes.BusinessNameRegisteredBusinessController.onPageLoad(NormalMode)
-      case BusinessType.UnIncorporatedBody => routes.BusinessNameOrganisationController.onPageLoad(NormalMode)
-    }
   }
 }

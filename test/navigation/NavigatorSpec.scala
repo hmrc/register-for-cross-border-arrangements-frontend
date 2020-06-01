@@ -203,7 +203,7 @@ class NavigatorSpec extends SpecBase with ScalaCheckPropertyChecks with Generato
         }
       }
 
-      "as a limited liabilty business must go from unique tax reference to registered business name page" in {
+      "as a limited liability business must go from unique tax reference to registered business name page" in {
         forAll(arbitrary[UserAnswers]) {
           answers =>
             val updatedAnswers =
@@ -254,7 +254,7 @@ class NavigatorSpec extends SpecBase with ScalaCheckPropertyChecks with Generato
 
             navigator
               .nextPage(BusinessNamePage, NormalMode, answers)
-              //.mustBe(routes.BusinessMatchingController.matchBusiness()) TODO add when ready
+              .mustBe(routes.BusinessMatchingController.matchBusiness())
         }
       }
 
