@@ -35,6 +35,7 @@ class Navigator @Inject()() {
     case NamePage => _ => Some(routes.DateOfBirthController.onPageLoad(NormalMode))
     case BusinessNamePage => _ => Some(routes.BusinessMatchingController.matchBusiness())
     case SoleTraderNamePage => _ => Some(routes.BusinessMatchingController.matchBusiness())
+    case ConfirmBusinessPage => confirmBusinessRoutes
     case DateOfBirthPage => dateOfBirthRoutes
     case DoYouLiveInTheUKPage => doYouLiveInTheUKRoutes
     case BusinessTypePage => _ => Some(routes.UniqueTaxpayerReferenceController.onPageLoad(NormalMode))
@@ -58,6 +59,12 @@ class Navigator @Inject()() {
       case BusinessType.UnIncorporatedBody => routes.BusinessNameOrganisationController.onPageLoad(NormalMode)
     }
   }
+
+  private def confirmBusinessRoutes(ua: UserAnswers): Option[Call] =
+    ua.get(ConfirmBusinessPage) map {
+      case true  => routes.IdentityConfirmedController.onPageLoad()
+      case false  => routes.BusinessNotConfirmedController.onPageLoad()
+    }
 
   private def doYouHaveUTRPage(ua: UserAnswers): Option[Call] =
     ua.get(DoYouHaveUTRPage) map {

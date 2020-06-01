@@ -25,7 +25,19 @@ case class BusinessAddress(
   addressLine3: Option[String],
   addressLine4: Option[String],
   postCode: String,
-  countryCode: String)
+  countryCode: String){
+
+  def toAddress: Address =
+    Address(
+      addressLine1,
+      addressLine2.getOrElse(""),
+      addressLine3,
+      addressLine4,
+      Some(postCode),
+      Country("valid", countryCode, "")
+    )
+
+}
 
 object BusinessAddress {
 

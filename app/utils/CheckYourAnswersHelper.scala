@@ -28,6 +28,21 @@ import utils.CheckYourAnswersHelper._
 
 class CheckYourAnswersHelper(userAnswers: UserAnswers) {
 
+  def confirmBusiness: Option[Row] = userAnswers.get(ConfirmBusinessPage) map {
+    answer =>
+      Row(
+        key     = Key(msg"confirmBusiness.checkYourAnswersLabel", classes = Seq("govuk-!-width-one-half")),
+        value   = Value(yesOrNo(answer)),
+        actions = List(
+          Action(
+            content            = msg"site.edit",
+            href               = routes.ConfirmBusinessController.onPageLoad(CheckMode).url,
+            visuallyHiddenText = Some(msg"site.edit.hidden".withArgs(msg"confirmBusiness.checkYourAnswersLabel"))
+          )
+        )
+      )
+  }
+
   def businessAddress: Option[Row] = userAnswers.get(BusinessAddressPage) map {
     answer =>
       Row(
