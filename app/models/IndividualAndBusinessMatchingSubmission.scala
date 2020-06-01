@@ -70,7 +70,7 @@ object Organisation {
     organisation =>
       Json.obj(
         "organisationName" -> organisation.organisationName,
-        "organisationType" -> organisation.organisationType
+        "organisationType" -> OrganisationType(organisation.organisationType).value
       )
   }
 
