@@ -41,7 +41,7 @@ class IdentityConfirmedController @Inject()(
     implicit request =>
 
       val nextPage: String = request.userAnswers.get(BusinessTypePage) match {
-        case Some(_) => routes.BusinessTypeController.onPageLoad(NormalMode).url //TODO Go to /register/contact-name once page is ready
+        case Some(_) => routes.ContactNameController.onPageLoad(NormalMode).url
         case None => routes.NinoController.onPageLoad(NormalMode).url //TODO Go to /register/email once page is ready
       }
 

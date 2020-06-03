@@ -352,3 +352,15 @@ confirmBusiness.title = Is this your business?
 confirmBusiness.heading = Is this your business?
 confirmBusiness.checkYourAnswersLabel = Is this your business?
 confirmBusiness.error.required = Select yes if this is your business
+
+contactName.title = Who should we contact if we have any questions about your disclosures?
+contactName.heading = Who should we contact if we have any questions about your disclosures?
+contactName.firstName = First name
+contactName.lastName = Last name
+contactName.checkYourAnswersLabel = Who should we contact if we have any questions about your disclosures?
+contactName.error.required.firstName = Enter the first name of the person we should contact if we have any questions about your disclosures
+contactName.error.length.firstName = First name must be 35 characters or less
+contactName.error.invalid.firstName = First name must only include letters a to z, apostrophes, slashes, ampersands and spaces
+contactName.error.required.lastName = Enter the last name of the person we should contact if we have any questions about your disclosures
+contactName.error.length.lastName = Last name must be 35 characters or less
+contactName.error.invalid.lastName = Last name must only include letters a to z, apostrophes, slashes, ampersands and spaces

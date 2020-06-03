@@ -34,7 +34,7 @@ object IndividualMatchingSubmission {
       name <- userAnswers.get(NamePage)
       dob <- userAnswers.get(DateOfBirthPage)
     } yield {
-      IndividualMatchingSubmission("DACSIX",
+      IndividualMatchingSubmission("DAC",
       requiresNameMatch = true,
       isAnAgent = false,
       Individual( name, dob))}
@@ -96,7 +96,7 @@ object BusinessMatchingSubmission {
       businessName <- userAnswers.get(BusinessNamePage)
       businessType <- userAnswers.get(BusinessTypePage)
     } yield BusinessMatchingSubmission(
-      regime = "DACSIX",
+      regime = "DAC",
       requiresNameMatch = true,
       isAnAgent = false,
       Organisation(businessName, businessType))

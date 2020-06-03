@@ -88,7 +88,7 @@ class IdentityConfirmedControllerSpec extends SpecBase with MockitoSugar with Js
       verify(mockRenderer, times(1)).render(templateCaptor.capture(), jsonCaptor.capture())(any())
 
       val expectedJson = Json.obj(
-        "nextPage" -> "/register-for-cross-border-arrangements-frontend/register/business/with-id/type"
+        "nextPage" -> "/register-for-cross-border-arrangements-frontend/register/contact-name"
       )
 
       templateCaptor.getValue mustEqual "identityConfirmed.njk"
