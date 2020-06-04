@@ -18,9 +18,13 @@ package models
 
 import play.api.libs.json.{Json, OFormat}
 
-case class EnrolmentInfo (dac6UserID: String, businessName: Option[String], primaryContactName: String,
-                          primaryEmailAddress: String, primaryTelephoneNumber: Option[String],
-                          secondaryContactName: Option[String], secondaryEmailAddress: Option[String],
+case class EnrolmentInfo (dac6UserID: String,
+                          businessName: Option[String],
+                          primaryContactName: String,
+                          primaryEmailAddress: String,
+                          primaryTelephoneNumber: Option[String],
+                          secondaryContactName: Option[String],
+                          secondaryEmailAddress: Option[String],
                           secondaryTelephoneNumber: Option[String]
                           )
 
