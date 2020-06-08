@@ -35,8 +35,13 @@ phaseBanner.1 = This is a new service – your
 phaseBanner.2 = feedback
 phaseBanner.3 = will help us to improve it.
 
-checkYourAnswers.title = Check your answers
-checkYourAnswers.heading = Check your answers
+checkYourAnswers.title = Check your answers before you register
+checkYourAnswers.heading = Check your answers before you register
+checkYourAnswers.businessDetails.h2 = Business details
+checkYourAnswers.contactDetails.h2 = Contact details
+checkYourAnswers.information.h2 = Now send your registration
+checkYourAnswers.information.p = By submitting this notification you are confirming that, to the best of your knowledge, the details you are providing are correct.
+checkYourAnswers.button = Confirm and send
 
 index.title = register-for-cross-border-arrangements-frontend
 index.heading = register-for-cross-border-arrangements-frontend
@@ -331,6 +336,7 @@ businessName.registered.error.invalid = Registered name of your business must on
 businessName.question.partnership = the partnership name
 businessName.question.limited = the registered name of your business
 businessName.question.unincorporated = the name of your organisation
+businessNamePage.checkYourAnswersLabel = Your business
 
 soleTraderName.title = What is your name?
 soleTraderName.heading = What is your name?
@@ -400,7 +406,7 @@ contactEmailAddress.individual.heading = What is your email address?
 contactEmailAddress.business.title = What is their email address?
 contactEmailAddress.business.heading = What is {0}’s email address?
 contactEmailAddress.hint = We will use this email address to send confirmation of your disclosures.
-contactEmailAddress.checkYourAnswersLabel = What is {0} email address?
+contactEmailAddress.checkYourAnswersLabel = What is the email address?
 contactEmailAddress.error.required = Enter an email address
 contactEmailAddress.error.length = Enter an email address that is 254 characters or less
 contactEmailAddress.error.email.invalid = Enter an email address in the correct format, like name@example.com
@@ -423,7 +429,7 @@ contactTelephoneNumber.error.invalid = Enter a telephone number, like 01632 960 
 
 haveSecondContact.title = Is there someone else we can contact if this person is not available?
 haveSecondContact.heading = Is there someone else we can contact if {0} is not available?
-haveSecondContact.checkYourAnswersLabel = Is there someone else we can contact if {0} is not available?
+haveSecondContact.checkYourAnswersLabel = Is there someone else we can contact if the contact is not available?
 haveSecondContact.error.required = Select yes if there is someone else we can contact?
 
 secondaryContactName.title = What is the name of the individual or team we should contact?
