@@ -154,7 +154,7 @@ class CheckYourAnswersHelper(userAnswers: UserAnswers) {
     answer =>
       Row(
         key     = Key(msg"contactName.checkYourAnswersLabel", classes = Seq("govuk-!-width-one-half")),
-        value   = Value(lit"$answer"),
+        value   = Value(lit"${answer.firstName} ${answer.secondName}"),
         actions = List(
           Action(
             content            = msg"site.edit",
@@ -184,7 +184,14 @@ class CheckYourAnswersHelper(userAnswers: UserAnswers) {
     answer =>
       Row(
         key     = Key(msg"businessAddress.checkYourAnswersLabel", classes = Seq("govuk-!-width-one-half")),
-        value   = Value(lit"$answer"),
+        value   = Value(
+          lit"""${answer.addressLine1}\n
+                ${answer.addressLine2}\n
+                ${answer.addressLine3.getOrElse("")}\n
+                ${answer.addressLine4.getOrElse("")}\n
+                ${answer.postCode.getOrElse("")}\n
+                ${answer.country.description}\n
+                """), //TODO Postcode not being displayed - always None.
         actions = List(
           Action(
             content            = msg"site.edit",
@@ -340,7 +347,7 @@ class CheckYourAnswersHelper(userAnswers: UserAnswers) {
     answer =>
       Row(
         key = Key(msg"name.checkYourAnswersLabel", classes = Seq("govuk-!-width-one-half")),
-        value = Value(lit"$answer"),
+        value = Value(lit"${answer.firstName} ${answer.secondName}"),
         actions = List(
           Action(
             content = msg"site.edit",
