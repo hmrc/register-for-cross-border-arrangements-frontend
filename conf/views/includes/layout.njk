@@ -1,4 +1,6 @@
 {% extends "govuk/template.njk" %}
+
+{% from "hmrc/components/header/macro.njk"     import hmrcHeader %}
 {%- set assetPath = "/assets/lib/govuk-frontend/govuk/assets" -%}
 {%- set htmlLang = request.language -%}
 
@@ -11,19 +13,17 @@
       {{ messages("phaseBanner.1") }} <a class="govuk-link" href="{{ config.betaFeedbackUnauthenticatedUrl }}">{{ messages("phaseBanner.2") }}</a> {{ messages("phaseBanner.3") }}
   {% endmacro %}
 
-  {{ govukHeader({
+  {{ hmrcHeader({
     homepageUrl: "https://www.gov.uk",
     serviceName: messages("site.service_name"),
     serviceUrl: "/register-for-cross-border-arrangements",
     containerClasses: "govuk-width-container",
     assetsPath: "/assets",
+    signOut: "true",
     phaseBanner: {
       show: true,
       text: 'alpha',
       html: phaseBanner()
-    },
-    languageToggle: {
-      inBody: true
     },
     signOutHref: config.signOutUrl
   }) }}
