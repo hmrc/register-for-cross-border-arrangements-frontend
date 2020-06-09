@@ -37,6 +37,7 @@ phaseBanner.3 = will help us to improve it.
 
 checkYourAnswers.title = Check your answers before you register
 checkYourAnswers.heading = Check your answers before you register
+checkYourAnswers.individual.h2 = Your details
 checkYourAnswers.businessDetails.h2 = Business details
 checkYourAnswers.contactDetails.h2 = Contact details
 checkYourAnswers.information.h2 = Now send your registration
@@ -139,19 +140,19 @@ compliant.nine.p3=This page was prepared on [date when it was first published]. 
 ## registration type page
 registrationType.title = What are you registering as?
 registrationType.heading = What are you registering as?
-registrationType.business =  A business (company, org???)
+registrationType.business = A business
 registrationType.business.guidance = [guidance to say employees should select this??]
 registrationType.individual = An individual
 registrationType.individual.guidance = [guidance about personal tax]
 registrationType.agent = An agent, reporting on behalf of individuals or businesses.
-registrationType.checkYourAnswersLabel = What are you registering as?
+registrationType.checkYourAnswersLabel = Registering as
 registrationType.error.required = Select what you are registering as?
 
 ## UTR page
 doYouHaveUTR.title =  Do you have a UK Unique Taxpayer Reference (UTR)?
 doYouHaveUTR.heading = Do you have a UK Unique Taxpayer Reference (UTR)?
 doYouHaveUTR.guidance = [guidance]
-doYouHaveUTR.checkYourAnswersLabel = Do you have a UK Unique Taxpayer Reference (UTR)?
+doYouHaveUTR.checkYourAnswersLabel = Do you have UK Unique Taxpayer Reference?
 doYouHaveUTR.error.required = Select yes if have a UK Unique Taxpayer Reference (UTR)
 
 doYouHaveANationalInsuranceNumber.title = Do you have a National Insurance number?
@@ -178,7 +179,7 @@ name.error.secondName.length = Second name must be 50 characters or less
 dateOfBirth.title = What is your date of birth?
 dateOfBirth.heading = What is your date of birth?
 dateOfBirth.hint = For example, 12 11 2007
-dateOfBirth.checkYourAnswersLabel = Date Of Birth
+dateOfBirth.checkYourAnswersLabel = Your date of birth
 dateOfBirth.error.required.all = Enter your date Of birth
 dateOfBirth.error.required.two = Date of birth must include {0} and {1}
 dateOfBirth.error.required = Date of birth must include {0}
@@ -225,14 +226,14 @@ doYouHaveANationalInsuranceNumber.error.required = Select yes if have a National
 
 nino.title = What is your National Insurance number?
 nino.heading = What is your National Insurance number?
-nino.checkYourAnswersLabel = What is your National Insurance number?
+nino.checkYourAnswersLabel = Your National Insurance number
 nino.error.required = Enter National Insurance number
 nino.error.length = Nino must be 9 characters or less
 
 
 name.title = What is your name?
 name.heading = What is your name?
-name.checkYourAnswersLabel = What is your name?
+name.checkYourAnswersLabel = Your name
 name.firstName = First name
 name.secondName = Second name
 name.error.firstName.required = Enter your first name
@@ -248,7 +249,7 @@ nonUkName.title = What is your name?
 nonUkName.heading = What is your name?
 nonUkName.firstName = Given name
 nonUkName.secondName = Family name
-nonUkName.checkYourAnswersLabel = What is your name?
+nonUkName.checkYourAnswersLabel = Your name
 nonUkName.error.firstName.required = Enter Given name
 nonUkName.error.secondName.required = Enter Family name
 nonUkName.error.firstName.length = Given name must be 50 characters or less
@@ -294,7 +295,7 @@ businessAddress.addressLine4 = Address line 4 (optional)
 businessAddress.postCode = Postal code (optional)
 businessAddress.countryCode = Country
 
-businessAddress.checkYourAnswersLabel = What is the main address of your business?
+businessAddress.checkYourAnswersLabel = Main business address
 businessAddress.error.addressLine1.required = Enter address line 1
 businessAddress.error.addressLine2.required = Enter address line 2
 businessAddress.error.country.required = Select country
@@ -306,7 +307,7 @@ businessAddress.error.postcode.length = Postcode must be 10 characters or less
 
 businessWithoutIDName.title = What is the name of your business?
 businessWithoutIDName.heading = What is the name of your business?
-businessWithoutIDName.checkYourAnswersLabel = What is the name of your business?
+businessWithoutIDName.checkYourAnswersLabel = Legal name of business
 businessWithoutIDName.error.businessName.required = Enter the name of your business
 businessWithoutIDName.error.businessName.length = Business name must be 105 characters or less
 businessWithoutIDName.error.businessName.invalid = Business name must only include letters a to z, numbers 0-9, spaces, apostrophes, &, \ and /
@@ -372,7 +373,7 @@ whatIsYourUkAddress.addressLine4 = Address line 4 (optional)
 whatIsYourUkAddress.postCode = Postcode
 whatIsYourUkAddress.countryCode = Country
 
-whatIsYourUkAddress.checkYourAnswersLabel = What is your home address?
+whatIsYourUkAddress.checkYourAnswersLabel = Your home address
 whatIsYourUkAddress.error.addressLine1.required = Enter address line 1
 whatIsYourUkAddress.error.addressLine2.required = Enter address line 2
 whatIsYourUkAddress.error.country.required = Select country
@@ -386,14 +387,14 @@ whatIsYourUkAddress.error.postcode.invalid = Enter a postcode, like AA1 1AA
 
 confirmBusiness.title = Is this your business?
 confirmBusiness.heading = Is this your business?
-confirmBusiness.checkYourAnswersLabel = Is this your business?
+confirmBusiness.checkYourAnswersLabel = Your business
 confirmBusiness.error.required = Select yes if this is your business
 
 contactName.title = Who should we contact if we have any questions about your disclosures?
 contactName.heading = Who should we contact if we have any questions about your disclosures?
 contactName.firstName = First name
 contactName.lastName = Last name
-contactName.checkYourAnswersLabel = Who should we contact if we have any questions about your disclosures?
+contactName.checkYourAnswersLabel = Contact name
 contactName.error.required.firstName = Enter the first name of the person we should contact if we have any questions about your disclosures
 contactName.error.length.firstName = First name must be 35 characters or less
 contactName.error.invalid.firstName = First name must only include letters a to z, apostrophes, slashes, ampersands and spaces
@@ -406,7 +407,7 @@ contactEmailAddress.individual.heading = What is your email address?
 contactEmailAddress.business.title = What is their email address?
 contactEmailAddress.business.heading = What is {0}’s email address?
 contactEmailAddress.hint = We will use this email address to send confirmation of your disclosures.
-contactEmailAddress.checkYourAnswersLabel = What is the email address?
+contactEmailAddress.checkYourAnswersLabel = Email address
 contactEmailAddress.error.required = Enter an email address
 contactEmailAddress.error.length = Enter an email address that is 254 characters or less
 contactEmailAddress.error.email.invalid = Enter an email address in the correct format, like name@example.com
@@ -415,26 +416,26 @@ telephoneNumberQuestion.business.title = Do they have a telephone number?
 telephoneNumberQuestion.business.heading = Does {0} have a telephone number?
 telephoneNumberQuestion.individual.title = Do you have a telephone number?
 telephoneNumberQuestion.individual.heading = Do you have a telephone number?
-telephoneNumberQuestion.checkYourAnswersLabel = Do you have a telephone number?
+telephoneNumberQuestion.checkYourAnswersLabel = Do they have a telephone number?
 telephoneNumberQuestion.error.required = Select yes if there is a telephone number
 
 contactTelephoneNumber.individual.title = What is your telephone number?
 contactTelephoneNumber.individual.heading = What is your telephone number?
 contactTelephoneNumber.business.title = What is their telephone number?
 contactTelephoneNumber.business.heading = What is {0}’s telephone number?
-contactTelephoneNumber.checkYourAnswersLabel = What is this person’s telephone number?
+contactTelephoneNumber.checkYourAnswersLabel = Telephone number
 contactTelephoneNumber.hint = For international numbers include the country code.
 contactTelephoneNumber.error.required = Enter a telephone number
 contactTelephoneNumber.error.invalid = Enter a telephone number, like 01632 960 001, 07700 900 982 or +44 0808 157 0192
 
 haveSecondContact.title = Is there someone else we can contact if this person is not available?
 haveSecondContact.heading = Is there someone else we can contact if {0} is not available?
-haveSecondContact.checkYourAnswersLabel = Is there someone else we can contact if the contact is not available?
+haveSecondContact.checkYourAnswersLabel = Do you have an additional contact?
 haveSecondContact.error.required = Select yes if there is someone else we can contact?
 
 secondaryContactName.title = What is the name of the individual or team we should contact?
 secondaryContactName.heading = What is the name of the individual or team we should contact?
-secondaryContactName.checkYourAnswersLabel = What is the name of the individual or team we should contact?
+secondaryContactName.checkYourAnswersLabel = Additional contact name
 secondaryContactName.hint = For example, ‘DAC6 team’ or ‘Ashley Smith’.
 secondaryContactName.error.required = Enter the name of the individual or team we should contact
 secondaryContactName.error.invalid = Name of the individual or team must only include letters a to z, numbers 0-9, apostrophes, commas, dashes, hyphens, quotation marks, slashes, ampersands and spaces
@@ -445,14 +446,13 @@ secondaryContactPreference.heading = How can we contact {0}?
 secondaryContactPreference.hint = Select all that apply.
 secondaryContactPreference.email = Email
 secondaryContactPreference.telephone = Telephone
-secondaryContactPreference.checkYourAnswersLabel = How can we contact them?
-secondaryContactPreference.checkYourAnswersLabel = How can we contact them?
+secondaryContactPreference.checkYourAnswersLabel = Contact preferences
 secondaryContactPreference.error.required = Select how we can contact them
 
 secondaryContactEmailAddress.title = What is the email address for your second contact?
 secondaryContactEmailAddress.heading = What is the email address for {0}?
 secondaryContactEmailAddress.hint = We will use this email address to send confirmation of your disclosures.
-secondaryContactEmailAddress.checkYourAnswersLabel = What is the email address for {0}?
+secondaryContactEmailAddress.checkYourAnswersLabel = Additional contact email address
 secondaryContactEmailAddress.error.required = Enter an email address
 secondaryContactEmailAddress.error.length = Email address must be 254 characters or less
 secondaryContactEmailAddress.error.email.invalid = Enter an email address in the correct format, like name@example.com
