@@ -47,7 +47,7 @@ class CheckYourAnswersHelper(userAnswers: UserAnswers) {
     answer =>
       Row(
         key     = Key(msg"secondaryContactPreference.checkYourAnswersLabel", classes = Seq("govuk-!-width-one-half")),
-        value   = Value(Html(answer.map(a => msg"secondaryContactPreference.$a").mkString(",<br>"))),
+        value   = Value(Html(answer.map(_.toString.capitalize).mkString(" and "))),
         actions = List(
           Action(
             content            = msg"site.edit",
@@ -92,8 +92,17 @@ class CheckYourAnswersHelper(userAnswers: UserAnswers) {
   def whatIsYourAddressUk: Option[Row] = userAnswers.get(WhatIsYourAddressUkPage) map {
     answer =>
       Row(
-        key     = Key(msg"whatIsYourAddressUk.checkYourAnswersLabel", classes = Seq("govuk-!-width-one-half")),
-        value   = Value(lit"$answer.lines"),
+        key     = Key(msg"whatIsYourUkAddress.checkYourAnswersLabel", classes = Seq("govuk-!-width-one-half")),
+        value   = Value(
+          Html(s"""
+              ${answer.addressLine1}<br>
+              ${answer.addressLine2}<br>
+              ${answer.addressLine3.fold("")(address => s"$address<br>")}
+              ${answer.addressLine4.fold("")(address => s"$address<br>")}
+              ${answer.postCode.fold("")(postcode => s"$postcode<br>")}
+              ${answer.country.description}
+              """)
+        ),
         actions = List(
           Action(
             content            = msg"site.edit",
@@ -137,9 +146,22 @@ class CheckYourAnswersHelper(userAnswers: UserAnswers) {
 
   def confirmBusiness: Option[Row] = userAnswers.get(ConfirmBusinessPage) map {
     answer =>
+      val businessName = userAnswers.get(RetrievedNamePage).get
+      val address = userAnswers.get(BusinessAddressPage).get
+
       Row(
         key     = Key(msg"confirmBusiness.checkYourAnswersLabel", classes = Seq("govuk-!-width-one-half")),
-        value   = Value(yesOrNo(answer)),
+        value   = Value(
+          Html(s"""
+              $businessName<br><br>
+              ${address.addressLine1}<br>
+              ${address.addressLine2}<br>
+              ${address.addressLine3.fold("")(address => s"$address<br>")}
+              ${address.addressLine4.fold("")(address => s"$address<br>")}
+              ${address.postCode.fold("")(postcode => s"$postcode<br>")}
+              ${address.country.description}
+              """)
+        ),
         actions = List(
           Action(
             content            = msg"site.edit",
@@ -185,13 +207,13 @@ class CheckYourAnswersHelper(userAnswers: UserAnswers) {
       Row(
         key     = Key(msg"businessAddress.checkYourAnswersLabel", classes = Seq("govuk-!-width-one-half")),
         value   = Value(
-          lit"""${answer.addressLine1}\n
-                ${answer.addressLine2}\n
-                ${answer.addressLine3.getOrElse("")}\n
-                ${answer.addressLine4.getOrElse("")}\n
-                ${answer.postCode.getOrElse("")}\n
-                ${answer.country.description}\n
-                """), //TODO Postcode not being displayed - always None.
+          Html(s"""${answer.addressLine1}<br>
+                ${answer.addressLine2}<br>
+                ${answer.addressLine3.fold("")(address => s"$address<br>")}
+                ${answer.addressLine4.fold("")(address => s"$address<br>")}
+                ${answer.postCode.fold("")(postcode => s"$postcode<br>")}
+                ${answer.country.description}
+                """)), //TODO Postcode not being displayed - always None.
         actions = List(
           Action(
             content            = msg"site.edit",
@@ -260,7 +282,16 @@ class CheckYourAnswersHelper(userAnswers: UserAnswers) {
     answer =>
       Row(
         key     = Key(msg"whatIsYourAddress.checkYourAnswersLabel", classes = Seq("govuk-!-width-one-half")),
-        value   = Value(lit"${answer.lines}"),
+        value   = Value(
+          Html(s"""
+              ${answer.addressLine1}<br>
+              ${answer.addressLine2}<br>
+              ${answer.addressLine3.fold("")(address => s"$address<br>")}
+              ${answer.addressLine4.fold("")(address => s"$address<br>")}
+              ${answer.postCode.fold("")(postcode => s"$postcode<br>")}
+              ${answer.country.description}
+              """)
+        ),
         actions = List(
           Action(
             content            = msg"site.edit",

@@ -18,7 +18,7 @@ package controllers
 
 import com.google.inject.Inject
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
-import models.UserAnswers
+import helpers.JourneyHelpers._
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -40,23 +40,29 @@ class CheckYourAnswersController @Inject()(
 
   def onPageLoad(): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
+      val helper = new CheckYourAnswersHelper(request.userAnswers)
 
-      val answers: Seq[SummaryList.Row] = buildBusinessDetails(request.userAnswers)
-      val other: Seq[SummaryList.Row] = buildContactDetails(request.userAnswers)
+      val businessDetails: Seq[SummaryList.Row] = buildDetails(helper)
+      val contactDetails: Seq[SummaryList.Row] = buildContactDetails(helper)
+
+      val header: String = if (isOrganisationJourney(request.userAnswers)) {
+        "checkYourAnswers.businessDetails.h2"
+      } else {
+        "checkYourAnswers.individual.h2"
+      }
 
       renderer.render(
         "check-your-answers.njk",
         Json.obj(
-          "businessDetailsList" -> answers,
-          "contactDetailsList" -> other,
+          "header" -> header,
+          "businessDetailsList" -> businessDetails,
+          "contactDetailsList" -> contactDetails,
         )
       ).map(Ok(_))
   }
 
-  private def buildBusinessDetails(ua: UserAnswers) = {
-    val helper = new CheckYourAnswersHelper(ua)
+  private def buildDetails(helper: CheckYourAnswersHelper): Seq[SummaryList.Row] = {
 
-    //Business with ID, Individual with ID, Business without ID, Individual without ID and all scenarios
     val pagesToCheck = Tuple4(
       helper.businessType,
       helper.nino,
@@ -64,30 +70,37 @@ class CheckYourAnswersController @Inject()(
       helper.nonUkName
     )
 
+//TODO Fix conditions for sole trader business type. Needs to go to individual with ID?
+
     pagesToCheck match {
       case (Some(_), None, None, None) =>
         //Business with ID
         Seq(
-          helper.businessType,
-          helper.doYouHaveUTR,
-          helper.businessNamePage
+          helper.confirmBusiness
         ).flatten
       case (None, Some(_), None, None) =>
         //Individual with ID
         Seq(
+          helper.doYouHaveUTR,
+          helper.doYouHaveANationalInsuranceNumber,
           helper.nino,
           helper.namePage,
           helper.dateOfBirth
         ).flatten
       case (None, None, Some(_), None) =>
         //Business without ID
+        println("\n\n33333333333\n\n")
         Seq(
+          helper.doYouHaveUTR,
+          helper.registrationType,
           helper.businessWithoutIDName,
           helper.businessAddress
         ).flatten
       case (None, None, None, Some(_)) =>
         //Individual without ID
         Seq(
+          helper.doYouHaveUTR,
+          helper.doYouHaveANationalInsuranceNumber,
           helper.nonUkName,
           helper.dateOfBirth,
           helper.doYouLiveInTheUK,
@@ -95,53 +108,40 @@ class CheckYourAnswersController @Inject()(
           helper.whatIsYourAddress,
           helper.whatIsYourAddressUk
         ).flatten
-      case _ => ???
+      case _ =>
+        //All pages
+        Seq(
+          helper.businessType,
+          helper.doYouHaveUTR,
+          helper.confirmBusiness,
+          helper.nino,
+          helper.namePage,
+          helper.dateOfBirth,
+          helper.registrationType,
+          helper.businessWithoutIDName,
+          helper.businessAddress,
+          helper.doYouHaveANationalInsuranceNumber,
+          helper.nonUkName,
+          helper.dateOfBirth,
+          helper.doYouLiveInTheUK,
+          helper.individualUKPostcode,
+          helper.whatIsYourAddress,
+          helper.whatIsYourAddressUk
+        ).flatten
     }
 
   }
 
-  private def buildContactDetails(ua: UserAnswers) = {
-    val helper = new CheckYourAnswersHelper(ua)
-
-    val pagesToCheck = Tuple3(
+  private def buildContactDetails(helper: CheckYourAnswersHelper): Seq[SummaryList.Row] = {
+    Seq(
       helper.contactName,
       helper.contactEmailAddress,
-      helper.haveSecondContact
-    )
-
-    pagesToCheck match {
-      case (Some(_), _, None) =>
-        //Business. No second contact
-        Seq(
-          helper.contactName,
-          helper.contactEmailAddress,
-          helper.telephoneNumberQuestion,
-          helper.contactTelephoneNumber,
-          helper.haveSecondContact
-        ).flatten
-      case (None, Some(_), None) =>
-        //Individual. No second contact
-        Seq(
-          helper.contactEmailAddress,
-          helper.telephoneNumberQuestion,
-          helper.contactTelephoneNumber,
-          helper.haveSecondContact
-        ).flatten
-      case (_, _, Some(_)) =>
-        //TODO Split into two for individual and business?
-        //Have second contact
-        Seq(
-          helper.contactName,
-          helper.contactEmailAddress,
-          helper.telephoneNumberQuestion,
-          helper.contactTelephoneNumber,
-          helper.haveSecondContact,
-          helper.secondaryContactName
-        ).flatten
-      case _ =>
-        println("\n\n_______Here_______\n\n\n")
-        ???
-    }
-
+      helper.telephoneNumberQuestion,
+      helper.contactTelephoneNumber,
+      helper.haveSecondContact,
+      helper.secondaryContactName,
+      helper.secondaryContactPreference,
+      helper.secondaryContactEmailAddress
+    ).flatten
   }
 }
