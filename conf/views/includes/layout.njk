@@ -1,6 +1,6 @@
 {% extends "govuk/template.njk" %}
-
 {% from "hmrc/components/header/macro.njk"     import hmrcHeader %}
+
 {%- set assetPath = "/assets/lib/govuk-frontend/govuk/assets" -%}
 {%- set htmlLang = request.language -%}
 
@@ -19,15 +19,13 @@
     serviceUrl: "/register-for-cross-border-arrangements",
     containerClasses: "govuk-width-container",
     assetsPath: "/assets",
-    signOut: "true",
     phaseBanner: {
       show: true,
       text: 'alpha',
       html: phaseBanner()
     },
-    signOutHref: config.signOutUrl
+    signOutHref: routes.controllers.SignOutController.signOut().url
   }) }}
-
 {% endblock %}
 
 {% block beforeContent %}

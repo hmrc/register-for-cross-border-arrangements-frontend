@@ -61,6 +61,7 @@ trait SpecBase extends FreeSpec
   def fakeRequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest("", "")
 
   val mockRenderer: NunjucksRenderer = mock[NunjucksRenderer]
+  val mockAppConfig: FrontendAppConfig = mock[FrontendAppConfig]
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
 
