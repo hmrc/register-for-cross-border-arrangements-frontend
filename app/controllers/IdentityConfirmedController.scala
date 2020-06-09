@@ -41,9 +41,9 @@ class IdentityConfirmedController @Inject()(
     implicit request =>
 
       val nextPage: String = request.userAnswers.get(BusinessTypePage) match {
-        case Some(businessType) if businessType.equals(BusinessType.NotSpecified)=> routes.NinoController.onPageLoad(NormalMode).url //TODO Go to /register/email once page is ready
+        case Some(businessType) if businessType.equals(BusinessType.NotSpecified)=> routes.ContactEmailAddressController.onPageLoad(NormalMode).url
         case Some(_) => routes.ContactNameController.onPageLoad(NormalMode).url
-        case None => routes.NinoController.onPageLoad(NormalMode).url //TODO Go to /register/email once page is ready
+        case None => routes.ContactEmailAddressController.onPageLoad(NormalMode).url
       }
 
       val json = Json.obj(

@@ -91,7 +91,7 @@ class SecondaryContactPreferenceController @Inject()(
             updatedAnswers <- Future.fromTry(request.userAnswers.set(SecondaryContactPreferencePage, value))
             _              <- sessionRepository.set(updatedAnswers)
           } yield
-            Redirect(navigator.nextPage(SecondaryContactPreferencePage, mode, updatedAnswers)) //TODO redirect to telephone or email page depending
+            Redirect(navigator.nextPage(SecondaryContactPreferencePage, mode, updatedAnswers))
       )
   }
 }
