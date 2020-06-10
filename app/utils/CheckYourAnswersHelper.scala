@@ -19,7 +19,7 @@ package utils
 import java.time.format.DateTimeFormatter
 
 import controllers.routes
-import models.{BusinessType, CheckMode, UserAnswers}
+import models.{Address, BusinessType, CheckMode, UserAnswers}
 import pages._
 import uk.gov.hmrc.viewmodels.SummaryList._
 import uk.gov.hmrc.viewmodels.Text.Literal
@@ -93,16 +93,7 @@ class CheckYourAnswersHelper(userAnswers: UserAnswers) {
     answer =>
       Row(
         key     = Key(msg"whatIsYourUkAddress.checkYourAnswersLabel", classes = Seq("govuk-!-width-one-half")),
-        value   = Value(
-          Html(s"""
-              ${answer.addressLine1}<br>
-              ${answer.addressLine2}<br>
-              ${answer.addressLine3.fold("")(address => s"$address<br>")}
-              ${answer.addressLine4.fold("")(address => s"$address<br>")}
-              ${answer.postCode.fold("")(postcode => s"$postcode<br>")}
-              ${answer.country.description}
-              """)
-        ),
+        value   = Value(formatAddress(answer)),
         actions = List(
           Action(
             content            = msg"site.edit",
@@ -206,14 +197,7 @@ class CheckYourAnswersHelper(userAnswers: UserAnswers) {
     answer =>
       Row(
         key     = Key(msg"businessAddress.checkYourAnswersLabel", classes = Seq("govuk-!-width-one-half")),
-        value   = Value(
-          Html(s"""${answer.addressLine1}<br>
-                ${answer.addressLine2}<br>
-                ${answer.addressLine3.fold("")(address => s"$address<br>")}
-                ${answer.addressLine4.fold("")(address => s"$address<br>")}
-                ${answer.postCode.fold("")(postcode => s"$postcode<br>")}
-                ${answer.country.description}
-                """)), //TODO Postcode not being displayed - always None.
+        value   = Value(formatAddress(answer)), //TODO Postcode not being displayed - always None.
         actions = List(
           Action(
             content            = msg"site.edit",
@@ -282,16 +266,7 @@ class CheckYourAnswersHelper(userAnswers: UserAnswers) {
     answer =>
       Row(
         key     = Key(msg"whatIsYourAddress.checkYourAnswersLabel", classes = Seq("govuk-!-width-one-half")),
-        value   = Value(
-          Html(s"""
-              ${answer.addressLine1}<br>
-              ${answer.addressLine2}<br>
-              ${answer.addressLine3.fold("")(address => s"$address<br>")}
-              ${answer.addressLine4.fold("")(address => s"$address<br>")}
-              ${answer.postCode.fold("")(postcode => s"$postcode<br>")}
-              ${answer.country.description}
-              """)
-        ),
+        value   = Value(formatAddress(answer)),
         actions = List(
           Action(
             content            = msg"site.edit",
@@ -485,6 +460,17 @@ class CheckYourAnswersHelper(userAnswers: UserAnswers) {
     } else {
       msg"site.no"
     }
+
+  private def formatAddress(answer: Address): Html = {
+    Html(s"""
+        ${answer.addressLine1}<br>
+        ${answer.addressLine2}<br>
+        ${answer.addressLine3.fold("")(address => s"$address<br>")}
+        ${answer.addressLine4.fold("")(address => s"$address<br>")}
+        ${answer.postCode.fold("")(postcode => s"$postcode<br>")}
+        ${answer.country.description}
+     """)
+  }
 }
 
 object CheckYourAnswersHelper {

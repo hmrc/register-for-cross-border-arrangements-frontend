@@ -17,9 +17,9 @@
 package helpers
 
 import base.SpecBase
-import models.{BusinessType, UserAnswers}
-import pages.BusinessTypePage
 import helpers.JourneyHelpers._
+import models.{BusinessType, RegistrationType, UserAnswers}
+import pages.{BusinessTypePage, RegistrationTypePage}
 
 class JourneyHelpersSpec extends SpecBase {
 
@@ -37,9 +37,31 @@ class JourneyHelpersSpec extends SpecBase {
         result mustBe true
       }
 
+      "must return true if it's an organisation is registering" in {
+        val userAnswers = UserAnswers(userAnswersId)
+          .set(RegistrationTypePage, RegistrationType.Business)
+          .success
+          .value
+
+        val result = isOrganisationJourney(userAnswers)
+
+        result mustBe true
+      }
+
       "must return false if business type is sole trader" in {
         val userAnswers = UserAnswers(userAnswersId)
           .set(BusinessTypePage, BusinessType.NotSpecified)
+          .success
+          .value
+
+        val result = isOrganisationJourney(userAnswers)
+
+        result mustBe false
+      }
+
+      "must return false if it's an individual is registering" in {
+        val userAnswers = UserAnswers(userAnswersId)
+          .set(RegistrationTypePage, RegistrationType.Individual)
           .success
           .value
 
