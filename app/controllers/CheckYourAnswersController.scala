@@ -40,12 +40,13 @@ class CheckYourAnswersController @Inject()(
 
   def onPageLoad(): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
-      val helper = new CheckYourAnswersHelper(request.userAnswers)
 
-      val businessDetails: Seq[SummaryList.Row] = buildDetails(helper)
+      val helper = new CheckYourAnswersHelper(request.userAnswers)
+      val isOrganisation: Boolean = isOrganisationJourney(request.userAnswers)
+      val businessDetails: Seq[SummaryList.Row] = buildDetails(helper, isOrganisation)
       val contactDetails: Seq[SummaryList.Row] = buildContactDetails(helper)
 
-      val header: String = if (isOrganisationJourney(request.userAnswers)) {
+      val header: String = if (isOrganisation) {
         "checkYourAnswers.businessDetails.h2"
       } else {
         "checkYourAnswers.individual.h2"
@@ -61,7 +62,7 @@ class CheckYourAnswersController @Inject()(
       ).map(Ok(_))
   }
 
-  private def buildDetails(helper: CheckYourAnswersHelper): Seq[SummaryList.Row] = {
+  private def buildDetails(helper: CheckYourAnswersHelper, isOrganisation: Boolean): Seq[SummaryList.Row] = {
 
     val pagesToCheck = Tuple4(
       helper.businessType,
@@ -70,14 +71,20 @@ class CheckYourAnswersController @Inject()(
       helper.nonUkName
     )
 
-//TODO Fix conditions for sole trader business type. Needs to go to individual with ID?
-
     pagesToCheck match {
-      case (Some(_), None, None, None) =>
+      case (Some(_), None, None, None) if isOrganisation =>
         //Business with ID
         Seq(
           helper.confirmBusiness
         ).flatten
+
+        //TODO Fix once Sole trader journey is working
+//      case (Some(_), None, None, None) =>
+//        //Sole trader
+//        Seq(
+//          ???
+//        ).flatten
+
       case (None, Some(_), None, None) =>
         //Individual with ID
         Seq(
@@ -89,7 +96,6 @@ class CheckYourAnswersController @Inject()(
         ).flatten
       case (None, None, Some(_), None) =>
         //Business without ID
-        println("\n\n33333333333\n\n")
         Seq(
           helper.doYouHaveUTR,
           helper.registrationType,
@@ -104,8 +110,6 @@ class CheckYourAnswersController @Inject()(
           helper.nonUkName,
           helper.dateOfBirth,
           helper.doYouLiveInTheUK,
-          helper.individualUKPostcode,
-          helper.whatIsYourAddress,
           helper.whatIsYourAddressUk
         ).flatten
       case _ =>
