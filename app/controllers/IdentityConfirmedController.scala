@@ -41,7 +41,7 @@ class IdentityConfirmedController @Inject()(
     implicit request =>
 
       val nextPage: String = request.userAnswers.get(BusinessTypePage) match {
-        case Some(businessType) if businessType.equals(BusinessType.NotSpecified)=> routes.ContactEmailAddressController.onPageLoad(NormalMode).url
+        case Some(BusinessType.NotSpecified) => routes.ContactEmailAddressController.onPageLoad(NormalMode).url
         case Some(_) => routes.ContactNameController.onPageLoad(NormalMode).url
         case None => routes.ContactEmailAddressController.onPageLoad(NormalMode).url
       }
