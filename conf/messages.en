@@ -276,7 +276,7 @@ whatIsYourAddress.postCode = Postal code (optional)
 whatIsYourAddress.countryCode = Country
 
 
-whatIsYourAddress.checkYourAnswersLabel = What is your home address?
+whatIsYourAddress.checkYourAnswersLabel = Your home address
 whatIsYourAddress.error.addressLine1.required = Enter address line 1
 whatIsYourAddress.error.addressLine2.required = Enter address line 2
 whatIsYourAddress.error.country.required = Select a country

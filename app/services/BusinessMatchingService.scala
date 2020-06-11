@@ -18,7 +18,7 @@ package services
 
 import connectors.BusinessMatchingConnector
 import javax.inject.Inject
-import models.{BusinessAddress, BusinessDetails, BusinessMatchingSubmission, IndividualMatchingSubmission, UserAnswers}
+import models.{BusinessDetails, BusinessMatchingSubmission, IndividualMatchingSubmission, UserAnswers}
 import pages.{NinoPage, SelfAssessmentUTRPage}
 import play.api.http.Status._
 import play.api.libs.json.JsResult.Exception

@@ -45,9 +45,11 @@ class CheckYourAnswersHelper(userAnswers: UserAnswers) {
 
   def secondaryContactPreference: Option[Row] = userAnswers.get(SecondaryContactPreferencePage) map {
     answer =>
+      val formattedAnswer = answer.map(_.toString).mkString(" and ").capitalize
+
       Row(
         key     = Key(msg"secondaryContactPreference.checkYourAnswersLabel", classes = Seq("govuk-!-width-one-half")),
-        value   = Value(Html(answer.map(_.toString.capitalize).mkString(" and "))),
+        value   = Value(lit"$formattedAnswer"),
         actions = List(
           Action(
             content            = msg"site.edit",
@@ -197,7 +199,7 @@ class CheckYourAnswersHelper(userAnswers: UserAnswers) {
     answer =>
       Row(
         key     = Key(msg"businessAddress.checkYourAnswersLabel", classes = Seq("govuk-!-width-one-half")),
-        value   = Value(formatAddress(answer)), //TODO Postcode not being displayed - always None.
+        value   = Value(formatAddress(answer)),
         actions = List(
           Action(
             content            = msg"site.edit",
