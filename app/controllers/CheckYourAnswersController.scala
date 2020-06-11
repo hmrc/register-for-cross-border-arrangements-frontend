@@ -110,6 +110,7 @@ class CheckYourAnswersController @Inject()(
           helper.nonUkName,
           helper.dateOfBirth,
           helper.doYouLiveInTheUK,
+          helper.whatIsYourAddress,
           helper.whatIsYourAddressUk
         ).flatten
       case _ =>

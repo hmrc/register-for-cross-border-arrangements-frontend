@@ -8,11 +8,12 @@ GET        /language/:lang                                controllers.LanguageSw
 
 GET        /this-service-has-been-reset                   controllers.SessionExpiredController.onPageLoad
 
-GET        /check-your-answers                            controllers.CheckYourAnswersController.onPageLoad
 
 GET        /unauthorised                                  controllers.UnauthorisedController.onPageLoad
 
 GET        /accessibility-statement                       controllers.AccessibilityController.onPageLoad
+
+GET        /register/check-answers                        controllers.CheckYourAnswersController.onPageLoad
 
 GET        /register/what-are-you-registering-as        controllers.RegistrationTypeController.onPageLoad(mode: Mode = NormalMode)
 POST       /register/what-are-you-registering-as        controllers.RegistrationTypeController.onSubmit(mode: Mode = NormalMode)
