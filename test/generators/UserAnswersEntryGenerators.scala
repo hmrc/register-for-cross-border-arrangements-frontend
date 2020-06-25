@@ -28,6 +28,14 @@ import wolfendale.scalacheck.regexp.RegexpGen
 
 trait UserAnswersEntryGenerators extends PageGenerators with ModelGenerators {
 
+  implicit lazy val arbitrarySelectAddressUserAnswersEntry: Arbitrary[(SelectAddressPage.type, JsValue)] =
+    Arbitrary {
+      for {
+        page  <- arbitrary[SelectAddressPage.type]
+        value <- arbitrary[SelectAddress].map(Json.toJson(_))
+      } yield (page, value)
+    }
+
   self: Generators =>
 
   implicit lazy val arbitrarySecondaryContactEmailAddressUserAnswersEntry: Arbitrary[(SecondaryContactEmailAddressPage.type, JsValue)] =

@@ -25,6 +25,11 @@ import uk.gov.hmrc.domain.Nino
 
 trait ModelGenerators {
 
+  implicit lazy val arbitrarySelectAddress: Arbitrary[SelectAddress] =
+    Arbitrary {
+      Gen.oneOf(SelectAddress.values.toSeq)
+    }
+
   self: Generators =>
 
   val regime = "DACSIX"

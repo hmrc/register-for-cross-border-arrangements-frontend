@@ -41,6 +41,7 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   lazy val loginUrl: String = configuration.get[String]("urls.login")
   lazy val loginContinueUrl: String = configuration.get[String]("urls.loginContinue")
   lazy val businessMatchingUrl: String = s"${configuration.get[Service]("microservice.services.business-matching").baseUrl}${configuration.get[String]("microservice.services.business-matching.startUrl")}"
+  lazy val addressLookUpUrl: String = configuration.get[Service]("microservice.services.address-lookup").baseUrl
 
   //TODO: Correctly rename when available decided
   lazy val dacFrontendUrl: String = s"${configuration.get[Service]("microservice.services.dac-frontend").baseUrl}${configuration.get[String]("microservice.services.dac-frontend.startUrl")}"

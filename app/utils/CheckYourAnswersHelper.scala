@@ -28,6 +28,21 @@ import utils.CheckYourAnswersHelper._
 
 class CheckYourAnswersHelper(userAnswers: UserAnswers) {
 
+  def selectAddress: Option[Row] = userAnswers.get(SelectAddressPage) map {
+    answer =>
+      Row(
+        key     = Key(msg"selectAddress.checkYourAnswersLabel", classes = Seq("govuk-!-width-one-half")),
+        value   = Value(msg"selectAddress.$answer"),
+        actions = List(
+          Action(
+            content            = msg"site.edit",
+            href               = routes.SelectAddressController.onPageLoad(CheckMode).url,
+            visuallyHiddenText = Some(msg"site.edit.hidden".withArgs(msg"selectAddress.checkYourAnswersLabel"))
+          )
+        )
+      )
+  }
+
   def secondaryContactTelephoneNumber: Option[Row] = userAnswers.get(SecondaryContactTelephoneNumberPage) map {
     answer =>
       Row(

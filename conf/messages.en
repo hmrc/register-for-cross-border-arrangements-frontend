@@ -452,3 +452,12 @@ secondaryContactTelephoneNumber.hint = For international numbers include the cou
 secondaryContactTelephoneNumber.checkYourAnswersLabel = Additional contact telephone number
 secondaryContactTelephoneNumber.error.required = Enter a telephone number
 secondaryContactTelephoneNumber.error.invalid = Enter a telephone number, like 01632 960 001, 07700 900 982 or +44 0808 157 0192
+
+selectAddress.title = What is your address?
+selectAddress.heading = What is your address?
+selectAddress.address.1 = Address 1
+selectAddress.address.3 = Address 3
+selectAddress.checkYourAnswersLabel = What is your address?
+selectAddress.error.required = Select selectAddress
+selectAddress.hint.part1 = Select from the list or
+selectAddress.hint.part2 = enter your address manually
