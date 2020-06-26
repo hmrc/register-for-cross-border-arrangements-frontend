@@ -455,9 +455,7 @@ secondaryContactTelephoneNumber.error.invalid = Enter a telephone number, like 0
 
 selectAddress.title = What is your address?
 selectAddress.heading = What is your address?
-selectAddress.address.1 = Address 1
-selectAddress.address.3 = Address 3
 selectAddress.checkYourAnswersLabel = What is your address?
-selectAddress.error.required = Select selectAddress
+selectAddress.error.required = Select your address
 selectAddress.hint.part1 = Select from the list or
 selectAddress.hint.part2 = enter your address manually

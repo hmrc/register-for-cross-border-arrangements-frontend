@@ -19,11 +19,11 @@ package connectors
 import config.FrontendAppConfig
 import javax.inject.Inject
 import models.AddressLookup
-import uk.gov.hmrc.play.bootstrap.http.HttpClient
-import uk.gov.hmrc.http._
-import play.api.http.Status._
 import play.api.Logger
+import play.api.http.Status._
 import play.api.libs.json.Reads
+import uk.gov.hmrc.http._
+import uk.gov.hmrc.play.bootstrap.http.HttpClient
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -32,11 +32,9 @@ class AddressLookupConnector @Inject()(http: HttpClient, config: FrontendAppConf
   def addressLookupByPostcode(postCode: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Seq[AddressLookup]] = {
 
     val addressLookupUrl: String = s"${config.addressLookUpUrl}/v2/uk/addresses"
-//    val addressLookupUrl: String = s"${config.addressLookUpUrl}/v2/uk/addresses?postcode=$postCode"
-
     val urlParams = Seq ("postcode" -> postCode)
 
-//    implicit val reads: Reads[Seq[AddressLookup]] = AddressLookup.addressesLookupReads
+    implicit val reads: Reads[Seq[AddressLookup]] = AddressLookup.addressesLookupReads
 
     http.GET[HttpResponse](
       url = addressLookupUrl,
@@ -45,7 +43,8 @@ class AddressLookupConnector @Inject()(http: HttpClient, config: FrontendAppConf
     )(implicitly, implicitly, implicitly) flatMap {
       case response if response.status equals OK =>
         Future.successful(response.json.as[Seq[AddressLookup]].filterNot(address =>
-          address.lines.isEmpty && address.town.isEmpty && address.county.isEmpty && address.postcode.isEmpty)
+          address.addressLine1.isEmpty && address.addressLine2.isEmpty && address.addressLine3.isEmpty &&
+            address.addressLine4.isEmpty)
         )
       case response =>
         val message = s"Address Lookup failed with status ${response.status} Response body :${response.body}"

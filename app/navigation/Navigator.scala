@@ -58,7 +58,7 @@ class Navigator @Inject()() {
     case SecondaryContactEmailAddressPage => secondaryContactEmailRoutes(NormalMode)
     case SecondaryContactTelephoneNumberPage => _ => Some(routes.CheckYourAnswersController.onPageLoad())
     case PostCodePage => _ => Some(routes.SelectAddressController.onPageLoad(NormalMode))
-    case SelectAddressPage => _ => Some(routes.IndexController.onPageLoad())
+    case SelectAddressPage => _ => Some(routes.ContactEmailAddressController.onPageLoad(NormalMode))
     case _ => _ => Some(routes.IndexController.onPageLoad())
   }
 

@@ -16,16 +16,14 @@
 
 package forms
 
-import javax.inject.Inject
-
 import forms.mappings.Mappings
+import javax.inject.Inject
 import play.api.data.Form
-import models.SelectAddress
 
 class SelectAddressFormProvider @Inject() extends Mappings {
 
-  def apply(): Form[SelectAddress] =
+  def apply(): Form[String] =
     Form(
-      "value" -> enumerable[SelectAddress]("selectAddress.error.required")
+        "value" -> text("selectAddress.error.required")
     )
 }

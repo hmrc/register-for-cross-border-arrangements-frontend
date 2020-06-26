@@ -52,6 +52,9 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   lazy val languageTranslationEnabled: Boolean =
     configuration.get[Boolean]("microservice.services.features.welsh-translation")
 
+  //Toggles
+  lazy val addressLookupToggle: Boolean = configuration.get[String]("addressLookupToggle").toBoolean
+
   def languageMap: Map[String, Lang] = Map(
     "english" -> Lang("en"),
     "cymraeg" -> Lang("cy")
