@@ -24,7 +24,7 @@ import uk.gov.hmrc.viewmodels._
 sealed trait SelectAddress
 
 object SelectAddress extends Enumerable.Implicits {
-
+//TODO Delete since it is no longer being used
   case object Address1 extends WithName("address 1") with SelectAddress
   case object Address3 extends WithName("address 3") with SelectAddress
 

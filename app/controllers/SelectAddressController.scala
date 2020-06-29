@@ -23,7 +23,7 @@ import forms.SelectAddressFormProvider
 import javax.inject.Inject
 import models.{AddressLookup, Mode, NormalMode}
 import navigation.Navigator
-import pages.{PostCodePage, SelectAddressPage}
+import pages.{IndividualUKPostcodePage, SelectAddressPage}
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.libs.json.Json
@@ -54,45 +54,41 @@ class SelectAddressController @Inject()(
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
-    if (appConfig.addressLookupToggle) {
-      val postCode = request.userAnswers.get(PostCodePage) match {
-        case Some(postCode) => postCode.replaceAll(" ", "").toUpperCase
-        case None => ""
-      }
+    val postCode = request.userAnswers.get(IndividualUKPostcodePage) match {
+      case Some(postCode) => postCode.replaceAll(" ", "").toUpperCase
+      case None => ""
+    }
 
-      addressLookupConnector.addressLookupByPostcode(postCode) flatMap {
-        case Nil => Future.successful(Redirect(routes.IndexController.onPageLoad()))
-        case addresses =>
-          val preparedForm: Form[String] = request.userAnswers.get(SelectAddressPage) match {
-            case None => form
-            case Some(value) => form.fill(value)
-          }
+    addressLookupConnector.addressLookupByPostcode(postCode) flatMap {
+      case Nil => Future.successful(Redirect(routes.IndexController.onPageLoad()))
+      case addresses =>
+        val preparedForm: Form[String] = request.userAnswers.get(SelectAddressPage) match {
+          case None => form
+          case Some(value) => form.fill(value)
+        }
 
-          val addressItems: Seq[Radios.Radio] = addresses.map(address =>
-            Radios.Radio(label = msg"${formatAddress(address)}", value = s"${formatAddress(address)}")
-          )
+        val addressItems: Seq[Radios.Radio] = addresses.map(address =>
+          Radios.Radio(label = msg"${formatAddress(address)}", value = s"${formatAddress(address)}")
+        )
 
-          val radios = Radios(field = preparedForm("value"), items = addressItems)
+        val radios = Radios(field = preparedForm("value"), items = addressItems)
 
-          val json = Json.obj(
-            "form" -> preparedForm,
-            "mode" -> mode,
-            "manualAddressURL" -> manualAddressURL,
-            "radios" -> radios
-          )
+        val json = Json.obj(
+          "form" -> preparedForm,
+          "mode" -> mode,
+          "manualAddressURL" -> manualAddressURL,
+          "radios" -> radios
+        )
 
-          renderer.render("selectAddress.njk", json).map(Ok(_))
-        case _ => Future.successful(Redirect(routes.WhatIsYourAddressController.onPageLoad(NormalMode)))
-      }
-    } else {
-      Future.successful(Redirect(routes.WhatIsYourAddressController.onPageLoad(NormalMode)))
+        renderer.render("selectAddress.njk", json).map(Ok(_))
+      case _ => Future.successful(Redirect(routes.WhatIsYourAddressController.onPageLoad(NormalMode)))
     }
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
 
-      val postCode = request.userAnswers.get(PostCodePage) match {
+      val postCode = request.userAnswers.get(IndividualUKPostcodePage) match {
         case Some(postCode) => postCode.replaceAll(" ", "").toUpperCase
         case None => ""
       }

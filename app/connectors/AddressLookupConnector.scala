@@ -47,7 +47,7 @@ class AddressLookupConnector @Inject()(http: HttpClient, config: FrontendAppConf
             address.addressLine4.isEmpty)
         )
       case response =>
-        val message = s"Address Lookup failed with status ${response.status} Response body :${response.body}"
+        val message = s"Address Lookup failed with status ${response.status} Response body: ${response.body}"
         Future.failed(new HttpException(message, response.status))
     } recover {
       case e: Exception =>

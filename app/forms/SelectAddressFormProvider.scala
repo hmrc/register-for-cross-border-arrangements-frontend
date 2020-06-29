@@ -24,6 +24,6 @@ class SelectAddressFormProvider @Inject() extends Mappings {
 
   def apply(): Form[String] =
     Form(
-        "value" -> text("selectAddress.error.required")
+      "value" -> text("selectAddress.error.required")
     )
 }

@@ -499,7 +499,7 @@ class CheckModeNavigatorSpec extends SpecBase with ScalaCheckPropertyChecks with
     }
 
     "must go from Do you live in the UK? page to" - {
-      "What is your home address? when answer is 'Yes'" in {
+      "What is your postcode? when answer is 'Yes'" in {
         forAll(arbitrary[UserAnswers]) {
           answers =>
             val updatedAnswers =
@@ -510,7 +510,7 @@ class CheckModeNavigatorSpec extends SpecBase with ScalaCheckPropertyChecks with
 
             navigator
               .nextPage(DoYouLiveInTheUKPage, CheckMode, updatedAnswers)
-              .mustBe(routes.WhatIsYourAddressUkController.onPageLoad(CheckMode))
+              .mustBe(routes.IndividualUKPostcodeController.onPageLoad(CheckMode))
         }
       }
 

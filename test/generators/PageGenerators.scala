@@ -22,10 +22,6 @@ import org.scalacheck.Arbitrary
 import pages._
 
 trait PageGenerators {
-
-  implicit lazy val arbitrarySelectAddressPage: Arbitrary[SelectAddressPage.type] =
-    Arbitrary(SelectAddressPage)
-
   self: Generators =>
 
   implicit lazy val arbitrarySecondaryContactEmailAddressPage: Arbitrary[SecondaryContactEmailAddressPage.type] =
@@ -118,5 +114,8 @@ trait PageGenerators {
 
   implicit lazy val arbitrarySecondaryContactPreferencePage: Arbitrary[SecondaryContactPreferencePage.type] =
     Arbitrary(SecondaryContactPreferencePage)
+
+  implicit lazy val arbitrarySelectAddressPage: Arbitrary[SelectAddressPage.type] =
+    Arbitrary(SelectAddressPage)
 
 }

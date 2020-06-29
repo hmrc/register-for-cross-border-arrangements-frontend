@@ -57,7 +57,7 @@ class Navigator @Inject()() {
     case SecondaryContactPreferencePage => secondaryContactPreferenceRoutes(NormalMode)
     case SecondaryContactEmailAddressPage => secondaryContactEmailRoutes(NormalMode)
     case SecondaryContactTelephoneNumberPage => _ => Some(routes.CheckYourAnswersController.onPageLoad())
-    case PostCodePage => _ => Some(routes.SelectAddressController.onPageLoad(NormalMode))
+    case IndividualUKPostcodePage => _ => Some(routes.SelectAddressController.onPageLoad(NormalMode)) //TODO Add UTs
     case SelectAddressPage => _ => Some(routes.ContactEmailAddressController.onPageLoad(NormalMode))
     case _ => _ => Some(routes.IndexController.onPageLoad())
   }
@@ -135,7 +135,7 @@ class Navigator @Inject()() {
 
   private def doYouLiveInTheUKRoutes(mode: Mode)(ua: UserAnswers): Option[Call] =
     ua.get(DoYouLiveInTheUKPage) map {
-      case true  => routes.WhatIsYourAddressUkController.onPageLoad(mode)
+      case true  => routes.IndividualUKPostcodeController.onPageLoad(mode)
       case false => routes.WhatIsYourAddressController.onPageLoad(mode)
     }
 
