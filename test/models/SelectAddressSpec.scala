@@ -23,7 +23,7 @@ import org.scalatest.{FreeSpec, MustMatchers, OptionValues}
 import play.api.libs.json.{JsError, JsString, Json}
 
 class SelectAddressSpec extends FreeSpec with MustMatchers with ScalaCheckPropertyChecks with OptionValues {
-
+//TODO Delete this. No longer used.
   "SelectAddress" - {
 
     "must deserialise valid values" in {

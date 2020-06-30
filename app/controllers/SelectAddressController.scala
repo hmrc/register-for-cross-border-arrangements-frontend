@@ -60,17 +60,14 @@ class SelectAddressController @Inject()(
     }
 
     addressLookupConnector.addressLookupByPostcode(postCode) flatMap {
-      case Nil => Future.successful(Redirect(routes.IndexController.onPageLoad()))
+      case Nil => Future.successful(Redirect(routes.WhatIsYourAddressController.onPageLoad(NormalMode)))
       case addresses =>
         val preparedForm: Form[String] = request.userAnswers.get(SelectAddressPage) match {
           case None => form
           case Some(value) => form.fill(value)
         }
-
         val addressItems: Seq[Radios.Radio] = addresses.map(address =>
-          Radios.Radio(label = msg"${formatAddress(address)}", value = s"${formatAddress(address)}")
-        )
-
+          Radios.Radio(label = msg"${formatAddress(address)}", value = s"${formatAddress(address)}"))
         val radios = Radios(field = preparedForm("value"), items = addressItems)
 
         val json = Json.obj(
@@ -81,7 +78,8 @@ class SelectAddressController @Inject()(
         )
 
         renderer.render("selectAddress.njk", json).map(Ok(_))
-      case _ => Future.successful(Redirect(routes.WhatIsYourAddressController.onPageLoad(NormalMode)))
+    } recover {
+      case _: Exception => Redirect(routes.WhatIsYourAddressController.onPageLoad(NormalMode))
     }
   }
 
@@ -94,17 +92,10 @@ class SelectAddressController @Inject()(
       }
 
       addressLookupConnector.addressLookupByPostcode(postCode) flatMap {
-        case addresses =>
-
+        addresses =>
           val addressItems: Seq[Radios.Radio] = addresses.map(address =>
             Radios.Radio(label = msg"${formatAddress(address)}", value = s"${formatAddress(address)}")
           )
-//          val addressItems: Seq[Radios.Radio] = for {
-//            address <- addresses
-//            num <- 1 to addresses.size
-//          } yield {
-//            Radios.Radio(label = msg"${address}", value = s"value-$num")
-//          }
 
           form.bindFromRequest().fold(
             formWithErrors => {
@@ -135,6 +126,6 @@ class SelectAddressController @Inject()(
     val addressLine4 = address.addressLine4.fold("")(a => s"$a, ")
     val county = address.county.fold("")(county => s"$county, ")
 
-    s"$addressLine1 $addressLine2 $addressLine3 $addressLine4 ${address.town}, $county ${address.postcode}"
+    s"$addressLine1$addressLine2$addressLine3$addressLine4${address.town}, $county${address.postcode}"
   }
 }

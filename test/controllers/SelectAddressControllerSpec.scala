@@ -30,13 +30,13 @@ import org.scalatestplus.mockito.MockitoSugar
 import pages.{IndividualUKPostcodePage, SelectAddressPage}
 import play.api.data.Form
 import play.api.inject.bind
-import play.api.libs.json.JsObject
+import play.api.libs.json.{JsObject, Json}
 import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import play.twirl.api.Html
 import repositories.SessionRepository
-import uk.gov.hmrc.viewmodels.NunjucksSupport
+import uk.gov.hmrc.viewmodels.{NunjucksSupport, Radios}
 
 import scala.concurrent.Future
 
@@ -57,6 +57,10 @@ class SelectAddressControllerSpec extends SpecBase
   val addresses: Seq[AddressLookup] = Seq(
     AddressLookup(Some("1 Address line 1"), None, None, None, "Town", None, "ZZ1 1ZZ"),
     AddressLookup(Some("2 Address line 1"), None, None, None, "Town", None, "ZZ1 1ZZ")
+  )
+  val addressRadios: Seq[Radios.Radio] = Seq(
+    Radios.Radio(label = msg"1 Address line 1, Town, ZZ1 1ZZ", value = s"1 Address line 1, Town, ZZ1 1ZZ"),
+    Radios.Radio(label = msg"2 Address line 1, Town, ZZ1 1ZZ", value = s"2 Address line 1, Town, ZZ1 1ZZ")
   )
   val dacFrontendUrl = "http://localhost:9755/register-for-cross-border-arrangements/"
 
@@ -89,15 +93,15 @@ class SelectAddressControllerSpec extends SpecBase
       status(result) mustEqual OK
 
       verify(mockRenderer, times(1)).render(templateCaptor.capture(), jsonCaptor.capture())(any())
-//TODO Needs fixing
-//      val expectedJson = Json.obj(
-//        "form"   -> form,
-//        "mode"   -> NormalMode,
-//        "radios" -> SelectAddress.radios(form)
-//      )
+
+      val expectedJson = Json.obj(
+        "form"   -> form,
+        "mode"   -> NormalMode,
+        "radios" -> Radios(field = form("value"), items = addressRadios)
+      )
 
       templateCaptor.getValue mustEqual "selectAddress.njk"
-//      jsonCaptor.getValue must containJson(expectedJson)
+      jsonCaptor.getValue must containJson(expectedJson)
 
       application.stop()
     }
@@ -111,7 +115,7 @@ class SelectAddressControllerSpec extends SpecBase
       when(mockFrontendConfig.dacFrontendUrl).thenReturn(dacFrontendUrl)
 
       val userAnswers = UserAnswers(userAnswersId)
-        .set(SelectAddressPage, "Address")
+        .set(SelectAddressPage, "1 Address line 1, Town, ZZ1 1ZZ")
         .success
         .value
         .set(IndividualUKPostcodePage, "ZZ1 1ZZ")
@@ -133,18 +137,63 @@ class SelectAddressControllerSpec extends SpecBase
 
       verify(mockRenderer, times(1)).render(templateCaptor.capture(), jsonCaptor.capture())(any())
 
-      val filledForm = form.bind(Map("value" -> SelectAddress.values.head.toString))
+      val filledForm = form.bind(Map("value" -> addressRadios.head.value))
 
-//      val expectedJson = Json.obj(
-//        "form"   -> filledForm,
-//        "mode"   -> NormalMode,
-//        "radios" -> SelectAddress.radios(filledForm)
-//      )
+      val expectedJson = Json.obj(
+        "form"   -> filledForm,
+        "mode"   -> NormalMode,
+        "radios" -> Radios(field = filledForm("value"), items = addressRadios)
+      )
 
       templateCaptor.getValue mustEqual "selectAddress.njk"
-//      jsonCaptor.getValue must containJson(expectedJson)
+      jsonCaptor.getValue must containJson(expectedJson)
 
       application.stop()
+    }
+
+    "must redirect to manual address page if there are no address matches" in {
+      when(mockAddressLookupConnector.addressLookupByPostcode(any())(any(), any()))
+        .thenReturn(Future.successful(Seq()))
+
+      val answers = UserAnswers(userAnswersId)
+        .set(IndividualUKPostcodePage, "ZZ1 1UU")
+        .success
+        .value
+
+      val application = applicationBuilder(userAnswers = Some(answers))
+        .overrides(
+          bind[AddressLookupConnector].toInstance(mockAddressLookupConnector)
+        ).build()
+
+      val request = FakeRequest(GET, selectAddressRoute)
+
+      val result = route(application, request).value
+
+      status(result) mustEqual SEE_OTHER
+      redirectLocation(result).value mustEqual routes.WhatIsYourAddressController.onPageLoad(NormalMode).url
+    }
+
+    "must redirect to manual address page if address lookup fails" in {
+
+      when(mockAddressLookupConnector.addressLookupByPostcode(any())(any(), any()))
+        .thenReturn(Future.failed(new Exception))
+
+      val answers = UserAnswers(userAnswersId)
+        .set(IndividualUKPostcodePage, "ZZ1 1UU")
+        .success
+        .value
+
+      val application = applicationBuilder(userAnswers = Some(answers))
+        .overrides(
+          bind[AddressLookupConnector].toInstance(mockAddressLookupConnector)
+        ).build()
+
+      val request = FakeRequest(GET, selectAddressRoute)
+
+      val result = route(application, request).value
+
+      status(result) mustEqual SEE_OTHER
+      redirectLocation(result).value mustEqual routes.WhatIsYourAddressController.onPageLoad(NormalMode).url
     }
 
     "must redirect to the next page when valid data is submitted" in {
@@ -211,14 +260,14 @@ class SelectAddressControllerSpec extends SpecBase
 
       verify(mockRenderer, times(1)).render(templateCaptor.capture(), jsonCaptor.capture())(any())
 
-//      val expectedJson = Json.obj(
-//        "form"   -> boundForm,
-//        "mode"   -> NormalMode,
-//        "radios" -> SelectAddress.radios(boundForm)
-//      )
+      val expectedJson = Json.obj(
+        "form"   -> boundForm,
+        "mode"   -> NormalMode,
+        "radios" -> Radios(field = boundForm("value"), items = addressRadios)
+      )
 
       templateCaptor.getValue mustEqual "selectAddress.njk"
-//      jsonCaptor.getValue must containJson(expectedJson)
+      jsonCaptor.getValue must containJson(expectedJson)
 
       application.stop()
     }

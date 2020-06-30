@@ -50,7 +50,6 @@ object AddressLookup {
         }
         AddressLookup(addressLines._1, addressLines._2, addressLines._3, addressLines._4, town, county, postcode)
     })
-    //TODO Change to (AddressLookup.apply _) if we don't have to process any data here
   }
 
   implicit val addressesLookupReads: Reads[Seq[AddressLookup]] = Reads {
