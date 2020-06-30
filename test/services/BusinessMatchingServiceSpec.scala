@@ -86,7 +86,7 @@ class BusinessMatchingServiceSpec extends SpecBase
 
             when(mockBusinessMatchingConnector.sendIndividualMatchingInformation(any(), any())(any(), any()))
               .thenReturn(
-                Future.successful(HttpResponse(OK, None))
+                Future.successful(HttpResponse(OK, ""))
               )
             val result = businessMatchingService.sendIndividualMatchingInformation(answers)
 
@@ -169,7 +169,7 @@ class BusinessMatchingServiceSpec extends SpecBase
 
             when(mockBusinessMatchingConnector.sendBusinessMatchingInformation(any(), any())(any(), any()))
               .thenReturn(
-                Future.successful(HttpResponse(OK, Some(responseJson)))
+                Future.successful(HttpResponse(OK, responseJson, Map.empty[String,Seq[String]]))
               )
             val result = businessMatchingService.sendBusinessMatchingInformation(answers)
 
@@ -208,7 +208,7 @@ class BusinessMatchingServiceSpec extends SpecBase
               """)
 
             when(mockBusinessMatchingConnector.sendBusinessMatchingInformation(any(), any())(any(), any()))
-              .thenReturn(Future.successful(HttpResponse(OK, Some(invalidJson))))
+              .thenReturn(Future.successful(HttpResponse(OK, invalidJson, Map.empty[String,Seq[String]])))
 
             val result = businessMatchingService.sendBusinessMatchingInformation(answers)
 
@@ -235,7 +235,7 @@ class BusinessMatchingServiceSpec extends SpecBase
 
 
             when(mockBusinessMatchingConnector.sendBusinessMatchingInformation(any(), any())(any(), any()))
-              .thenReturn(Future.successful(HttpResponse(NOT_FOUND, None)))
+              .thenReturn(Future.successful(HttpResponse(NOT_FOUND, "")))
 
             val result = businessMatchingService.sendBusinessMatchingInformation(answers)
 

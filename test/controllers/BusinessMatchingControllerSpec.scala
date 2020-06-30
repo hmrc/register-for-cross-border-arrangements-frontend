@@ -85,7 +85,7 @@ class BusinessMatchingControllerSpec extends SpecBase
           ).build()
 
         when(mockBusinessMatchingService.sendIndividualMatchingInformation(any())(any(), any()))
-          .thenReturn(Future.successful(Some(HttpResponse(OK, None))))
+          .thenReturn(Future.successful(Some(HttpResponse(OK, ""))))
 
         val result = route(application, getRequest(individualMatchingRoute)).value
 
@@ -115,7 +115,7 @@ class BusinessMatchingControllerSpec extends SpecBase
           ).build()
 
         when(mockBusinessMatchingService.sendIndividualMatchingInformation(any())(any(), any()))
-          .thenReturn(Future.successful(Some(HttpResponse(NOT_FOUND, None))))
+          .thenReturn(Future.successful(Some(HttpResponse(NOT_FOUND, ""))))
 
         val result = route(application, getRequest(individualMatchingRoute)).value
 
