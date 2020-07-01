@@ -19,10 +19,12 @@ package navigation
 import java.time.LocalDate
 
 import base.SpecBase
+import config.FrontendAppConfig
 import controllers.routes
 import generators.Generators
 import models.RegistrationType.{Business, Individual}
 import models.{Address, BusinessType, CheckMode, Country, Name, RegistrationType, SecondaryContactPreference, UniqueTaxpayerReference, UserAnswers}
+import org.mockito.Mockito.when
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import pages._
@@ -30,7 +32,8 @@ import uk.gov.hmrc.domain.Generator
 
 class CheckModeNavigatorSpec extends SpecBase with ScalaCheckPropertyChecks with Generators {
 
-  val navigator = new Navigator
+  val mockFrontendConfig: FrontendAppConfig = mock[FrontendAppConfig]
+  val navigator: Navigator = new Navigator(mockFrontendConfig)
 
   val name: Name = Name("FirstName", "LastName")
   val address: Address = Address("", "", None, None, None, Country("", "", ""))
@@ -499,7 +502,10 @@ class CheckModeNavigatorSpec extends SpecBase with ScalaCheckPropertyChecks with
     }
 
     "must go from Do you live in the UK? page to" - {
-      "What is your postcode? when answer is 'Yes'" in {
+      "What is your postcode? when answer is 'Yes' and address lookup toggle is true" in {
+
+        when(mockFrontendConfig.addressLookupToggle).thenReturn(true)
+
         forAll(arbitrary[UserAnswers]) {
           answers =>
             val updatedAnswers =
@@ -511,6 +517,24 @@ class CheckModeNavigatorSpec extends SpecBase with ScalaCheckPropertyChecks with
             navigator
               .nextPage(DoYouLiveInTheUKPage, CheckMode, updatedAnswers)
               .mustBe(routes.IndividualUKPostcodeController.onPageLoad(CheckMode))
+        }
+      }
+
+      "What is your address? when answer is 'Yes' and address lookup toggle is false" in {
+
+        when(mockFrontendConfig.addressLookupToggle).thenReturn(false)
+
+        forAll(arbitrary[UserAnswers]) {
+          answers =>
+            val updatedAnswers =
+              answers
+                .set(DoYouLiveInTheUKPage, true)
+                .success
+                .value
+
+            navigator
+              .nextPage(DoYouLiveInTheUKPage, CheckMode, updatedAnswers)
+              .mustBe(routes.WhatIsYourAddressUkController.onPageLoad(CheckMode))
         }
       }
 

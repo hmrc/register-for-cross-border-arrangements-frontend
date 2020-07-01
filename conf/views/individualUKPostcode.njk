@@ -37,14 +37,15 @@
               isPageHeading: true,
               classes: "govuk-label--xl"
             },
-            id: "value",
+            id: "postCode",
             name: "value",
             value: form.value.value,
             errorMessage: form.value.error
           }) }}
 
           {{ govukButton({
-            text: messages("site.continue")
+            text: messages("site.continue"),
+            attributes: {"id": "submit"}
           }) }}
 
         </form>

@@ -17,6 +17,7 @@
 package controllers
 
 import base.SpecBase
+import config.FrontendAppConfig
 import forms.HaveSecondContactFormProvider
 import matchers.JsonMatchers
 import models.{Name, NormalMode, UserAnswers}
@@ -118,13 +119,14 @@ class HaveSecondContactControllerSpec extends SpecBase with MockitoSugar with Nu
     "must redirect to Contact Name page when no contact name available" in {
 
       val mockSessionRepository = mock[SessionRepository]
+      val mockFrontendAppConfig = mock[FrontendAppConfig]
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers))
           .overrides(
-            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
+            bind[Navigator].toInstance(new FakeNavigator(onwardRoute, appConfig = mockFrontendAppConfig)),
             bind[SessionRepository].toInstance(mockSessionRepository)
           )
           .build()
@@ -143,6 +145,7 @@ class HaveSecondContactControllerSpec extends SpecBase with MockitoSugar with Nu
     "must redirect to the next page when valid data is submitted" in {
 
       val mockSessionRepository = mock[SessionRepository]
+      val mockFrontendAppConfig = mock[FrontendAppConfig]
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
@@ -152,7 +155,7 @@ class HaveSecondContactControllerSpec extends SpecBase with MockitoSugar with Nu
       val application =
         applicationBuilder(userAnswers = Some(userAnswers))
           .overrides(
-            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
+            bind[Navigator].toInstance(new FakeNavigator(onwardRoute, appConfig = mockFrontendAppConfig)),
             bind[SessionRepository].toInstance(mockSessionRepository)
           )
           .build()

@@ -17,6 +17,7 @@
 package controllers
 
 import base.SpecBase
+import config.FrontendAppConfig
 import forms.PostCodeFormProvider
 import matchers.JsonMatchers
 import models.{NormalMode, UserAnswers}
@@ -108,13 +109,14 @@ class PostCodeControllerSpec extends SpecBase with MockitoSugar with NunjucksSup
     "must redirect to the next page when valid data is submitted" in {
 
       val mockSessionRepository = mock[SessionRepository]
+      val mockFrontendAppConfig = mock[FrontendAppConfig]
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers))
           .overrides(
-            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
+            bind[Navigator].toInstance(new FakeNavigator(onwardRoute, appConfig = mockFrontendAppConfig)),
             bind[SessionRepository].toInstance(mockSessionRepository)
           )
           .build()

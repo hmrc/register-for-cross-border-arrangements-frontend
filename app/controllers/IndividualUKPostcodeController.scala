@@ -16,11 +16,10 @@
 
 package controllers
 
-import config.FrontendAppConfig
 import controllers.actions._
 import forms.IndividualUKPostcodeFormProvider
 import javax.inject.Inject
-import models.{Mode, NormalMode}
+import models.Mode
 import navigation.Navigator
 import pages.IndividualUKPostcodePage
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -41,7 +40,6 @@ class IndividualUKPostcodeController @Inject()(
     getData: DataRetrievalAction,
     requireData: DataRequiredAction,
     formProvider: IndividualUKPostcodeFormProvider,
-    appConfig: FrontendAppConfig,
     val controllerComponents: MessagesControllerComponents,
     renderer: Renderer
 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with NunjucksSupport {
@@ -50,21 +48,18 @@ class IndividualUKPostcodeController @Inject()(
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
-      if (appConfig.addressLookupToggle) {
-        val preparedForm = request.userAnswers.get(IndividualUKPostcodePage) match {
-          case None => form
-          case Some(value) => form.fill(value)
-        }
 
-        val json = Json.obj(
-          "form" -> preparedForm,
-          "mode" -> mode
-        )
-
-        renderer.render("individualUKPostcode.njk", json).map(Ok(_))
-      } else {
-        Future.successful(Redirect(routes.WhatIsYourAddressController.onPageLoad(NormalMode)))
+      val preparedForm = request.userAnswers.get(IndividualUKPostcodePage) match {
+        case None => form
+        case Some(value) => form.fill(value)
       }
+
+      val json = Json.obj(
+        "form" -> preparedForm,
+        "mode" -> mode
+      )
+
+      renderer.render("individualUKPostcode.njk", json).map(Ok(_))
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {

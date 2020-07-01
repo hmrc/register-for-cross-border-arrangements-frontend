@@ -94,10 +94,10 @@ POST       /register/individual/without-id/live-in-uk           controllers.DoYo
 GET        /register/individual/without-id/live-in-uk-change    controllers.DoYouLiveInTheUKController.onPageLoad(mode: Mode = CheckMode)
 POST       /register/individual/without-id/live-in-uk-change    controllers.DoYouLiveInTheUKController.onSubmit(mode: Mode = CheckMode)
 
-GET        /register/individual/without-id/uk-postcode        controllers.IndividualUKPostcodeController.onPageLoad(mode: Mode = NormalMode)
-POST       /register/individual/without-id/uk-postcode        controllers.IndividualUKPostcodeController.onSubmit(mode: Mode = NormalMode)
-GET        /register/individual/without-id/change-uk-postcode controllers.IndividualUKPostcodeController.onPageLoad(mode: Mode = CheckMode)
-POST       /register/individual/without-id/change-uk-postcode controllers.IndividualUKPostcodeController.onSubmit(mode: Mode = CheckMode)
+GET        /register/postcode               controllers.IndividualUKPostcodeController.onPageLoad(mode: Mode = NormalMode)
+POST       /register/postcode               controllers.IndividualUKPostcodeController.onSubmit(mode: Mode = NormalMode)
+GET        /register/change-postcode        controllers.IndividualUKPostcodeController.onPageLoad(mode: Mode = CheckMode)
+POST       /register/change-postcode        controllers.IndividualUKPostcodeController.onSubmit(mode: Mode = CheckMode)
 
 GET        /register/individual/without-id/address              controllers.WhatIsYourAddressController.onPageLoad(mode: Mode = NormalMode)
 POST       /register/individual/without-id/address              controllers.WhatIsYourAddressController.onSubmit(mode: Mode = NormalMode)

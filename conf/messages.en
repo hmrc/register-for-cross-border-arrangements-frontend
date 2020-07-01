@@ -254,6 +254,7 @@ individualUKPostcode.heading = What is your postcode?
 individualUKPostcode.checkYourAnswersLabel = What is your postcode?
 individualUKPostcode.error.required = Enter your postcode
 individualUKPostcode.error.length = Your postcode must be 8 characters or less
+individualUKPostcode.error.invalid = Enter a postcode, like AA1 1AA
 
 whatIsYourAddress.title = What is your home address?
 whatIsYourAddress.heading = What is your home address?

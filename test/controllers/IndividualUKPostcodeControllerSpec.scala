@@ -45,22 +45,17 @@ class IndividualUKPostcodeControllerSpec extends SpecBase with MockitoSugar with
 
   val formProvider = new IndividualUKPostcodeFormProvider()
   val form: Form[String] = formProvider()
-  val mockFrontendConfig: FrontendAppConfig = mock[FrontendAppConfig]
 
   lazy val individualUKPostcodeRoute: String = routes.IndividualUKPostcodeController.onPageLoad(NormalMode).url
 
   "IndividualUKPostcode Controller" - {
 
-    "must return OK and the correct view for a GET when addressLookupToggle is true" in {
+    "must return OK and the correct view for a GET" in {
 
       when(mockRenderer.render(any(), any())(any()))
         .thenReturn(Future.successful(Html("")))
-      when(mockFrontendConfig.addressLookupToggle).thenReturn(true)
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
-        .overrides(
-          bind[FrontendAppConfig].toInstance(mockFrontendConfig),
-        ).build()
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       val request = FakeRequest(GET, individualUKPostcodeRoute)
       val templateCaptor = ArgumentCaptor.forClass(classOf[String])
@@ -83,17 +78,13 @@ class IndividualUKPostcodeControllerSpec extends SpecBase with MockitoSugar with
       application.stop()
     }
 
-    "must populate the view correctly on a GET when the question has previously been answered when addressLookupToggle is true" in {
+    "must populate the view correctly on a GET when the question has previously been answered" in {
 
       when(mockRenderer.render(any(), any())(any()))
         .thenReturn(Future.successful(Html("")))
-      when(mockFrontendConfig.addressLookupToggle).thenReturn(true)
 
-      val userAnswers = UserAnswers(userAnswersId).set(IndividualUKPostcodePage, "answer").success.value
-      val application = applicationBuilder(userAnswers = Some(userAnswers))
-        .overrides(
-          bind[FrontendAppConfig].toInstance(mockFrontendConfig),
-        ).build()
+      val userAnswers = UserAnswers(userAnswersId).set(IndividualUKPostcodePage, "AA1 1AA").success.value
+      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       val request = FakeRequest(GET, individualUKPostcodeRoute)
       val templateCaptor = ArgumentCaptor.forClass(classOf[String])
@@ -105,7 +96,7 @@ class IndividualUKPostcodeControllerSpec extends SpecBase with MockitoSugar with
 
       verify(mockRenderer, times(1)).render(templateCaptor.capture(), jsonCaptor.capture())(any())
 
-      val filledForm = form.bind(Map("value" -> "answer"))
+      val filledForm = form.bind(Map("value" -> "AA1 1AA"))
 
       val expectedJson = Json.obj(
         "form" -> filledForm,
@@ -118,39 +109,24 @@ class IndividualUKPostcodeControllerSpec extends SpecBase with MockitoSugar with
       application.stop()
     }
 
-    "must redirect to manual address page if addressLookupToggle is false" in {
-      when(mockFrontendConfig.addressLookupToggle).thenReturn(false)
-
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
-        .overrides(
-          bind[FrontendAppConfig].toInstance(mockFrontendConfig),
-        ).build()
-
-      val request = FakeRequest(GET, individualUKPostcodeRoute)
-
-      val result = route(application, request).value
-
-      status(result) mustEqual SEE_OTHER
-      redirectLocation(result).value mustEqual routes.WhatIsYourAddressController.onPageLoad(NormalMode).url
-    }
-
     "must redirect to the next page when valid data is submitted" in {
 
       val mockSessionRepository = mock[SessionRepository]
+      val mockFrontendAppConfig = mock[FrontendAppConfig]
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers))
           .overrides(
-            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
+            bind[Navigator].toInstance(new FakeNavigator(onwardRoute, appConfig = mockFrontendAppConfig)),
             bind[SessionRepository].toInstance(mockSessionRepository)
           )
           .build()
 
       val request =
         FakeRequest(POST, individualUKPostcodeRoute)
-          .withFormUrlEncodedBody(("value", "answer"))
+          .withFormUrlEncodedBody(("value", "AA1 1AA"))
 
       val result = route(application, request).value
 

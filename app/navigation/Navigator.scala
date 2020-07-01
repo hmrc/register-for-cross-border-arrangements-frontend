@@ -16,6 +16,7 @@
 
 package navigation
 
+import config.FrontendAppConfig
 import controllers.routes
 import helpers.JourneyHelpers._
 import javax.inject.{Inject, Singleton}
@@ -27,7 +28,7 @@ import pages._
 import play.api.mvc.Call
 
 @Singleton
-class Navigator @Inject()() {
+class Navigator @Inject()(appConfig: FrontendAppConfig) {
 
   private val normalRoutes: PartialFunction[Page, UserAnswers => Option[Call]] = {
     case RegistrationTypePage => registrationTypeRoutes(NormalMode)
@@ -137,7 +138,8 @@ class Navigator @Inject()() {
 
   private def doYouLiveInTheUKRoutes(mode: Mode)(ua: UserAnswers): Option[Call] =
     ua.get(DoYouLiveInTheUKPage) map {
-      case true  => routes.IndividualUKPostcodeController.onPageLoad(mode)
+      case true if appConfig.addressLookupToggle => routes.IndividualUKPostcodeController.onPageLoad(mode)
+      case true => routes.WhatIsYourAddressUkController.onPageLoad(mode)
       case false => routes.WhatIsYourAddressController.onPageLoad(mode)
     }
 

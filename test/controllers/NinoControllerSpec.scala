@@ -17,6 +17,7 @@
 package controllers
 
 import base.SpecBase
+import config.FrontendAppConfig
 import forms.NinoFormProvider
 import matchers.JsonMatchers
 import models.{NormalMode, UserAnswers}
@@ -111,13 +112,14 @@ class NinoControllerSpec extends SpecBase with MockitoSugar with NunjucksSupport
 
       val nino = (new Generator()).nextNino
       val mockSessionRepository = mock[SessionRepository]
+      val mockFrontendAppConfig = mock[FrontendAppConfig]
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers))
           .overrides(
-            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
+            bind[Navigator].toInstance(new FakeNavigator(onwardRoute, appConfig = mockFrontendAppConfig)),
             bind[SessionRepository].toInstance(mockSessionRepository)
           )
           .build()

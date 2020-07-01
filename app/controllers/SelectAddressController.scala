@@ -123,12 +123,9 @@ class SelectAddressController @Inject()(
   }
 
   private def formatAddress(address: AddressLookup) = {
-    val addressLine1 = address.addressLine1.fold("")(a => s"$a, ")
-    val addressLine2 = address.addressLine2.fold("")(a => s"$a, ")
-    val addressLine3 = address.addressLine3.fold("")(a => s"$a, ")
-    val addressLine4 = address.addressLine4.fold("")(a => s"$a, ")
+    val lines = Seq(address.addressLine1, address.addressLine2, address.addressLine3, address.addressLine4).flatten.mkString(", ")
     val county = address.county.fold("")(county => s"$county, ")
 
-    s"$addressLine1$addressLine2$addressLine3$addressLine4${address.town}, $county${address.postcode}"
+    s"$lines, ${address.town}, $county${address.postcode}"
   }
 }
