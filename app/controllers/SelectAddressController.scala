@@ -50,7 +50,7 @@ class SelectAddressController @Inject()(
 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with NunjucksSupport {
 
   private val form = formProvider()
-  private val manualAddressURL: String = appConfig.dacFrontendUrl + routes.WhatIsYourAddressController.onPageLoad(NormalMode).url
+  private val manualAddressURL: String = appConfig.dacFrontendUrl + routes.WhatIsYourAddressUkController.onPageLoad(NormalMode).url
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
@@ -60,7 +60,7 @@ class SelectAddressController @Inject()(
     }
 
     addressLookupConnector.addressLookupByPostcode(postCode) flatMap {
-      case Nil => Future.successful(Redirect(routes.WhatIsYourAddressController.onPageLoad(NormalMode)))
+      case Nil => Future.successful(Redirect(routes.WhatIsYourAddressUkController.onPageLoad(NormalMode)))
       case addresses =>
         val preparedForm: Form[String] = request.userAnswers.get(SelectAddressPage) match {
           case None => form
@@ -79,7 +79,7 @@ class SelectAddressController @Inject()(
 
         renderer.render("selectAddress.njk", json).map(Ok(_))
     } recover {
-      case _: Exception => Redirect(routes.WhatIsYourAddressController.onPageLoad(NormalMode))
+      case _: Exception => Redirect(routes.WhatIsYourAddressUkController.onPageLoad(NormalMode))
     }
   }
 
@@ -105,6 +105,7 @@ class SelectAddressController @Inject()(
               val json = Json.obj(
                 "form" -> formWithErrors,
                 "mode" -> mode,
+                "manualAddressURL" -> manualAddressURL,
                 "radios" -> radios
               )
 
@@ -116,6 +117,8 @@ class SelectAddressController @Inject()(
                 _ <- sessionRepository.set(updatedAnswers)
               } yield Redirect(navigator.nextPage(SelectAddressPage, mode, updatedAnswers))
           )
+      } recover {
+        case _: Exception => Redirect(routes.WhatIsYourAddressUkController.onPageLoad(NormalMode))
       }
   }
 

@@ -547,7 +547,24 @@ class CheckModeNavigatorSpec extends SpecBase with ScalaCheckPropertyChecks with
       }
     }
 
-    "must go from What is your home address? (non-UK) page to" - {
+    "must go from What is your postcode? page to" - {
+      "What is your address? page when answer is a valid postcode" in {
+        forAll(arbitrary[UserAnswers]) {
+          answers =>
+            val updatedAnswers =
+              answers
+                .set(IndividualUKPostcodePage, "AA1 1AA")
+                .success
+                .value
+
+            navigator
+              .nextPage(IndividualUKPostcodePage, CheckMode, updatedAnswers)
+              .mustBe(routes.SelectAddressController.onPageLoad(CheckMode))
+        }
+      }
+    }
+
+    "must go from What is your home address? page to" - {
       "What is your email address? page when answer is a home address" in {
         forAll(arbitrary[UserAnswers]) {
           answers =>
@@ -559,6 +576,23 @@ class CheckModeNavigatorSpec extends SpecBase with ScalaCheckPropertyChecks with
 
             navigator
               .nextPage(WhatIsYourAddressUkPage, CheckMode, updatedAnswers)
+              .mustBe(routes.ContactEmailAddressController.onPageLoad(CheckMode))
+        }
+      }
+    }
+
+    "must go from What is your address? page to" - {
+      "What is your email address? page when user selects an address from the list" in {
+        forAll(arbitrary[UserAnswers]) {
+          answers =>
+            val updatedAnswers =
+              answers
+                .set(SelectAddressPage, "Some UK address")
+                .success
+                .value
+
+            navigator
+              .nextPage(SelectAddressPage, CheckMode, updatedAnswers)
               .mustBe(routes.ContactEmailAddressController.onPageLoad(CheckMode))
         }
       }

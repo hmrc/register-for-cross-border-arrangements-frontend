@@ -16,6 +16,8 @@
 
 package pages
 
+import models.{Address, Country, UserAnswers}
+import org.scalacheck.Arbitrary.arbitrary
 import pages.behaviours.PageBehaviours
 
 class SelectAddressPageSpec extends PageBehaviours {
@@ -27,5 +29,20 @@ class SelectAddressPageSpec extends PageBehaviours {
     beSettable[String](SelectAddressPage)
 
     beRemovable[String](SelectAddressPage)
+
+    "must remove manual UK address when user fills in this page" in {
+      forAll(arbitrary[UserAnswers]) {
+        answers =>
+          val result = answers
+            .set(WhatIsYourAddressUkPage, Address("", "", None, None, None, Country("", "", "")))
+            .success
+            .value
+            .set(SelectAddressPage, "Some UK address")
+            .success
+            .value
+
+          result.get(WhatIsYourAddressUkPage) must not be defined
+      }
+    }
   }
 }

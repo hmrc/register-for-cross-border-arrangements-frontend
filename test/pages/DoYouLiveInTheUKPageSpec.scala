@@ -52,6 +52,9 @@ class DoYouLiveInTheUKPageSpec extends PageBehaviours {
       forAll(arbitrary[UserAnswers]) {
         answers =>
           val result = answers
+            .set(SelectAddressPage, "Some UK address")
+            .success
+            .value
             .set(WhatIsYourAddressUkPage, address)
             .success
             .value
@@ -59,6 +62,7 @@ class DoYouLiveInTheUKPageSpec extends PageBehaviours {
             .success
             .value
 
+          result.get(SelectAddressPage) must not be defined
           result.get(WhatIsYourAddressUkPage) must not be defined
       }
     }

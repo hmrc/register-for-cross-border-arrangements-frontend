@@ -43,6 +43,8 @@ class Navigator @Inject()() {
     case ConfirmBusinessPage => confirmBusinessRoutes
     case DateOfBirthPage => dateOfBirthRoutes(NormalMode)
     case DoYouLiveInTheUKPage => doYouLiveInTheUKRoutes(NormalMode)
+    case IndividualUKPostcodePage => _ => Some(routes.SelectAddressController.onPageLoad(NormalMode))
+    case SelectAddressPage => _ => Some(routes.ContactEmailAddressController.onPageLoad(NormalMode))
     case NonUkNamePage => _ => Some(routes.DateOfBirthController.onPageLoad(NormalMode))
     case BusinessAddressPage => _ =>   Some(routes.ContactNameController.onPageLoad(NormalMode))
     case BusinessWithoutIDNamePage => _ => Some(routes.BusinessAddressController.onPageLoad(NormalMode))
@@ -57,8 +59,6 @@ class Navigator @Inject()() {
     case SecondaryContactPreferencePage => secondaryContactPreferenceRoutes(NormalMode)
     case SecondaryContactEmailAddressPage => secondaryContactEmailRoutes(NormalMode)
     case SecondaryContactTelephoneNumberPage => _ => Some(routes.CheckYourAnswersController.onPageLoad())
-    case IndividualUKPostcodePage => _ => Some(routes.SelectAddressController.onPageLoad(NormalMode)) //TODO Add UTs
-    case SelectAddressPage => _ => Some(routes.ContactEmailAddressController.onPageLoad(NormalMode))
     case _ => _ => Some(routes.IndexController.onPageLoad())
   }
 
@@ -73,7 +73,9 @@ class Navigator @Inject()() {
     case DateOfBirthPage => dateOfBirthRoutes(CheckMode)
     case DoYouLiveInTheUKPage => doYouLiveInTheUKRoutes(CheckMode)
     case WhatIsYourAddressPage => _ => Some(routes.ContactEmailAddressController.onPageLoad(CheckMode))
+    case IndividualUKPostcodePage => _ => Some(routes.SelectAddressController.onPageLoad(CheckMode))
     case WhatIsYourAddressUkPage => _ => Some(routes.ContactEmailAddressController.onPageLoad(CheckMode))
+    case SelectAddressPage => _ => Some(routes.ContactEmailAddressController.onPageLoad(CheckMode))
     case BusinessTypePage => businessTypeRoutes(CheckMode)
     case CorporationTaxUTRPage => businessNameRoutes(CheckMode)
     case SelfAssessmentUTRPage => businessNameRoutes(CheckMode)

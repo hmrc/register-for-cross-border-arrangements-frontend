@@ -32,7 +32,7 @@ class CheckYourAnswersHelper(userAnswers: UserAnswers) {
     answer =>
       Row(
         key     = Key(msg"selectAddress.checkYourAnswersLabel", classes = Seq("govuk-!-width-one-half")),
-        value   = Value(msg"selectAddress.$answer"),
+        value   = Value(Html(s"${answer.replace(",", "<br>")}")),
         actions = List(
           Action(
             content            = msg"site.edit",

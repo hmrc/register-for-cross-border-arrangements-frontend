@@ -105,6 +105,7 @@ class CheckYourAnswersController @Inject()(
           helper.dateOfBirth,
           helper.doYouLiveInTheUK,
           helper.whatIsYourAddress,
+          helper.selectAddress,
           helper.whatIsYourAddressUk
         ).flatten
       case _ =>

@@ -381,6 +381,38 @@ class NavigatorSpec extends SpecBase with ScalaCheckPropertyChecks with Generato
         }
       }
 
+      "must go from the What is your postcode? page to What is your address? page" in {
+        forAll(arbitrary[UserAnswers]) {
+          answers =>
+
+            val updatedAnswers =
+              answers
+                .set(IndividualUKPostcodePage, "AA1 1AA")
+                .success
+                .value
+
+            navigator
+              .nextPage(IndividualUKPostcodePage, NormalMode, updatedAnswers)
+              .mustBe(routes.SelectAddressController.onPageLoad(NormalMode))
+        }
+      }
+
+      "must go from the What is your address? page to What is your email address? page" in {
+        forAll(arbitrary[UserAnswers]) {
+          answers =>
+
+            val updatedAnswers =
+              answers
+                .set(SelectAddressPage, "Some UK address")
+                .success
+                .value
+
+            navigator
+              .nextPage(SelectAddressPage, NormalMode, updatedAnswers)
+              .mustBe(routes.ContactEmailAddressController.onPageLoad(NormalMode))
+        }
+      }
+
       "must go from the What is your business name page (without-id) to the What is your business address page" in {
         forAll(arbitrary[UserAnswers]) {
           answers =>

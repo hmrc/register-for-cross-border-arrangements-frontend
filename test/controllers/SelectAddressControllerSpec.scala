@@ -21,7 +21,7 @@ import config.FrontendAppConfig
 import connectors.AddressLookupConnector
 import forms.SelectAddressFormProvider
 import matchers.JsonMatchers
-import models.{AddressLookup, NormalMode, SelectAddress, UserAnswers}
+import models.{AddressLookup, NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.any
@@ -151,7 +151,7 @@ class SelectAddressControllerSpec extends SpecBase
       application.stop()
     }
 
-    "must redirect to manual address page if there are no address matches" in {
+    "must redirect to manual UK address page if there are no address matches" in {
       when(mockAddressLookupConnector.addressLookupByPostcode(any())(any(), any()))
         .thenReturn(Future.successful(Seq()))
 
@@ -170,10 +170,10 @@ class SelectAddressControllerSpec extends SpecBase
       val result = route(application, request).value
 
       status(result) mustEqual SEE_OTHER
-      redirectLocation(result).value mustEqual routes.WhatIsYourAddressController.onPageLoad(NormalMode).url
+      redirectLocation(result).value mustEqual routes.WhatIsYourAddressUkController.onPageLoad(NormalMode).url
     }
 
-    "must redirect to manual address page if address lookup fails" in {
+    "must redirect to manual UK address page if address lookup fails" in {
 
       when(mockAddressLookupConnector.addressLookupByPostcode(any())(any(), any()))
         .thenReturn(Future.failed(new Exception))
@@ -193,7 +193,7 @@ class SelectAddressControllerSpec extends SpecBase
       val result = route(application, request).value
 
       status(result) mustEqual SEE_OTHER
-      redirectLocation(result).value mustEqual routes.WhatIsYourAddressController.onPageLoad(NormalMode).url
+      redirectLocation(result).value mustEqual routes.WhatIsYourAddressUkController.onPageLoad(NormalMode).url
     }
 
     "must redirect to the next page when valid data is submitted" in {
@@ -292,7 +292,7 @@ class SelectAddressControllerSpec extends SpecBase
 
       val request =
         FakeRequest(POST, selectAddressRoute)
-          .withFormUrlEncodedBody(("value", SelectAddress.values.head.toString))
+          .withFormUrlEncodedBody(("value", addressRadios.head.value))
 
       val result = route(application, request).value
 
