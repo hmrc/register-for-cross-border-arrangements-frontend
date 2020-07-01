@@ -191,7 +191,7 @@ POST       /register/second-contact-telephone                      controllers.S
 GET        /register/change-second-contact-telephone               controllers.SecondaryContactTelephoneNumberController.onPageLoad(mode: Mode = CheckMode)
 POST       /register/change-second-contact-telephone               controllers.SecondaryContactTelephoneNumberController.onSubmit(mode: Mode = CheckMode)
 
-GET        /selectAddress                        controllers.SelectAddressController.onPageLoad(mode: Mode = NormalMode)
-POST       /selectAddress                        controllers.SelectAddressController.onSubmit(mode: Mode = NormalMode)
-GET        /changeSelectAddress                  controllers.SelectAddressController.onPageLoad(mode: Mode = CheckMode)
-POST       /changeSelectAddress                  controllers.SelectAddressController.onSubmit(mode: Mode = CheckMode)
+GET        /register/select-address                        controllers.SelectAddressController.onPageLoad(mode: Mode = NormalMode)
+POST       /register/select-address                        controllers.SelectAddressController.onSubmit(mode: Mode = NormalMode)
+GET        /register/change-select-address                 controllers.SelectAddressController.onPageLoad(mode: Mode = CheckMode)
+POST       /register/change-select-address                 controllers.SelectAddressController.onSubmit(mode: Mode = CheckMode)
