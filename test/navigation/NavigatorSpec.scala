@@ -352,8 +352,7 @@ class NavigatorSpec extends SpecBase with ScalaCheckPropertyChecks with Generato
         }
       }
 
-      "must go from the Do You Live in the UK page for people who answer yes to What is your postcode? - " +
-        "address lookup toggle is true" in {
+      "must go from the Do You Live in the UK page for people who answer yes to What is your postcode? - address lookup toggle is true" in {
 
         when(mockFrontendConfig.addressLookupToggle).thenReturn(true)
 
@@ -372,8 +371,7 @@ class NavigatorSpec extends SpecBase with ScalaCheckPropertyChecks with Generato
         }
       }
 
-      "must go from the Do You Live in the UK page for people who answer yes to What is your address? - " +
-        "address lookup toggle is false" in {
+      "must go from the Do You Live in the UK page for people who answer yes to What is your address? - address lookup toggle is false" in {
 
         when(mockFrontendConfig.addressLookupToggle).thenReturn(false)
 
