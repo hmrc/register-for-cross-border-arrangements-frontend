@@ -25,58 +25,35 @@ import play.api.libs.json.{JsValue, Json, OWrites}
 import scala.util.Random
 
 
-case class OrganisationTest(organisationName: String)
-object OrganisationTest {
-  def apply(userAnswers: UserAnswers): OrganisationTest = {
+case class OrganisationDetails(organisationName: String)
+object OrganisationDetails {
+  def apply(userAnswers: UserAnswers): OrganisationDetails = {
     userAnswers.get(BusinessNamePage) match {
-      case Some(name) => new OrganisationTest(name)
+      case Some(name) => new OrganisationDetails(name)
       case None => throw new Exception("Organisation name can't be empty when creating a subscription")
     }
   }
 
-  implicit val format = Json.format[OrganisationTest]
+  implicit val format = Json.format[OrganisationDetails]
 }
 
-case class IndividualTest(firstName: String,
+case class IndividualDetails(firstName: String,
                           middleName: Option[String],
                           lastName: String)
-object IndividualTest {
-  def apply(userAnswers: UserAnswers): IndividualTest = {
+object IndividualDetails {
+  def apply(userAnswers: UserAnswers): IndividualDetails = {
     userAnswers.get(ContactNamePage) match {
-      case Some(name) => new IndividualTest(name.firstName, None, name.secondName)
+      case Some(name) => new IndividualDetails(name.firstName, None, name.secondName)
       case None => throw new Exception("Individual name can't be empty when creating a subscription")
     }
   }
 
-  implicit val format = Json.format[IndividualTest]
-}
-
-
-object ContactInformation {
-  def apply(`class`: String, data: JsValue): ContactInformation = {
-    (`class` match {
-      case "ContactInformationForIndividual" =>
-        Json.fromJson[ContactInformationForIndividual](data)(ContactInformationForIndividual.format)
-      case "ContactInformationForOrganisation" =>
-        Json.fromJson[ContactInformationForOrganisation](data)(ContactInformationForOrganisation.format)
-    }).get
-  }
-
-  def unapply(contactInformation: ContactInformation): Option[(String, JsValue)] = {
-    val (prod: Product, jsValue) = contactInformation match {
-      case contactInformationForIndividual: ContactInformationForIndividual =>
-        (contactInformationForIndividual, Json.toJson(contactInformationForIndividual)(ContactInformationForIndividual.format))
-      case contactInformationForOrganisation: ContactInformationForOrganisation =>
-        (contactInformationForOrganisation, Json.toJson(contactInformationForOrganisation)(ContactInformationForOrganisation.format))
-    }
-    Some(prod.productPrefix -> jsValue)
-  }
-
-  implicit val format = Json.format[ContactInformation]
+  implicit val format = Json.format[IndividualDetails]
 }
 
 sealed trait ContactInformation
-case class ContactInformationForIndividual(individual: IndividualTest,
+
+case class ContactInformationForIndividual(individual: IndividualDetails,
                                            email: String,
                                            phone: Option[String],
                                            mobile: Option[String]) extends ContactInformation
@@ -84,7 +61,7 @@ object ContactInformationForIndividual {
   implicit val format = Json.format[ContactInformationForIndividual]
 }
 
-case class ContactInformationForOrganisation(organisation: OrganisationTest,
+case class ContactInformationForOrganisation(organisation: OrganisationDetails,
                                              email: String,
                                              phone: Option[String],
                                              mobile: Option[String]) extends ContactInformation
@@ -243,8 +220,8 @@ object SubscriptionForDACRequest {
   private def getIdTypeAndNumber(userAnswers: UserAnswers): (String, String) = {
     (userAnswers.get(NinoPage), userAnswers.get(SelfAssessmentUTRPage), userAnswers.get(CorporationTaxUTRPage)) match {
       case (Some(nino), _, _) => ("NINO", nino.toString().capitalize)
-      case (_, Some(selfAssessmentUTRPage), _) => ("UTR", selfAssessmentUTRPage.uniqueTaxPayerReference.capitalize)
-      case (_, _, Some(corporationTaxUTRPage)) => ("UTR", corporationTaxUTRPage.uniqueTaxPayerReference.capitalize)
+      case (_, Some(selfAssessmentUTRPage), _) => ("UTR", selfAssessmentUTRPage.uniqueTaxPayerReference)
+      case (_, _, Some(corporationTaxUTRPage)) => ("UTR", corporationTaxUTRPage.uniqueTaxPayerReference)
     }
   }
 
@@ -268,7 +245,7 @@ object SubscriptionForDACRequest {
       val secondaryContactNumber = userAnswers.get(SecondaryContactTelephoneNumberPage)
 
       ContactInformationForOrganisation(
-        organisation = OrganisationTest(userAnswers),
+        organisation = OrganisationDetails(userAnswers),
         email = secondaryEmail,
         phone = secondaryContactNumber,
         mobile = secondaryContactNumber)
@@ -282,13 +259,13 @@ object SubscriptionForDACRequest {
 
       if (getIdTypeAndNumber(userAnswers)._1 == "NINO") {
         ContactInformationForIndividual(
-          individual = IndividualTest(userAnswers),
+          individual = IndividualDetails(userAnswers),
           email = email,
           phone = contactNumber,
           mobile = contactNumber)
       } else {
         ContactInformationForOrganisation(
-          organisation = OrganisationTest(userAnswers),
+          organisation = OrganisationDetails(userAnswers),
           email = email,
           phone = contactNumber,
           mobile = contactNumber)
