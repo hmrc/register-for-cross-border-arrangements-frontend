@@ -35,7 +35,7 @@ class SubscriptionConnector @Inject()(val config: FrontendAppConfig, val http: H
   def createEISSubscription(userAnswers: UserAnswers)
                            (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] = {
 
-    val submissionUrl = s"${config.businessMatchingUrl}/enrolment/create-enrolment" //TODO Change once endpoint is ready
-    http.PUT[SubscriptionForDACRequest, HttpResponse](submissionUrl, SubscriptionForDACRequest.createDacRequest(userAnswers))
+    val submissionUrl = s"${config.businessMatchingUrl}/subscription/create-dac-subscription"
+    http.POST[SubscriptionForDACRequest, HttpResponse](submissionUrl, SubscriptionForDACRequest.createDacRequest(userAnswers))
   }
 }

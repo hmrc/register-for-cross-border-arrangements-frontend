@@ -21,9 +21,10 @@ import com.github.tomakehurst.wiremock.client.WireMock.{aResponse, put, urlEqual
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import generators.Generators
 import helpers.WireMockServerHandler
-import models.UserAnswers
+import models.{BusinessType, UniqueTaxpayerReference, UserAnswers}
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
+import pages._
 import play.api.Application
 import play.api.http.Status.{BAD_REQUEST, INTERNAL_SERVER_ERROR, OK}
 import play.api.inject.guice.GuiceApplicationBuilder
@@ -77,6 +78,21 @@ class SubscriptionConnectorSpec extends SpecBase
 
           val result = connector.createSubscription(userAnswers)
           result.futureValue.status mustBe INTERNAL_SERVER_ERROR
+      }
+    }
+
+    "when calling createEISSubscription" - {
+      "must return status OK for submission of valid organisation registration details" in {
+        val userAnswers = UserAnswers(userAnswersId)
+          .set(BusinessTypePage, BusinessType.Partnership).success.value
+          .set(SelfAssessmentUTRPage, UniqueTaxpayerReference("0123456789")).success.value
+          .set(BusinessNamePage, "Pizza for you").success.value
+          .set(ContactEmailAddressPage, "email@email.com").success.value
+
+        stubResponse("/register-for-cross-border-arrangements/enrolment/create-enrolment", OK)
+
+        val result = connector.createEISSubscription(userAnswers)
+        result.futureValue.status mustBe OK
       }
     }
   }
