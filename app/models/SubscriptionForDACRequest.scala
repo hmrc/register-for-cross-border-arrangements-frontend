@@ -20,7 +20,7 @@ import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 
 import pages._
-import play.api.libs.json.{Format, JsValue, Json, OWrites, Reads, __}
+import play.api.libs.json.{JsValue, Json, OWrites}
 
 import scala.util.Random
 
@@ -100,20 +100,18 @@ object PrimaryContact {
       primaryContact.contactInformation match {
         case ContactInformationForIndividual(individual, email, phone, mobile) =>
           Json.obj(
-            "contactInformation" -> Json.obj(
-              "individual" -> Json.obj(
-                "firstName" -> individual.firstName,
-                "lastName" -> individual.lastName
-              ),
-              "email" -> email,
-              "phone" -> phone,
-              "mobile" -> mobile
-            )
+            "individual" -> Json.obj(
+              "firstName" -> individual.firstName,
+              "lastName" -> individual.lastName
+            ),
+            "email" -> email,
+            "phone" -> phone,
+            "mobile" -> mobile
           )
         case ContactInformationForOrganisation(organisation, email, phone, mobile) =>
           Json.obj(
-            "contactInformation" -> Json.obj(
-              "organisation" -> organisation.organisationName
+            "organisation" -> Json.obj(
+              "organisationName" -> organisation.organisationName
             ),
             "email" -> email,
             "phone" -> phone,
@@ -217,7 +215,7 @@ object SubscriptionForDACRequest {
       regime = "DAC",
       receiptDate = ZonedDateTime.now().format(formatter),
       acknowledgementReference = generateAcknowledgementReference,
-      originatingSystem = "DAC6",
+      originatingSystem = "MDTP",
       requestParameters = None,
       paramName = "",
       paramValue = ""
@@ -230,30 +228,27 @@ object SubscriptionForDACRequest {
       case None => true
     }
 
+    val (idType, idNumber) = getIdTypeAndNumber(userAnswers)
+
     RequestDetail(
-      idType = getIdType(userAnswers),
-      idNumber = "idNumber",
-      tradingName = Some("tradingName"),
+      idType = idType,
+      idNumber = idNumber,
+      tradingName = None,
       isGBUser = isGBUser,
       primaryContact = createPrimaryContact(userAnswers),
       secondaryContact = createSecondaryContact(userAnswers)
     )
   }
 
-  private def getIdType(userAnswers: UserAnswers): String = {
+  private def getIdTypeAndNumber(userAnswers: UserAnswers): (String, String) = {
     (userAnswers.get(NinoPage), userAnswers.get(SelfAssessmentUTRPage), userAnswers.get(CorporationTaxUTRPage)) match {
-      case (Some(nino), _, _) => nino.toString().capitalize
-      case (_, Some(selfAssessmentUTRPage), _) => selfAssessmentUTRPage.uniqueTaxPayerReference.capitalize
-      case (_, _, Some(corporationTaxUTRPage)) => corporationTaxUTRPage.uniqueTaxPayerReference.capitalize
+      case (Some(nino), _, _) => ("NINO", nino.toString().capitalize)
+      case (_, Some(selfAssessmentUTRPage), _) => ("UTR", selfAssessmentUTRPage.uniqueTaxPayerReference.capitalize)
+      case (_, _, Some(corporationTaxUTRPage)) => ("UTR", corporationTaxUTRPage.uniqueTaxPayerReference.capitalize)
     }
   }
 
-  private def createPrimaryContact(userAnswers: UserAnswers): PrimaryContact = {
-    userAnswers.get(BusinessTypePage) match {
-      case Some(BusinessType.NotSpecified) => PrimaryContact(createContactInformation(userAnswers)) //TODO Is this still needed?
-      case _ => PrimaryContact(createContactInformation(userAnswers))
-    }
-  }
+  private def createPrimaryContact(userAnswers: UserAnswers): PrimaryContact = PrimaryContact(createContactInformation(userAnswers))
 
   private def createSecondaryContact(userAnswers: UserAnswers): Option[SecondaryContact] = {
     userAnswers.get(HaveSecondContactPage) match {
@@ -285,7 +280,7 @@ object SubscriptionForDACRequest {
 
       val contactNumber = userAnswers.get(ContactTelephoneNumberPage)
 
-      if (getIdType(userAnswers) == "NINO") {
+      if (getIdTypeAndNumber(userAnswers)._1 == "NINO") {
         ContactInformationForIndividual(
           individual = IndividualTest(userAnswers),
           email = email,
