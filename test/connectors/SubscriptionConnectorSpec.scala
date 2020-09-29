@@ -17,7 +17,7 @@
 package connectors
 
 import base.SpecBase
-import com.github.tomakehurst.wiremock.client.WireMock.{aResponse, put, urlEqualTo}
+import com.github.tomakehurst.wiremock.client.WireMock.{aResponse, post, put, urlEqualTo}
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import generators.Generators
 import helpers.WireMockServerHandler
@@ -89,7 +89,7 @@ class SubscriptionConnectorSpec extends SpecBase
           .set(BusinessNamePage, "Pizza for you").success.value
           .set(ContactEmailAddressPage, "email@email.com").success.value
 
-        stubResponse("/register-for-cross-border-arrangements/enrolment/create-enrolment", OK)
+        stubPostResponse("/register-for-cross-border-arrangements/subscription/create-dac-subscription", OK)
 
         val result = connector.createEISSubscription(userAnswers)
         result.futureValue.status mustBe OK
@@ -100,6 +100,15 @@ class SubscriptionConnectorSpec extends SpecBase
   private def stubResponse(expectedUrl: String, expectedStatus: Int): StubMapping =
     server.stubFor(
       put(urlEqualTo(expectedUrl))
+        .willReturn(
+          aResponse()
+            .withStatus(expectedStatus)
+        )
+    )
+
+  private def stubPostResponse(expectedUrl: String, expectedStatus: Int): StubMapping =
+    server.stubFor(
+      post(urlEqualTo(expectedUrl))
         .willReturn(
           aResponse()
             .withStatus(expectedStatus)
