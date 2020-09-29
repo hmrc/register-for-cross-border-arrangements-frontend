@@ -32,7 +32,7 @@ import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.viewmodels.{NunjucksSupport, SummaryList}
 import utils.CheckYourAnswersHelper
-
+import pages.SelectedAddressLookupPage
 import scala.concurrent.{ExecutionContext, Future}
 
 class CheckYourAnswersController @Inject()(
