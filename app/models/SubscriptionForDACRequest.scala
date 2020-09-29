@@ -20,7 +20,7 @@ import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 
 import pages._
-import play.api.libs.json.{JsValue, Json, OWrites}
+import play.api.libs.json.{Json, OFormat, OWrites, Reads, __}
 
 import scala.util.Random
 
@@ -34,12 +34,12 @@ object OrganisationDetails {
     }
   }
 
-  implicit val format = Json.format[OrganisationDetails]
+  implicit val format: OFormat[OrganisationDetails] = Json.format[OrganisationDetails]
 }
 
 case class IndividualDetails(firstName: String,
-                          middleName: Option[String],
-                          lastName: String)
+                             middleName: Option[String],
+                             lastName: String)
 object IndividualDetails {
   def apply(userAnswers: UserAnswers): IndividualDetails = {
     userAnswers.get(ContactNamePage) match {
@@ -48,7 +48,7 @@ object IndividualDetails {
     }
   }
 
-  implicit val format = Json.format[IndividualDetails]
+  implicit val format: OFormat[IndividualDetails] = Json.format[IndividualDetails]
 }
 
 sealed trait ContactInformation
@@ -58,7 +58,7 @@ case class ContactInformationForIndividual(individual: IndividualDetails,
                                            phone: Option[String],
                                            mobile: Option[String]) extends ContactInformation
 object ContactInformationForIndividual {
-  implicit val format = Json.format[ContactInformationForIndividual]
+  implicit val format: OFormat[ContactInformationForIndividual] = Json.format[ContactInformationForIndividual]
 }
 
 case class ContactInformationForOrganisation(organisation: OrganisationDetails,
@@ -66,78 +66,83 @@ case class ContactInformationForOrganisation(organisation: OrganisationDetails,
                                              phone: Option[String],
                                              mobile: Option[String]) extends ContactInformation
 object ContactInformationForOrganisation {
-  implicit val format = Json.format[ContactInformationForOrganisation]
+  implicit val format: OFormat[ContactInformationForOrganisation] = Json.format[ContactInformationForOrganisation]
 }
 
 case class PrimaryContact(contactInformation: ContactInformation)
 object PrimaryContact {
 
-  implicit val writes: OWrites[PrimaryContact] = OWrites[PrimaryContact] {
-    primaryContact =>
-      primaryContact.contactInformation match {
-        case ContactInformationForIndividual(individual, email, phone, mobile) =>
-          Json.obj(
-            "individual" -> Json.obj(
-              "firstName" -> individual.firstName,
-              "lastName" -> individual.lastName
-            ),
-            "email" -> email,
-            "phone" -> phone,
-            "mobile" -> mobile
-          )
-        case ContactInformationForOrganisation(organisation, email, phone, mobile) =>
-          Json.obj(
-            "organisation" -> Json.obj(
-              "organisationName" -> organisation.organisationName
-            ),
-            "email" -> email,
-            "phone" -> phone,
-            "mobile" -> mobile
-          )
+  implicit lazy val reads: Reads[PrimaryContact] = {//TODO Path probably needs PrimaryContact
+    import play.api.libs.functional.syntax._
+    (
+      (__ \ "organisation").readNullable[OrganisationDetails] and
+      (__ \ "individual").readNullable[IndividualDetails] and
+      (__ \ "email").read[String] and
+      (__ \ "phone").readNullable[String] and
+      (__ \ "mobile").readNullable[String]
+    )((organisation, individual, email, phone, mobile) =>
+      if (organisation.isDefined) {
+        PrimaryContact(ContactInformationForOrganisation(organisation.get, email, phone, mobile))
       }
+      else {
+        PrimaryContact(ContactInformationForIndividual(individual.get, email, phone, mobile))
+      }
+    )
+  }
+
+  implicit lazy val writes: OWrites[PrimaryContact] = {
+    case PrimaryContact(contactInformationForInd@ContactInformationForIndividual(_, _, _, _)) =>
+      Json.toJsObject(contactInformationForInd)
+    case PrimaryContact(contactInformationForOrg@ContactInformationForOrganisation(_, _, _, _)) =>
+      Json.toJsObject(contactInformationForOrg)
   }
 }
 
 case class SecondaryContact(contactInformation: ContactInformation)
 object SecondaryContact {
-  implicit val writes: OWrites[SecondaryContact] = OWrites[SecondaryContact] {
-    secondaryContact =>
-      secondaryContact.contactInformation match {
-        case ContactInformationForOrganisation(organisation, email, phone, mobile) =>
-          Json.obj(
-            "contactInformation" -> Json.obj(
-              "organisation" -> organisation.organisationName
-            ),
-            "email" -> email,
-            "phone" -> phone,
-            "mobile" -> mobile
-          )
+
+  implicit lazy val reads: Reads[SecondaryContact] = {
+    import play.api.libs.functional.syntax._
+    (
+      (__ \ "organisation").readNullable[OrganisationDetails] and
+        (__ \ "individual").readNullable[IndividualDetails] and
+        (__ \ "email").read[String] and
+        (__ \ "phone").readNullable[String] and
+        (__ \ "mobile").readNullable[String]
+      )((organisation, individual, email, phone, mobile) =>
+      if (organisation.isDefined) {
+        SecondaryContact(ContactInformationForOrganisation(organisation.get, email, phone, mobile))
       }
+      else {
+        SecondaryContact(ContactInformationForIndividual(individual.get, email, phone, mobile))
+      }
+    )
+  }
+
+  implicit lazy val writes: OWrites[SecondaryContact] = {
+    case SecondaryContact(contactInformationForInd@ContactInformationForIndividual(_, _, _, _)) =>
+      Json.toJsObject(contactInformationForInd)
+    case SecondaryContact(contactInformationForOrg@ContactInformationForOrganisation(_, _, _, _)) =>
+      Json.toJsObject(contactInformationForOrg)
   }
 }
 
-//TODO What type is requestParameters?
+case class RequestParameter(paramName: String, paramValue: String)
+
+object RequestParameter {
+  implicit val format: OFormat[RequestParameter] = Json.format[RequestParameter]
+}
+
 case class RequestCommon(regime: String,
                          receiptDate: String,
                          acknowledgementReference: String,
                          originatingSystem: String,
-                         requestParameters: Option[Seq[String]],
+                         requestParameters: Option[Seq[RequestParameter]],
                          paramName: String,
                          paramValue: String)
 
 object RequestCommon {
-  implicit val writes: OWrites[RequestCommon] = OWrites[RequestCommon] {
-    requestCommon =>
-      Json.obj(
-        "regime" -> requestCommon.regime,
-        "receiptDate" -> requestCommon.receiptDate,
-        "acknowledgementReference" -> requestCommon.acknowledgementReference,
-        "originatingSystem" -> requestCommon.originatingSystem,
-        "requestParameters" -> requestCommon.requestParameters,
-        "paramName" -> requestCommon.paramName,
-        "paramValue" -> requestCommon.paramValue
-      )
-  }
+  implicit val format: OFormat[RequestCommon] = Json.format[RequestCommon]
 }
 
 case class RequestDetail(idType: String,
@@ -147,24 +152,36 @@ case class RequestDetail(idType: String,
                          primaryContact: PrimaryContact,
                          secondaryContact: Option[SecondaryContact])
 object RequestDetail {
-  implicit val writes = OWrites[RequestDetail] {
-    requestDetails =>
-      Json.obj(
-        "idType" -> requestDetails.idType,
-        "idNumber" -> requestDetails.idNumber,
-        "tradingName" -> requestDetails.tradingName,
-        "isGBUser" -> requestDetails.isGBUser,
-        "primaryContact" -> requestDetails.primaryContact,
-        "secondaryContact" -> requestDetails.secondaryContact
-      )
+
+  implicit val reads: Reads[RequestDetail] = {
+    import play.api.libs.functional.syntax._
+    (
+      (__ \ "idType").read[String] and
+      (__ \ "idNumber").read[String] and
+      (__ \ "tradingName").readNullable[String] and
+      (__ \ "isGBUser").read[Boolean] and
+      (__ \ "primaryContact").read[PrimaryContact] and
+      (__ \ "secondaryContact").readNullable[SecondaryContact]
+    )((idType, idNumber, tradingName, isGBUser, primaryContact, secondaryContact) =>
+      RequestDetail(idType, idNumber, tradingName, isGBUser, primaryContact, secondaryContact))
   }
+
+  implicit val writes: OWrites[RequestDetail] = Json.writes[RequestDetail]
 }
 
 
 case class SubscriptionForDACRequest(requestCommon: RequestCommon, requestDetail: RequestDetail)
 object SubscriptionForDACRequest {
 
-  implicit val writes = OWrites[SubscriptionForDACRequest] {
+  implicit val reads: Reads[SubscriptionForDACRequest] = {
+    import play.api.libs.functional.syntax._
+    (
+      (__ \ "requestCommon").read[RequestCommon] and
+        (__ \ "requestDetail").read[RequestDetail]
+    )((requestCommon, requestDetail) => SubscriptionForDACRequest(requestCommon, requestDetail))
+  }
+
+  implicit val writes: OWrites[SubscriptionForDACRequest] = OWrites[SubscriptionForDACRequest] {
     dacRequest =>
       Json.obj(
         "requestCommon" -> dacRequest.requestCommon,
@@ -172,7 +189,7 @@ object SubscriptionForDACRequest {
       )
   }
 
-  def createDacRequest(userAnswers: UserAnswers): SubscriptionForDACRequest = {
+  def createEnrolment(userAnswers: UserAnswers): SubscriptionForDACRequest = {
 
     SubscriptionForDACRequest(
       requestCommon = createRequestCommon,
