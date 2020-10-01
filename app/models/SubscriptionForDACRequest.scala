@@ -20,7 +20,7 @@ import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 
 import pages._
-import play.api.libs.json.{Json, OFormat, OWrites, Reads, __}
+import play.api.libs.json._
 
 import scala.util.Random
 
@@ -71,8 +71,7 @@ object ContactInformationForOrganisation {
 
 case class PrimaryContact(contactInformation: ContactInformation)
 object PrimaryContact {
-
-  implicit lazy val reads: Reads[PrimaryContact] = {//TODO Path probably needs PrimaryContact
+  implicit lazy val reads: Reads[PrimaryContact] = {
     import play.api.libs.functional.syntax._
     (
       (__ \ "organisation").readNullable[OrganisationDetails] and
@@ -100,7 +99,6 @@ object PrimaryContact {
 
 case class SecondaryContact(contactInformation: ContactInformation)
 object SecondaryContact {
-
   implicit lazy val reads: Reads[SecondaryContact] = {
     import play.api.libs.functional.syntax._
     (
@@ -127,22 +125,20 @@ object SecondaryContact {
   }
 }
 
-case class RequestParameter(paramName: String, paramValue: String)
-
+case class RequestParameter(paramName: String,
+                            paramValue: String)
 object RequestParameter {
   implicit val format: OFormat[RequestParameter] = Json.format[RequestParameter]
 }
 
-case class RequestCommon(regime: String,
-                         receiptDate: String,
-                         acknowledgementReference: String,
-                         originatingSystem: String,
-                         requestParameters: Option[Seq[RequestParameter]],
-                         paramName: String,
-                         paramValue: String)
+case class RequestCommonForSubscription(regime: String,
+                                        receiptDate: String,
+                                        acknowledgementReference: String,
+                                        originatingSystem: String,
+                                        requestParameters: Option[Seq[RequestParameter]])
 
-object RequestCommon {
-  implicit val format: OFormat[RequestCommon] = Json.format[RequestCommon]
+object RequestCommonForSubscription {
+  implicit val format: OFormat[RequestCommonForSubscription] = Json.format[RequestCommonForSubscription]
 }
 
 case class RequestDetail(idType: String,
@@ -170,22 +166,25 @@ object RequestDetail {
 }
 
 
-case class SubscriptionForDACRequest(requestCommon: RequestCommon, requestDetail: RequestDetail)
+case class SubscriptionForDACRequest(requestCommon: RequestCommonForSubscription,
+                                     requestDetail: RequestDetail)
 object SubscriptionForDACRequest {
 
   implicit val reads: Reads[SubscriptionForDACRequest] = {
     import play.api.libs.functional.syntax._
     (
-      (__ \ "requestCommon").read[RequestCommon] and
-        (__ \ "requestDetail").read[RequestDetail]
+      (__ \ "createSubscriptionForDACRequest" \ "requestCommon").read[RequestCommonForSubscription] and
+        (__ \ "createSubscriptionForDACRequest" \ "requestDetail").read[RequestDetail]
     )((requestCommon, requestDetail) => SubscriptionForDACRequest(requestCommon, requestDetail))
   }
 
   implicit val writes: OWrites[SubscriptionForDACRequest] = OWrites[SubscriptionForDACRequest] {
     dacRequest =>
       Json.obj(
-        "requestCommon" -> dacRequest.requestCommon,
-        "requestDetail" -> dacRequest.requestDetail
+        "createSubscriptionForDACRequest" -> Json.obj(
+          "requestCommon" -> dacRequest.requestCommon,
+          "requestDetail" -> dacRequest.requestDetail
+        )
       )
   }
 
@@ -197,7 +196,7 @@ object SubscriptionForDACRequest {
     )
   }
 
-  private def createRequestCommon: RequestCommon = {
+  private def createRequestCommon: RequestCommonForSubscription = {
     //Format: ISO 8601 YYYY-MM-DDTHH:mm:ssZ e.g. 2020-09-23T16:12:11Z
     val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'")
 
@@ -205,14 +204,12 @@ object SubscriptionForDACRequest {
     val idSize: Int = 1 + r.nextInt(33) //Generate a size between 1 and 32
     val generateAcknowledgementReference: String = r.alphanumeric.take(idSize).mkString
 
-    RequestCommon(
+    RequestCommonForSubscription(
       regime = "DAC",
       receiptDate = ZonedDateTime.now().format(formatter),
       acknowledgementReference = generateAcknowledgementReference,
       originatingSystem = "MDTP",
-      requestParameters = None,
-      paramName = "",
-      paramValue = ""
+      requestParameters = None
     )
   }
 

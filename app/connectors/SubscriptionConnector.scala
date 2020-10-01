@@ -18,7 +18,7 @@ package connectors
 
 import config.FrontendAppConfig
 import javax.inject.Inject
-import models.{SubscriptionForDACRequest, SubscriptionInfo, UserAnswers}
+import models.{SubscriptionForDACRequest, SubscriptionForDACResponse, SubscriptionInfo, UserAnswers}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse}
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -33,9 +33,14 @@ class SubscriptionConnector @Inject()(val config: FrontendAppConfig, val http: H
   }
 
   def createEISSubscription(userAnswers: UserAnswers)
-                           (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] = {
+                           (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[SubscriptionForDACResponse] = {
 
     val submissionUrl = s"${config.businessMatchingUrl}/subscription/create-dac-subscription"
-    http.POST[SubscriptionForDACRequest, HttpResponse](submissionUrl, SubscriptionForDACRequest.createEnrolment(userAnswers))
+    http.POST[SubscriptionForDACRequest, HttpResponse](submissionUrl, SubscriptionForDACRequest.createEnrolment(userAnswers)).map {
+      response =>
+        response.status match {
+          case _ => response.json.as[SubscriptionForDACResponse]//.responseDetail.subscriptionID
+        }
+    }
   }
 }
