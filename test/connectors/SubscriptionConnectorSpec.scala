@@ -21,7 +21,7 @@ import com.github.tomakehurst.wiremock.client.WireMock.{aResponse, post, put, ur
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import generators.Generators
 import helpers.WireMockServerHandler
-import models.{BusinessType, UniqueTaxpayerReference, UserAnswers}
+import models.{BusinessType, ResponseCommon, ResponseDetail, SubscriptionForDACResponse, UniqueTaxpayerReference, UserAnswers}
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import pages._
@@ -89,10 +89,29 @@ class SubscriptionConnectorSpec extends SpecBase
           .set(BusinessNamePage, "Pizza for you").success.value
           .set(ContactEmailAddressPage, "email@email.com").success.value
 
-        stubPostResponse("/register-for-cross-border-arrangements/subscription/create-dac-subscription", OK)
+        val subscriptionForDACResponse = SubscriptionForDACResponse(
+          responseCommon = ResponseCommon("OK", None, "2020-09-23T16:12:11Z", None),
+          responseDetail = ResponseDetail("XADAC0000123456")
+        )
+
+        val expectedBody =
+          """
+            |{
+            | "createSubscriptionForDACResponse": {
+            |   "responseCommon": {
+            |     "status": "OK",
+            |     "processingDate": "2020-09-23T16:12:11Z"
+            |   },
+            |   "responseDetail": {
+            |      "subscriptionID": "XADAC0000123456"
+            |   }
+            | }
+            |}""".stripMargin
+
+        stubPostResponse("/register-for-cross-border-arrangements/subscription/create-dac-subscription", OK, expectedBody)
 
         val result = connector.createEISSubscription(userAnswers)
-        result.futureValue.status mustBe OK
+        result.futureValue mustBe subscriptionForDACResponse
       }
     }
   }
@@ -106,12 +125,13 @@ class SubscriptionConnectorSpec extends SpecBase
         )
     )
 
-  private def stubPostResponse(expectedUrl: String, expectedStatus: Int): StubMapping =
+  private def stubPostResponse(expectedUrl: String, expectedStatus: Int, expectedBody: String): StubMapping =
     server.stubFor(
       post(urlEqualTo(expectedUrl))
         .willReturn(
           aResponse()
             .withStatus(expectedStatus)
+            .withBody(expectedBody)
         )
     )
 }

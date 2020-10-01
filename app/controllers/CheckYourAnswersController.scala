@@ -22,21 +22,23 @@ import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierA
 import models.RegistrationType.Individual
 import models.{RegistrationType, UserAnswers}
 import org.slf4j.LoggerFactory
-import pages.{BusinessTypePage, DoYouHaveANationalInsuranceNumberPage, DoYouHaveUTRPage, RegistrationTypePage}
+import pages.{BusinessTypePage, DoYouHaveANationalInsuranceNumberPage, DoYouHaveUTRPage, RegistrationTypePage, SelectedAddressLookupPage, SubscriptionIDPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import renderer.Renderer
+import repositories.SessionRepository
 import services.{EmailService, RegistrationService}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.viewmodels.{NunjucksSupport, SummaryList}
 import utils.CheckYourAnswersHelper
-import pages.SelectedAddressLookupPage
+
 import scala.concurrent.{ExecutionContext, Future}
 
 class CheckYourAnswersController @Inject()(
                                             override val messagesApi: MessagesApi,
+                                            sessionRepository: SessionRepository,
                                             identify: IdentifierAction,
                                             notEnrolled: NotEnrolledForDAC6Action,
                                             getData: DataRetrievalAction,
@@ -158,20 +160,34 @@ class CheckYourAnswersController @Inject()(
   def onSubmit(): Action[AnyContent] = (identify andThen notEnrolled andThen getData andThen requireData).async {
     implicit request =>
 
-      (request.userAnswers.get(DoYouHaveUTRPage), request.userAnswers.get(RegistrationTypePage),
-        request.userAnswers.get(DoYouHaveANationalInsuranceNumberPage)) match {
+      val updatedUserAnswers =
+        for {
+          response           <- taxEnrolmentsConnector.createEISSubscription(request.userAnswers)
+          updatedUserAnswers <- Future.fromTry(request.userAnswers.set(SubscriptionIDPage, response.responseDetail.subscriptionID))
+          _                  <- sessionRepository.set(updatedUserAnswers)
+        } yield updatedUserAnswers
 
-        case (Some(true), None, None) => createEnrolment(request.userAnswers) // TODO: EIS subscription for business with ID
-        case (Some(false), Some(Individual), Some(true)) => createEnrolment(request.userAnswers) // TODO: EIS subscription for individual with ID
+      updatedUserAnswers.flatMap {
+        updatedUA =>
+          (request.userAnswers.get(DoYouHaveUTRPage), request.userAnswers.get(RegistrationTypePage),
+            request.userAnswers.get(DoYouHaveANationalInsuranceNumberPage)) match {
 
-        case (Some(false), _, Some(false) | None) => registrationService.sendRegistration(request.userAnswers) flatMap {
-          case Some(response) => response.status match {
-            case OK => createEnrolment(request.userAnswers)
+            case (Some(true), None, None) => createEnrolment(updatedUA) // TODO: EIS subscription for business with ID
+            case (Some(false), Some(Individual), Some(true)) => createEnrolment(updatedUA) // TODO: EIS subscription for individual with ID
+
+            case (Some(false), _, Some(false) | None) => registrationService.sendRegistration(request.userAnswers) flatMap {
+              case Some(response) => response.status match {
+                case OK => createEnrolment(updatedUA)
+                case _ => Future.successful(Redirect(routes.ProblemWithServiceController.onPageLoad()))
+              }
+              case _ => Future.successful(Redirect(routes.ProblemWithServiceController.onPageLoad()))
+            }
             case _ => Future.successful(Redirect(routes.ProblemWithServiceController.onPageLoad()))
           }
-          case _ => Future.successful(Redirect(routes.ProblemWithServiceController.onPageLoad()))
-        }
-        case _ => Future.successful(Redirect(routes.ProblemWithServiceController.onPageLoad()))
+      }.recover {
+        case e: Exception =>
+          logger.error("Unable to create an EIS subscription", e)
+          Redirect(routes.ProblemWithServiceController.onPageLoad())
       }
 
   }
