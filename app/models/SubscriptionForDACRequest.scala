@@ -27,7 +27,7 @@ import scala.util.Random
 
 case class OrganisationDetails(organisationName: String)
 object OrganisationDetails {
-  def apply(userAnswers: UserAnswers): OrganisationDetails = {
+  def buildOrganisationDetails(userAnswers: UserAnswers): OrganisationDetails = {
     userAnswers.get(BusinessNamePage) match {
       case Some(name) => new OrganisationDetails(name)
       case None => throw new Exception("Organisation name can't be empty when creating a subscription")
@@ -41,7 +41,7 @@ case class IndividualDetails(firstName: String,
                              middleName: Option[String],
                              lastName: String)
 object IndividualDetails {
-  def apply(userAnswers: UserAnswers): IndividualDetails = {
+  def buildIndividualDetails(userAnswers: UserAnswers): IndividualDetails = {
     userAnswers.get(ContactNamePage) match {
       case Some(name) => new IndividualDetails(name.firstName, None, name.secondName)
       case None => throw new Exception("Individual name can't be empty when creating a subscription")
@@ -71,20 +71,21 @@ object ContactInformationForOrganisation {
 
 case class PrimaryContact(contactInformation: ContactInformation)
 object PrimaryContact {
+
   implicit lazy val reads: Reads[PrimaryContact] = {
     import play.api.libs.functional.syntax._
     (
       (__ \ "organisation").readNullable[OrganisationDetails] and
-      (__ \ "individual").readNullable[IndividualDetails] and
-      (__ \ "email").read[String] and
-      (__ \ "phone").readNullable[String] and
-      (__ \ "mobile").readNullable[String]
-    )((organisation, individual, email, phone, mobile) =>
-      if (organisation.isDefined) {
-        PrimaryContact(ContactInformationForOrganisation(organisation.get, email, phone, mobile))
-      }
-      else {
-        PrimaryContact(ContactInformationForIndividual(individual.get, email, phone, mobile))
+        (__ \ "individual").readNullable[IndividualDetails] and
+        (__ \ "email").read[String] and
+        (__ \ "phone").readNullable[String] and
+        (__ \ "mobile").readNullable[String]
+      ) (
+      (organisation, individual, email, phone, mobile) => (organisation, individual) match {
+        case (Some(_), Some(_)) => throw new Exception("PrimaryContact cannot have both and organisation or individual element")
+        case (Some(org), _) => PrimaryContact(ContactInformationForOrganisation(org, email, phone, mobile))
+        case (_, Some(ind)) => PrimaryContact(ContactInformationForIndividual(ind, email, phone, mobile))
+        case (None, None) => throw new Exception("PrimaryContact must have either an organisation or individual element")
       }
     )
   }
@@ -99,6 +100,7 @@ object PrimaryContact {
 
 case class SecondaryContact(contactInformation: ContactInformation)
 object SecondaryContact {
+
   implicit lazy val reads: Reads[SecondaryContact] = {
     import play.api.libs.functional.syntax._
     (
@@ -107,12 +109,12 @@ object SecondaryContact {
         (__ \ "email").read[String] and
         (__ \ "phone").readNullable[String] and
         (__ \ "mobile").readNullable[String]
-      )((organisation, individual, email, phone, mobile) =>
-      if (organisation.isDefined) {
-        SecondaryContact(ContactInformationForOrganisation(organisation.get, email, phone, mobile))
-      }
-      else {
-        SecondaryContact(ContactInformationForIndividual(individual.get, email, phone, mobile))
+      ) (
+      (organisation, individual, email, phone, mobile) => (organisation, individual) match {
+        case (Some(_), Some(_)) => throw new Exception("SecondaryContact cannot have both and organisation or individual element")
+        case (Some(org), _) => SecondaryContact(ContactInformationForOrganisation(org, email, phone, mobile))
+        case (_, Some(ind)) => SecondaryContact(ContactInformationForIndividual(ind, email, phone, mobile))
+        case (None, None) => throw new Exception("SecondaryContact must have either an organisation or individual element")
       }
     )
   }
@@ -173,18 +175,16 @@ object SubscriptionForDACRequest {
   implicit val reads: Reads[SubscriptionForDACRequest] = {
     import play.api.libs.functional.syntax._
     (
-      (__ \ "createSubscriptionForDACRequest" \ "requestCommon").read[RequestCommonForSubscription] and
-        (__ \ "createSubscriptionForDACRequest" \ "requestDetail").read[RequestDetail]
+      (__ \ "requestCommon").read[RequestCommonForSubscription] and
+        (__ \ "requestDetail").read[RequestDetail]
     )((requestCommon, requestDetail) => SubscriptionForDACRequest(requestCommon, requestDetail))
   }
 
   implicit val writes: OWrites[SubscriptionForDACRequest] = OWrites[SubscriptionForDACRequest] {
     dacRequest =>
       Json.obj(
-        "createSubscriptionForDACRequest" -> Json.obj(
-          "requestCommon" -> dacRequest.requestCommon,
-          "requestDetail" -> dacRequest.requestDetail
-        )
+        "requestCommon" -> dacRequest.requestCommon,
+        "requestDetail" -> dacRequest.requestDetail
       )
   }
 
@@ -253,13 +253,13 @@ object SubscriptionForDACRequest {
     if (secondaryContact) {
       val secondaryEmail = userAnswers.get(SecondaryContactEmailAddressPage) match {
         case Some(email) => email
-        case None => "" //TODO Secondary email should be optional? In the API it isn't
+        case None => throw new Exception("Unable to retrieve secondary email address")
       }
 
       val secondaryContactNumber = userAnswers.get(SecondaryContactTelephoneNumberPage)
 
       ContactInformationForOrganisation(
-        organisation = OrganisationDetails(userAnswers),
+        organisation = OrganisationDetails.buildOrganisationDetails(userAnswers),
         email = secondaryEmail,
         phone = secondaryContactNumber,
         mobile = secondaryContactNumber)
@@ -273,13 +273,13 @@ object SubscriptionForDACRequest {
 
       if (getIdTypeAndNumber(userAnswers)._1 == "NINO") {
         ContactInformationForIndividual(
-          individual = IndividualDetails(userAnswers),
+          individual = IndividualDetails.buildIndividualDetails(userAnswers),
           email = email,
           phone = contactNumber,
           mobile = contactNumber)
       } else {
         ContactInformationForOrganisation(
-          organisation = OrganisationDetails(userAnswers),
+          organisation = OrganisationDetails.buildOrganisationDetails(userAnswers),
           email = email,
           phone = contactNumber,
           mobile = contactNumber)
@@ -287,4 +287,10 @@ object SubscriptionForDACRequest {
     }
   }
 
+}
+
+case class CreateSubscriptionForDACRequest(createSubscriptionForDACRequest: SubscriptionForDACRequest)
+
+object CreateSubscriptionForDACRequest {
+  implicit val format: OFormat[CreateSubscriptionForDACRequest] = Json.format[CreateSubscriptionForDACRequest]
 }

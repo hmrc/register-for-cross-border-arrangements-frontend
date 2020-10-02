@@ -22,7 +22,7 @@ import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierA
 import models.RegistrationType.Individual
 import models.{RegistrationType, UserAnswers}
 import org.slf4j.LoggerFactory
-import pages.{BusinessTypePage, DoYouHaveANationalInsuranceNumberPage, DoYouHaveUTRPage, RegistrationTypePage, SelectedAddressLookupPage, SubscriptionIDPage}
+import pages._
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
@@ -159,37 +159,44 @@ class CheckYourAnswersController @Inject()(
 
   def onSubmit(): Action[AnyContent] = (identify andThen notEnrolled andThen getData andThen requireData).async {
     implicit request =>
+      taxEnrolmentsConnector.createEISSubscription(request.userAnswers).flatMap {
+        response =>
+          if (response.isDefined) {
+            val safeID = response.get.createSubscriptionForDACResponse.responseDetail.subscriptionID
 
-      val updatedUserAnswers =
-        for {
-          response           <- taxEnrolmentsConnector.createEISSubscription(request.userAnswers)
-          updatedUserAnswers <- Future.fromTry(request.userAnswers.set(SubscriptionIDPage, response.responseDetail.subscriptionID))
-          _                  <- sessionRepository.set(updatedUserAnswers)
-        } yield updatedUserAnswers
+            updateUserAnswers(request.userAnswers, safeID).flatMap {
+              userAnswers =>
+                (userAnswers.get(DoYouHaveUTRPage), userAnswers.get(RegistrationTypePage),
+                  userAnswers.get(DoYouHaveANationalInsuranceNumberPage)) match {
 
-      updatedUserAnswers.flatMap {
-        updatedUA =>
-          (request.userAnswers.get(DoYouHaveUTRPage), request.userAnswers.get(RegistrationTypePage),
-            request.userAnswers.get(DoYouHaveANationalInsuranceNumberPage)) match {
+                  case (Some(true), None, None) => createEnrolment(userAnswers)
+                  case (Some(false), Some(Individual), Some(true)) => createEnrolment(userAnswers)
 
-            case (Some(true), None, None) => createEnrolment(updatedUA) // TODO: EIS subscription for business with ID
-            case (Some(false), Some(Individual), Some(true)) => createEnrolment(updatedUA) // TODO: EIS subscription for individual with ID
-
-            case (Some(false), _, Some(false) | None) => registrationService.sendRegistration(request.userAnswers) flatMap {
-              case Some(response) => response.status match {
-                case OK => createEnrolment(updatedUA)
-                case _ => Future.successful(Redirect(routes.ProblemWithServiceController.onPageLoad()))
-              }
-              case _ => Future.successful(Redirect(routes.ProblemWithServiceController.onPageLoad()))
+                  case (Some(false), _, Some(false) | None) => registrationService.sendRegistration(userAnswers).flatMap {
+                    case Some(response) => response.status match {
+                      case OK => createEnrolment(userAnswers)
+                      case _ => Future.successful(Redirect(routes.ProblemWithServiceController.onPageLoad()))
+                    }
+                    case _ => Future.successful(Redirect(routes.ProblemWithServiceController.onPageLoad()))
+                  }
+                  case _ => Future.successful(Redirect(routes.ProblemWithServiceController.onPageLoad()))
+                }
             }
-            case _ => Future.successful(Redirect(routes.ProblemWithServiceController.onPageLoad()))
+          } else {
+            Future.successful(Redirect(routes.ProblemWithServiceController.onPageLoad()))
           }
       }.recover {
         case e: Exception =>
           logger.error("Unable to create an EIS subscription", e)
           Redirect(routes.ProblemWithServiceController.onPageLoad())
       }
+  }
 
+  private def updateUserAnswers(userAnswers: UserAnswers, safeID: String): Future[UserAnswers] = {
+    for {
+      updatedUserAnswers <- Future.fromTry(userAnswers.set(SubscriptionIDPage, safeID))
+      _                  <- sessionRepository.set(updatedUserAnswers)
+    } yield updatedUserAnswers
   }
 
   private def logEmailResponse(emailResponse: Option[HttpResponse]): Unit = {

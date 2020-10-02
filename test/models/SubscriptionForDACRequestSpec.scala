@@ -54,24 +54,28 @@ class SubscriptionForDACRequestSpec extends FreeSpec with MustMatchers with Scal
     secondaryContact = None)
 
 
-  val indRequest: SubscriptionForDACRequest = SubscriptionForDACRequest(
-    requestCommon = requestCommon,
-    requestDetail = requestDetail.copy(primaryContact = primaryContactForInd)
+  val indRequest: CreateSubscriptionForDACRequest = CreateSubscriptionForDACRequest(
+    SubscriptionForDACRequest(
+      requestCommon = requestCommon,
+      requestDetail = requestDetail.copy(primaryContact = primaryContactForInd))
   )
 
-  val orgRequest: SubscriptionForDACRequest = SubscriptionForDACRequest(
-    requestCommon = requestCommon,
-    requestDetail = requestDetail
+  val orgRequest: CreateSubscriptionForDACRequest = CreateSubscriptionForDACRequest(
+    SubscriptionForDACRequest(
+      requestCommon = requestCommon,
+      requestDetail = requestDetail)
   )
 
-  val indWithSecondaryContact: SubscriptionForDACRequest = SubscriptionForDACRequest(
-    requestCommon = requestCommon.copy(requestParameters = None),
-    requestDetail = requestDetail.copy(primaryContact = primaryContactForInd, secondaryContact = Some(secondaryContactForInd))
+  val indWithSecondaryContact: CreateSubscriptionForDACRequest = CreateSubscriptionForDACRequest(
+    SubscriptionForDACRequest(
+      requestCommon = requestCommon.copy(requestParameters = None),
+      requestDetail = requestDetail.copy(primaryContact = primaryContactForInd, secondaryContact = Some(secondaryContactForInd)))
   )
 
-  val orgWithSecondaryContact: SubscriptionForDACRequest = SubscriptionForDACRequest(
-    requestCommon = requestCommon.copy(requestParameters = None),
-    requestDetail = requestDetail.copy(secondaryContact = Some(secondaryContactForOrg))
+  val orgWithSecondaryContact: CreateSubscriptionForDACRequest = CreateSubscriptionForDACRequest(
+    SubscriptionForDACRequest(
+      requestCommon = requestCommon.copy(requestParameters = None),
+      requestDetail = requestDetail.copy(secondaryContact = Some(secondaryContactForOrg)))
   )
 
   //TODO Move the json to JsonFixtures once 286 is merged to master
@@ -204,22 +208,22 @@ class SubscriptionForDACRequestSpec extends FreeSpec with MustMatchers with Scal
       |}
       |""".stripMargin
 
-  "SubscriptionForDACRequest" - {
+  "CreateSubscriptionForDACRequest" - {
 
-    "must deserialise SubscriptionForDACRequest (with Request parameters) for an individual without a secondary contact" in {
-      Json.parse(jsonPayloadForInd).validate[SubscriptionForDACRequest].get mustBe indRequest
+    "must deserialise CreateSubscriptionForDACRequest (with Request parameters) for an individual without a secondary contact" in {
+      Json.parse(jsonPayloadForInd).validate[CreateSubscriptionForDACRequest].get mustBe indRequest
     }
 
-    "must deserialise SubscriptionForDACRequest (with Request parameters) for an organisation without a secondary contact" in {
-      Json.parse(jsonPayloadForOrg).validate[SubscriptionForDACRequest].get mustBe orgRequest
+    "must deserialise CreateSubscriptionForDACRequest (with Request parameters) for an organisation without a secondary contact" in {
+      Json.parse(jsonPayloadForOrg).validate[CreateSubscriptionForDACRequest].get mustBe orgRequest
     }
 
-    "must deserialise SubscriptionForDACRequest for an individual with a secondary contact" in {
-      Json.parse(jsonPayloadForIndWithSecondaryContact).validate[SubscriptionForDACRequest].get mustBe indWithSecondaryContact
+    "must deserialise CreateSubscriptionForDACRequest for an individual with a secondary contact" in {
+      Json.parse(jsonPayloadForIndWithSecondaryContact).validate[CreateSubscriptionForDACRequest].get mustBe indWithSecondaryContact
     }
 
-    "must deserialise SubscriptionForDACRequest for an organisation with a secondary contact" in {
-      Json.parse(jsonPayloadForOrgWithSecondaryContact).validate[SubscriptionForDACRequest].get mustBe orgWithSecondaryContact
+    "must deserialise CreateSubscriptionForDACRequest for an organisation with a secondary contact" in {
+      Json.parse(jsonPayloadForOrgWithSecondaryContact).validate[CreateSubscriptionForDACRequest].get mustBe orgWithSecondaryContact
     }
 
     "must serialise subscription request for individual - exclude null fields for optional contact details" in {

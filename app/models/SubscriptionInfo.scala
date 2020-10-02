@@ -16,7 +16,7 @@
 
 package models
 
-import pages.{CorporationTaxUTRPage, NinoPage, SelfAssessmentUTRPage, WhatIsYourAddressPage}
+import pages.{CorporationTaxUTRPage, NinoPage, SelfAssessmentUTRPage, SubscriptionIDPage, WhatIsYourAddressPage}
 import play.api.libs.json.{Json, OFormat}
 
 case class SubscriptionInfo(safeID: String,
@@ -29,14 +29,21 @@ object SubscriptionInfo {
 
   def createSubscriptionInfo(userAnswers: UserAnswers): SubscriptionInfo = {
 
-    //TODO: pass safeID from register cal lto ETMP
-
-    SubscriptionInfo(safeID = "id",
+    SubscriptionInfo(
+      safeID = getSafeID(userAnswers),
       saUtr = getSaUtrIfProvided(userAnswers),
       ctUtr = getCtUtrIfProvided(userAnswers),
       nino = getNinoIfProvided(userAnswers),
       nonUkPostcode = getNonUkPostCodeIfProvided(userAnswers))
   }
+
+    private def getSafeID(userAnswers: UserAnswers) = {
+      userAnswers.get(SubscriptionIDPage) match {
+        case Some(id) => id
+        case None => throw new Exception("Unable to retrieve Safe ID")
+      }
+    }
+
     private def getNinoIfProvided(userAnswers: UserAnswers): Option[String] = {
       userAnswers.get(NinoPage) match {
 

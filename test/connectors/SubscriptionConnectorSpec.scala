@@ -21,12 +21,12 @@ import com.github.tomakehurst.wiremock.client.WireMock.{aResponse, post, put, ur
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import generators.Generators
 import helpers.WireMockServerHandler
-import models.{BusinessType, ResponseCommon, ResponseDetail, SubscriptionForDACResponse, UniqueTaxpayerReference, UserAnswers}
+import models.{BusinessType, CreateSubscriptionForDACResponse, ResponseCommon, ResponseDetail, SubscriptionForDACResponse, UniqueTaxpayerReference, UserAnswers}
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import pages._
 import play.api.Application
-import play.api.http.Status.{BAD_REQUEST, INTERNAL_SERVER_ERROR, OK}
+import play.api.http.Status.{BAD_REQUEST, INTERNAL_SERVER_ERROR, OK, SERVICE_UNAVAILABLE}
 import play.api.inject.guice.GuiceApplicationBuilder
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -49,10 +49,11 @@ class SubscriptionConnectorSpec extends SpecBase
 
 
       forAll(arbitrary[UserAnswers]) {
-        (userAnswers) =>
+        userAnswers =>
+          val updatedUserAnswers = userAnswers.set(SubscriptionIDPage, "XADAC0000123456").success.value
           stubResponse(s"/register-for-cross-border-arrangements/enrolment/create-enrolment", OK)
 
-          val result = connector.createSubscription(userAnswers)
+          val result = connector.createSubscription(updatedUserAnswers)
           result.futureValue.status mustBe OK
       }
     }
@@ -61,10 +62,11 @@ class SubscriptionConnectorSpec extends SpecBase
 
 
       forAll(arbitrary[UserAnswers]) {
-        (userAnswers) =>
+        userAnswers =>
+          val updatedUserAnswers = userAnswers.set(SubscriptionIDPage, "XADAC0000123456").success.value
           stubResponse(s"/register-for-cross-border-arrangements/enrolment/create-enrolment", BAD_REQUEST)
 
-          val result = connector.createSubscription(userAnswers)
+          val result = connector.createSubscription(updatedUserAnswers)
           result.futureValue.status mustBe BAD_REQUEST
       }
     }
@@ -73,25 +75,29 @@ class SubscriptionConnectorSpec extends SpecBase
 
 
       forAll(arbitrary[UserAnswers]) {
-        (userAnswers) =>
+        userAnswers =>
+          val updatedUserAnswers = userAnswers.set(SubscriptionIDPage, "XADAC0000123456").success.value
           stubResponse(s"/register-for-cross-border-arrangements/enrolment/create-enrolment", INTERNAL_SERVER_ERROR)
 
-          val result = connector.createSubscription(userAnswers)
+          val result = connector.createSubscription(updatedUserAnswers)
           result.futureValue.status mustBe INTERNAL_SERVER_ERROR
       }
     }
 
     "when calling createEISSubscription" - {
-      "must return status OK for submission of valid organisation registration details" in {
-        val userAnswers = UserAnswers(userAnswersId)
-          .set(BusinessTypePage, BusinessType.Partnership).success.value
-          .set(SelfAssessmentUTRPage, UniqueTaxpayerReference("0123456789")).success.value
-          .set(BusinessNamePage, "Pizza for you").success.value
-          .set(ContactEmailAddressPage, "email@email.com").success.value
 
-        val subscriptionForDACResponse = SubscriptionForDACResponse(
-          responseCommon = ResponseCommon("OK", None, "2020-09-23T16:12:11Z", None),
-          responseDetail = ResponseDetail("XADAC0000123456")
+      val userAnswers = UserAnswers(userAnswersId)
+        .set(BusinessTypePage, BusinessType.Partnership).success.value
+        .set(SelfAssessmentUTRPage, UniqueTaxpayerReference("0123456789")).success.value
+        .set(BusinessNamePage, "Pizza for you").success.value
+        .set(ContactEmailAddressPage, "email@email.com").success.value
+
+      "must return status OK for submission of valid registration details" in {
+
+        val response = CreateSubscriptionForDACResponse(
+          SubscriptionForDACResponse(
+            responseCommon = ResponseCommon("OK", None, "2020-09-23T16:12:11Z", None),
+            responseDetail = ResponseDetail("XADAC0000123456"))
         )
 
         val expectedBody =
@@ -111,8 +117,15 @@ class SubscriptionConnectorSpec extends SpecBase
         stubPostResponse("/register-for-cross-border-arrangements/subscription/create-dac-subscription", OK, expectedBody)
 
         val result = connector.createEISSubscription(userAnswers)
-        result.futureValue mustBe subscriptionForDACResponse
+        result.futureValue mustBe Some(response)
       }
+
+      "must return None if status is not OK and subscription fails" in {
+        stubPostResponse("/register-for-cross-border-arrangements/subscription/create-dac-subscription", SERVICE_UNAVAILABLE, "")
+
+        val result = connector.createEISSubscription(userAnswers)
+        result.futureValue mustBe None
+        }
     }
   }
 
