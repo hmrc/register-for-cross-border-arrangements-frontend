@@ -43,10 +43,15 @@ object SubscriptionForDACResponse {
   implicit val reads: Reads[SubscriptionForDACResponse] = {
     import play.api.libs.functional.syntax._
     (
-      (__ \ "createSubscriptionForDACResponse" \ "responseCommon").read[ResponseCommon] and
-        (__ \ "createSubscriptionForDACResponse" \ "responseDetail").read[ResponseDetail]
+      (__ \ "responseCommon").read[ResponseCommon] and
+        (__ \ "responseDetail").read[ResponseDetail]
     )((responseCommon, responseDetail) => SubscriptionForDACResponse(responseCommon, responseDetail))
   }
 
   implicit val writes: OWrites[SubscriptionForDACResponse] = Json.writes[SubscriptionForDACResponse]
+}
+
+case class CreateSubscriptionForDACResponse(createSubscriptionForDACResponse: SubscriptionForDACResponse)
+object CreateSubscriptionForDACResponse {
+  implicit val format: OFormat[CreateSubscriptionForDACResponse] = Json.format[CreateSubscriptionForDACResponse]
 }
