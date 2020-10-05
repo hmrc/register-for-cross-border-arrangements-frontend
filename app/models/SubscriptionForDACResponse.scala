@@ -19,32 +19,18 @@ package models
 import play.api.libs.json.{Json, OFormat, OWrites, Reads, __}
 
 
-case class ReturnParameters(paramName: String,
-                            paramValue: String)
-object ReturnParameters {
-  implicit val format: OFormat[ReturnParameters] = Json.format[ReturnParameters]
+case class ResponseDetailForDACSubscription(subscriptionID: String)
+object ResponseDetailForDACSubscription {
+  implicit val format: OFormat[ResponseDetailForDACSubscription] = Json.format[ResponseDetailForDACSubscription]
 }
 
-case class ResponseCommon(status: String,
-                          statusText: Option[String],
-                          processingDate: String,
-                          returnParameters: Option[Seq[ReturnParameters]])
-object ResponseCommon {
-  implicit val format: OFormat[ResponseCommon] = Json.format[ResponseCommon]
-}
-
-case class ResponseDetail(subscriptionID: String)
-object ResponseDetail {
-  implicit val format: OFormat[ResponseDetail] = Json.format[ResponseDetail]
-}
-
-case class SubscriptionForDACResponse(responseCommon: ResponseCommon, responseDetail: ResponseDetail)
+case class SubscriptionForDACResponse(responseCommon: ResponseCommon, responseDetail: ResponseDetailForDACSubscription)
 object SubscriptionForDACResponse {
   implicit val reads: Reads[SubscriptionForDACResponse] = {
     import play.api.libs.functional.syntax._
     (
       (__ \ "responseCommon").read[ResponseCommon] and
-        (__ \ "responseDetail").read[ResponseDetail]
+        (__ \ "responseDetail").read[ResponseDetailForDACSubscription]
     )((responseCommon, responseDetail) => SubscriptionForDACResponse(responseCommon, responseDetail))
   }
 

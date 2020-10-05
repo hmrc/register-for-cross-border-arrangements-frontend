@@ -21,7 +21,7 @@ import com.github.tomakehurst.wiremock.client.WireMock.{aResponse, post, put, ur
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import generators.Generators
 import helpers.WireMockServerHandler
-import models.{BusinessType, CreateSubscriptionForDACResponse, ResponseCommon, ResponseDetail, SubscriptionForDACResponse, UniqueTaxpayerReference, UserAnswers}
+import models.{BusinessType, CreateSubscriptionForDACResponse, ResponseCommon, ResponseDetailForDACSubscription, SubscriptionForDACResponse, UniqueTaxpayerReference, UserAnswers}
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import pages._
@@ -97,7 +97,7 @@ class SubscriptionConnectorSpec extends SpecBase
         val response = CreateSubscriptionForDACResponse(
           SubscriptionForDACResponse(
             responseCommon = ResponseCommon("OK", None, "2020-09-23T16:12:11Z", None),
-            responseDetail = ResponseDetail("XADAC0000123456"))
+            responseDetail = ResponseDetailForDACSubscription("XADAC0000123456"))
         )
 
         val expectedBody =

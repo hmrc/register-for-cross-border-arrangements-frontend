@@ -21,7 +21,7 @@ import java.time.LocalDate
 import base.SpecBase
 import connectors.SubscriptionConnector
 import models.RegistrationType.{Business, Individual}
-import models.{Address, BusinessType, Country, Name, RegistrationType, SecondaryContactPreference, UserAnswers}
+import models.{Address, BusinessType, Country, CreateSubscriptionForDACResponse, Name, RegistrationType, ResponseCommon, ResponseDetailForDACSubscription, SecondaryContactPreference, SubscriptionForDACResponse, UserAnswers}
 import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.any
 import org.mockito.Mockito.{reset, times, verify, when}
@@ -45,6 +45,10 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach {
   val nino: Nino = new Generator().nextNino
   val name: Name = Name("FirstName", "LastName")
   val email: String = "email@email.com"
+  val dacSubscriptionResponse: CreateSubscriptionForDACResponse = CreateSubscriptionForDACResponse(
+    SubscriptionForDACResponse(
+      responseCommon = ResponseCommon("OK", None, "2020-09-23T16:12:11Z", None),
+      responseDetail = ResponseDetailForDACSubscription("XADAC0000123456")))
 
   val mockEmailService: EmailService = mock[EmailService]
   val mockSubscriptionConnector: SubscriptionConnector = mock[SubscriptionConnector]
@@ -311,7 +315,8 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach {
 
     "OnSubmit" - {
 
-      "must send email and redirect to the confirmation page when OK response received for individual" in {
+      "must send email and redirect to the confirmation page when OK response received for individual and " +
+        "EIS subscription returned a subscription/safe ID" in {
 
         val userAnswers: UserAnswers = UserAnswers(userAnswersId)
           .set(DoYouHaveUTRPage, false)
@@ -330,6 +335,9 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach {
             .toInstance(mockSubscriptionConnector))
           .build()
 
+        when(mockSubscriptionConnector.createEISSubscription(any())(any(), any()))
+          .thenReturn(Future.successful(Some(dacSubscriptionResponse)))
+
         when(mockRegistrationService.sendRegistration(any())(any(), any()))
           .thenReturn(Future.successful(Some(HttpResponse(OK, ""))))
 
@@ -347,6 +355,38 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach {
         verify(mockEmailService, times(1)).sendEmail(any())(any())
       }
 
+      "must redirect to the problem with service if EIS subscription returns None" in {
+        val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          .overrides(bind[SubscriptionConnector]
+            .toInstance(mockSubscriptionConnector))
+          .build()
+
+        when(mockSubscriptionConnector.createEISSubscription(any())(any(), any()))
+          .thenReturn(Future.successful(None))
+
+        val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit().url)
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result) mustBe Some("/register-for-cross-border-arrangements/register/problem-with-service")
+      }
+
+      "must redirect to the problem with service if EIS subscription throws an error" in {
+        val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          .overrides(bind[SubscriptionConnector]
+            .toInstance(mockSubscriptionConnector))
+          .build()
+
+        when(mockSubscriptionConnector.createEISSubscription(any())(any(), any()))
+          .thenReturn(Future.failed(new Exception("")))
+
+        val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit().url)
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result) mustBe Some("/register-for-cross-border-arrangements/register/problem-with-service")
+      }
+
       "must redirect to the problem with service and not send email when error response received from subscription connector" in {
 
         val userAnswers: UserAnswers = UserAnswers(userAnswersId)
@@ -360,6 +400,9 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach {
             bind[SubscriptionConnector]
             .toInstance(mockSubscriptionConnector))
           .build()
+
+        when(mockSubscriptionConnector.createEISSubscription(any())(any(), any()))
+          .thenReturn(Future.successful(Some(dacSubscriptionResponse)))
 
         when(mockEmailService.sendEmail(any())(any()))
           .thenReturn(Future.successful(Some(HttpResponse(OK, ""))))
@@ -379,45 +422,51 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach {
 
     "must send email and redirect to the confirmation page when OK response received for organisation" in {
 
-        val userAnswers: UserAnswers = UserAnswers(userAnswersId)
-          .set(DoYouHaveUTRPage, false)
-          .success.value
-          .set(RegistrationTypePage, Business)
-          .success.value
+      val userAnswers: UserAnswers = UserAnswers(userAnswersId)
+        .set(DoYouHaveUTRPage, false)
+        .success.value
+        .set(RegistrationTypePage, Business)
+        .success.value
 
 
-        val application = applicationBuilder(userAnswers = Some(userAnswers))
-          .overrides(bind[RegistrationService]
-            .toInstance(mockRegistrationService))
-          .overrides(bind[EmailService]
-            .toInstance(mockEmailService),
-            bind[SubscriptionConnector]
-              .toInstance(mockSubscriptionConnector))
-          .build()
+      val application = applicationBuilder(userAnswers = Some(userAnswers))
+        .overrides(bind[RegistrationService]
+          .toInstance(mockRegistrationService))
+        .overrides(bind[EmailService]
+          .toInstance(mockEmailService),
+          bind[SubscriptionConnector]
+            .toInstance(mockSubscriptionConnector))
+        .build()
 
-        when(mockRegistrationService.sendRegistration(any())(any(), any()))
-          .thenReturn(Future.successful(Some(HttpResponse(OK, ""))))
+      when(mockSubscriptionConnector.createEISSubscription(any())(any(), any()))
+        .thenReturn(Future.successful(Some(dacSubscriptionResponse)))
 
-        when(mockEmailService.sendEmail(any())(any()))
-          .thenReturn(Future.successful(Some(HttpResponse(OK, ""))))
+      when(mockRegistrationService.sendRegistration(any())(any(), any()))
+        .thenReturn(Future.successful(Some(HttpResponse(OK, ""))))
 
-        when(mockSubscriptionConnector.createSubscription(any())(any(), any()))
-          .thenReturn(Future.successful(HttpResponse(NO_CONTENT, "")))
+      when(mockEmailService.sendEmail(any())(any()))
+        .thenReturn(Future.successful(Some(HttpResponse(OK, ""))))
 
+      when(mockSubscriptionConnector.createSubscription(any())(any(), any()))
+        .thenReturn(Future.successful(HttpResponse(NO_CONTENT, "")))
 
-        val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit().url)
-        val result = route(application, request).value
+      val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit().url)
+      val result = route(application, request).value
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result) mustBe Some("/register-for-cross-border-arrangements/register/confirm-registration")
-      }
+      status(result) mustEqual SEE_OTHER
+      redirectLocation(result) mustBe Some("/register-for-cross-border-arrangements/register/confirm-registration")
+    }
 
       "must redirect to problem with service when NOT_FOUND response received from registration for organisation" in {
 
         val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
-          .overrides(bind[RegistrationService]
-            .toInstance(mockRegistrationService))
+          .overrides(
+            bind[RegistrationService].toInstance(mockRegistrationService),
+            bind[SubscriptionConnector].toInstance(mockSubscriptionConnector))
           .build()
+
+        when(mockSubscriptionConnector.createEISSubscription(any())(any(), any()))
+          .thenReturn(Future.successful(Some(dacSubscriptionResponse)))
 
         when(mockRegistrationService.sendRegistration(any())(any(), any()))
           .thenReturn(Future.successful(Some(HttpResponse(NOT_FOUND, ""))))
@@ -440,6 +489,9 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach {
           .overrides(bind[RegistrationService]
             .toInstance(mockRegistrationService))
           .build()
+
+        when(mockSubscriptionConnector.createEISSubscription(any())(any(), any()))
+          .thenReturn(Future.successful(Some(dacSubscriptionResponse)))
 
         when(mockRegistrationService.sendRegistration(any())(any(), any()))
           .thenReturn(Future.successful(Some(HttpResponse(BAD_REQUEST, ""))))
@@ -465,6 +517,9 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach {
             .toInstance(mockRegistrationService))
           .build()
 
+        when(mockSubscriptionConnector.createEISSubscription(any())(any(), any()))
+          .thenReturn(Future.successful(Some(dacSubscriptionResponse)))
+
         when(mockRegistrationService.sendRegistration(any())(any(), any()))
           .thenReturn(Future.successful(None))
 
@@ -488,6 +543,9 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach {
               .toInstance(mockSubscriptionConnector))
           .build()
 
+        when(mockSubscriptionConnector.createEISSubscription(any())(any(), any()))
+          .thenReturn(Future.successful(Some(dacSubscriptionResponse)))
+
         when(mockEmailService.sendEmail(any())(any()))
           .thenReturn(Future.failed(new RuntimeException))
 
@@ -505,8 +563,13 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach {
 
         val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
           .overrides(bind[RegistrationService]
-            .toInstance(mockRegistrationService))
+            .toInstance(mockRegistrationService),
+            bind[SubscriptionConnector]
+              .toInstance(mockSubscriptionConnector))
           .build()
+
+        when(mockSubscriptionConnector.createEISSubscription(any())(any(), any()))
+          .thenReturn(Future.successful(Some(dacSubscriptionResponse)))
 
         when(mockRegistrationService.sendRegistration(any())(any(), any()))
           .thenReturn(Future.successful(Some(HttpResponse(NOT_FOUND, ""))))
@@ -522,8 +585,13 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach {
 
         val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
           .overrides(bind[RegistrationService]
-            .toInstance(mockRegistrationService))
+            .toInstance(mockRegistrationService),
+            bind[SubscriptionConnector]
+              .toInstance(mockSubscriptionConnector))
           .build()
+
+        when(mockSubscriptionConnector.createEISSubscription(any())(any(), any()))
+          .thenReturn(Future.successful(Some(dacSubscriptionResponse)))
 
         when(mockRegistrationService.sendRegistration(any())(any(), any()))
           .thenReturn(Future.successful(Some(HttpResponse(BAD_REQUEST, ""))))
@@ -539,8 +607,13 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach {
 
         val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
           .overrides(bind[RegistrationService]
-            .toInstance(mockRegistrationService))
+            .toInstance(mockRegistrationService),
+            bind[SubscriptionConnector]
+              .toInstance(mockSubscriptionConnector))
           .build()
+
+        when(mockSubscriptionConnector.createEISSubscription(any())(any(), any()))
+          .thenReturn(Future.successful(Some(dacSubscriptionResponse)))
 
         when(mockRegistrationService.sendRegistration(any())(any(), any()))
           .thenReturn(Future.successful(None))

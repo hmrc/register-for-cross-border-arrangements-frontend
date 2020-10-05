@@ -17,6 +17,7 @@
 package models
 
 import generators.Generators
+import helpers.JsonFixtures._
 import org.scalatest.{FreeSpec, MustMatchers}
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import play.api.libs.json.Json
@@ -78,136 +79,6 @@ class SubscriptionForDACRequestSpec extends FreeSpec with MustMatchers with Scal
       requestDetail = requestDetail.copy(secondaryContact = Some(secondaryContactForOrg)))
   )
 
-  //TODO Move the json to JsonFixtures once 286 is merged to master
-  val jsonPayloadForInd: String =
-    """
-      |{
-      |  "createSubscriptionForDACRequest": {
-      |    "requestCommon": {
-      |      "regime": "DAC",
-      |      "receiptDate": "2020-09-23T16:12:11Z",
-      |      "acknowledgementReference": "AB123c",
-      |      "originatingSystem": "MDTP",
-      |      "requestParameters": [{
-      |        "paramName":"Name",
-      |        "paramValue":"Value"
-      |      }]
-      |    },
-      |    "requestDetail": {
-      |      "idType": "idType",
-      |      "idNumber": "idNumber",
-      |      "isGBUser": true,
-      |      "primaryContact": {
-      |        "individual": {
-      |          "firstName": "Fairy",
-      |          "lastName": "Liquid"
-      |        },
-      |        "email": "email2@email.com"
-      |      }
-      |    }
-      |  }
-      |}
-      |""".stripMargin
-
-  val jsonPayloadForOrg: String =
-    """
-      |{
-      |  "createSubscriptionForDACRequest": {
-      |    "requestCommon": {
-      |      "regime": "DAC",
-      |      "receiptDate": "2020-09-23T16:12:11Z",
-      |      "acknowledgementReference": "AB123c",
-      |      "originatingSystem": "MDTP",
-      |      "requestParameters": [{
-      |        "paramName":"Name",
-      |        "paramValue":"Value"
-      |      }]
-      |    },
-      |    "requestDetail": {
-      |      "idType": "idType",
-      |      "idNumber": "idNumber",
-      |      "isGBUser": true,
-      |      "primaryContact": {
-      |        "organisation": {
-      |          "organisationName": "Pizza for you"
-      |        },
-      |        "email": "email@email.com",
-      |        "phone": "0191 111 2222",
-      |        "mobile": "07111111111"
-      |      }
-      |    }
-      |  }
-      |}
-      |""".stripMargin
-
-  val jsonPayloadForIndWithSecondaryContact: String =
-    """
-      |{
-      |  "createSubscriptionForDACRequest": {
-      |    "requestCommon": {
-      |      "regime": "DAC",
-      |      "receiptDate": "2020-09-23T16:12:11Z",
-      |      "acknowledgementReference": "AB123c",
-      |      "originatingSystem": "MDTP"
-      |    },
-      |    "requestDetail": {
-      |      "idType": "idType",
-      |      "idNumber": "idNumber",
-      |      "isGBUser": true,
-      |      "primaryContact": {
-      |        "individual": {
-      |          "firstName": "Fairy",
-      |          "lastName": "Liquid"
-      |        },
-      |        "email": "email2@email.com"
-      |      },
-      |      "secondaryContact": {
-      |        "organisation": {
-      |          "organisationName": "Pizza for you"
-      |        },
-      |        "email": "email@email.com",
-      |        "phone": "0191 111 2222",
-      |        "mobile": "07111111111"
-      |      }
-      |    }
-      |  }
-      |}
-      |""".stripMargin
-
-  val jsonPayloadForOrgWithSecondaryContact: String =
-    """
-      |{
-      |  "createSubscriptionForDACRequest": {
-      |    "requestCommon": {
-      |      "regime": "DAC",
-      |      "receiptDate": "2020-09-23T16:12:11Z",
-      |      "acknowledgementReference": "AB123c",
-      |      "originatingSystem": "MDTP"
-      |    },
-      |    "requestDetail": {
-      |      "idType": "idType",
-      |      "idNumber": "idNumber",
-      |      "isGBUser": true,
-      |      "primaryContact": {
-      |        "organisation": {
-      |          "organisationName": "Pizza for you"
-      |        },
-      |        "email": "email@email.com",
-      |        "phone": "0191 111 2222",
-      |        "mobile": "07111111111"
-      |      },
-      |      "secondaryContact": {
-      |        "individual": {
-      |          "firstName": "Fairy",
-      |          "lastName": "Liquid"
-      |        },
-      |        "email": "email2@email.com"
-      |      }
-      |    }
-      |  }
-      |}
-      |""".stripMargin
-
   "CreateSubscriptionForDACRequest" - {
 
     "must deserialise CreateSubscriptionForDACRequest (with Request parameters) for an individual without a secondary contact" in {
@@ -227,151 +98,18 @@ class SubscriptionForDACRequestSpec extends FreeSpec with MustMatchers with Scal
     }
 
     "must serialise subscription request for individual - exclude null fields for optional contact details" in {
-
-      val indRequestJson = {
-        Json.obj(
-          "createSubscriptionForDACRequest" -> Json.obj(
-            "requestCommon" -> Json.obj(
-              "regime" -> "DAC",
-              "receiptDate" -> "2020-09-23T16:12:11Z",
-              "acknowledgementReference" -> "AB123c",
-              "originatingSystem" -> "MDTP",
-              "requestParameters" -> Json.arr(
-                Json.obj(
-                  "paramName" -> "Name",
-                  "paramValue" -> "Value"
-                )
-              )
-            ),
-            "requestDetail" -> Json.obj(
-              "idType" -> "idType",
-              "idNumber" -> "idNumber",
-              "isGBUser" -> true,
-              "primaryContact" -> Json.obj(
-                "individual" -> Json.obj(
-                  "firstName" -> "Fairy",
-                  "lastName" -> "Liquid"
-                ),
-                "email" -> "email2@email.com"
-              )
-            )
-          )
-        )
-      }
-
       Json.toJson(indRequest) mustBe indRequestJson
     }
 
     "must serialise subscription request for organisation - exclude null fields for optional contact details" in {
-
-      val orgRequestJson = {
-        Json.obj(
-          "createSubscriptionForDACRequest" -> Json.obj(
-            "requestCommon" -> Json.obj(
-              "regime" -> "DAC",
-              "receiptDate" -> "2020-09-23T16:12:11Z",
-              "acknowledgementReference" -> "AB123c",
-              "originatingSystem" -> "MDTP",
-              "requestParameters" -> Json.arr(
-                Json.obj(
-                  "paramName" -> "Name",
-                  "paramValue" -> "Value"
-                )
-              )
-            ),
-            "requestDetail" -> Json.obj(
-              "idType" -> "idType",
-              "idNumber" -> "idNumber",
-              "isGBUser" -> true,
-              "primaryContact" -> Json.obj(
-                "organisation" -> Json.obj(
-                  "organisationName" -> "Pizza for you"
-                ),
-                "email" -> "email@email.com",
-                "phone" -> "0191 111 2222",
-                "mobile" -> "07111111111"
-              )
-            )
-          )
-        )
-      }
-
       Json.toJson(orgRequest) mustBe orgRequestJson
     }
 
     "must serialise subscription request for individual - exclude null fields for requestParameters and contact numbers" in {
-
-      val indWithSecondaryContactJson = {
-        Json.obj(
-          "createSubscriptionForDACRequest" -> Json.obj(
-            "requestCommon" -> Json.obj(
-              "regime" -> "DAC",
-              "receiptDate" -> "2020-09-23T16:12:11Z",
-              "acknowledgementReference" -> "AB123c",
-              "originatingSystem" -> "MDTP"
-            ),
-            "requestDetail" -> Json.obj(
-              "idType" -> "idType",
-              "idNumber" -> "idNumber",
-              "isGBUser" -> true,
-              "primaryContact" -> Json.obj(
-                "individual" -> Json.obj(
-                  "firstName" -> "Fairy",
-                  "lastName" -> "Liquid"
-                ),
-                "email" -> "email2@email.com"
-              ),
-              "secondaryContact" -> Json.obj(
-                "organisation" -> Json.obj(
-                  "organisationName" -> "Pizza for you"
-                ),
-                "email" -> "email@email.com",
-                "phone" -> "0191 111 2222",
-                "mobile" -> "07111111111"
-              )
-            )
-          )
-        )
-      }
-
       Json.toJson(indWithSecondaryContact) mustBe indWithSecondaryContactJson
     }
 
     "must serialise subscription request for organisation - exclude null fields for requestParameters and contact numbers" in {
-
-      val orgWithSecondaryContactJson = {
-        Json.obj(
-          "createSubscriptionForDACRequest" -> Json.obj(
-            "requestCommon" -> Json.obj(
-              "regime" -> "DAC",
-              "receiptDate" -> "2020-09-23T16:12:11Z",
-              "acknowledgementReference" -> "AB123c",
-              "originatingSystem" -> "MDTP"
-            ),
-            "requestDetail" -> Json.obj(
-              "idType" -> "idType",
-              "idNumber" -> "idNumber",
-              "isGBUser" -> true,
-              "primaryContact" -> Json.obj(
-                "organisation" -> Json.obj(
-                  "organisationName" -> "Pizza for you"
-                ),
-                "email" -> "email@email.com",
-                "phone" -> "0191 111 2222",
-                "mobile" -> "07111111111"
-              ),
-              "secondaryContact" -> Json.obj(
-                "individual" -> Json.obj(
-                  "firstName" -> "Fairy",
-                  "lastName" -> "Liquid"
-                ),
-                "email" -> "email2@email.com"
-              )
-            )
-          )
-        )
-      }
-
       Json.toJson(orgWithSecondaryContact) mustBe orgWithSecondaryContactJson
     }
 
