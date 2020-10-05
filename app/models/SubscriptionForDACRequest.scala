@@ -42,9 +42,10 @@ case class IndividualDetails(firstName: String,
                              lastName: String)
 object IndividualDetails {
   def buildIndividualDetails(userAnswers: UserAnswers): IndividualDetails = {
-    userAnswers.get(ContactNamePage) match {
-      case Some(name) => new IndividualDetails(name.firstName, None, name.secondName)
-      case None => throw new Exception("Individual name can't be empty when creating a subscription")
+    (userAnswers.get(NamePage), userAnswers.get(NonUkNamePage)) match {
+      case (Some(name), _) => new IndividualDetails(name.firstName, None, name.secondName)
+      case (_, Some(name)) => new IndividualDetails(name.firstName, None, name.secondName)
+      case _ => throw new Exception("Individual name can't be empty when creating a subscription")
     }
   }
 
@@ -236,6 +237,7 @@ object SubscriptionForDACRequest {
       case (Some(nino), _, _) => ("NINO", nino.toString().capitalize)
       case (_, Some(selfAssessmentUTRPage), _) => ("UTR", selfAssessmentUTRPage.uniqueTaxPayerReference)
       case (_, _, Some(corporationTaxUTRPage)) => ("UTR", corporationTaxUTRPage.uniqueTaxPayerReference)
+      case _ => throw new Exception("Error retrieving ID type and number")
     }
   }
 
