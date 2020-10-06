@@ -46,7 +46,7 @@ class CheckYourAnswersController @Inject()(
                                             val controllerComponents: MessagesControllerComponents,
                                             emailService: EmailService,
                                             registrationService: RegistrationService,
-                                            taxEnrolmentsConnector: SubscriptionConnector,
+                                            subscriptionConnector: SubscriptionConnector,
                                             renderer: Renderer
                                           )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with NunjucksSupport {
 
@@ -159,36 +159,21 @@ class CheckYourAnswersController @Inject()(
 
   def onSubmit(): Action[AnyContent] = (identify andThen notEnrolled andThen getData andThen requireData).async {
     implicit request =>
-      taxEnrolmentsConnector.createEISSubscription(request.userAnswers).flatMap {
-        response =>
-          if (response.isDefined) {
-            val safeID = response.get.createSubscriptionForDACResponse.responseDetail.subscriptionID
 
-            updateUserAnswers(request.userAnswers, safeID).flatMap {
-              userAnswers =>
-                (userAnswers.get(DoYouHaveUTRPage), userAnswers.get(RegistrationTypePage),
-                  userAnswers.get(DoYouHaveANationalInsuranceNumberPage)) match {
+      (request.userAnswers.get(DoYouHaveUTRPage), request.userAnswers.get(RegistrationTypePage),
+        request.userAnswers.get(DoYouHaveANationalInsuranceNumberPage)) match {
 
-                  case (Some(true), None, None) => createEnrolment(userAnswers)
-                  case (Some(false), Some(Individual), Some(true)) => createEnrolment(userAnswers)
+        case (Some(true), None, None) => createEnrolment(request.userAnswers)
+        case (Some(false), Some(Individual), Some(true)) => createEnrolment(request.userAnswers)
 
-                  case (Some(false), _, Some(false) | None) => registrationService.sendRegistration(userAnswers).flatMap {
-                    case Some(response) => response.status match {
-                      case OK => createEnrolment(userAnswers)
-                      case _ => Future.successful(Redirect(routes.ProblemWithServiceController.onPageLoad()))
-                    }
-                    case _ => Future.successful(Redirect(routes.ProblemWithServiceController.onPageLoad()))
-                  }
-                  case _ => Future.successful(Redirect(routes.ProblemWithServiceController.onPageLoad()))
-                }
-            }
-          } else {
-            Future.successful(Redirect(routes.ProblemWithServiceController.onPageLoad()))
+        case (Some(false), _, Some(false) | None) => registrationService.sendRegistration(request.userAnswers) flatMap {
+          case Some(response) => response.status match {
+            case OK => createEnrolment(request.userAnswers)
+            case _ => Future.successful(Redirect(routes.ProblemWithServiceController.onPageLoad()))
           }
-      }.recover {
-        case e: Exception =>
-          logger.error("Unable to create an EIS subscription", e)
-          Redirect(routes.ProblemWithServiceController.onPageLoad())
+          case _ => Future.successful(Redirect(routes.ProblemWithServiceController.onPageLoad()))
+        }
+        case _ => Future.successful(Redirect(routes.ProblemWithServiceController.onPageLoad()))
       }
   }
 
@@ -209,19 +194,31 @@ class CheckYourAnswersController @Inject()(
   }
 
   def createEnrolment(userAnswers: UserAnswers)(implicit hc: HeaderCarrier): Future[Result] = {
-    taxEnrolmentsConnector.createSubscription(userAnswers).flatMap {
-      subscriptionResponse =>
-        if (subscriptionResponse.status.equals(NO_CONTENT)) {
-          emailService.sendEmail(userAnswers).map {
-            emailResponse =>
-              logEmailResponse(emailResponse)
-              Redirect(routes.RegistrationSuccessfulController.onPageLoad())
-          }.recover {
-            case e: Exception => Redirect(routes.RegistrationSuccessfulController.onPageLoad())
-          }
-        } else {
-          Future(Redirect(routes.ProblemWithServiceController.onPageLoad()))
+    subscriptionConnector.createSubscription(userAnswers).flatMap {
+      response =>
+        val safeID = response.get.createSubscriptionForDACResponse.responseDetail.subscriptionID
+
+        updateUserAnswers(userAnswers, safeID).flatMap {
+          updatedUserAnswers =>
+            subscriptionConnector.createEnrolment(updatedUserAnswers).flatMap {
+              subscriptionResponse =>
+                if (subscriptionResponse.status.equals(NO_CONTENT)) {
+                  emailService.sendEmail(updatedUserAnswers).map {
+                    emailResponse =>
+                      logEmailResponse(emailResponse)
+                      Redirect(routes.RegistrationSuccessfulController.onPageLoad())
+                  }.recover {
+                    case e: Exception => Redirect(routes.RegistrationSuccessfulController.onPageLoad())
+                  }
+                } else {
+                  Future(Redirect(routes.ProblemWithServiceController.onPageLoad()))
+                }
+            }
         }
+    }.recover {
+      case e: Exception =>
+        logger.warn("Unable to create an EIS subscription", e)
+        Redirect(routes.ProblemWithServiceController.onPageLoad())
     }
 
   }

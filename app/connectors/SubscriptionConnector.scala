@@ -26,17 +26,18 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class SubscriptionConnector @Inject()(val config: FrontendAppConfig, val http: HttpClient) {
 
-  def createSubscription(userAnswers: UserAnswers)
+  def createEnrolment(userAnswers: UserAnswers)
                         (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] = {
 
     val submissionUrl = s"${config.businessMatchingUrl}/enrolment/create-enrolment"
     http.PUT[SubscriptionInfo, HttpResponse](submissionUrl, SubscriptionInfo.createSubscriptionInfo(userAnswers))
   }
 
-  def createEISSubscription(userAnswers: UserAnswers)
+  def createSubscription(userAnswers: UserAnswers)
                            (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[CreateSubscriptionForDACResponse]] = {
 
     val submissionUrl = s"${config.businessMatchingUrl}/subscription/create-dac-subscription"
+
     http.POST[CreateSubscriptionForDACRequest, HttpResponse](
       submissionUrl,
       CreateSubscriptionForDACRequest(SubscriptionForDACRequest.createEnrolment(userAnswers))
