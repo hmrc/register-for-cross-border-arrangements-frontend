@@ -53,7 +53,7 @@ class SubscriptionConnectorSpec extends SpecBase
           val updatedUserAnswers = userAnswers.set(SubscriptionIDPage, "XADAC0000123456").success.value
           stubResponse(s"/register-for-cross-border-arrangements/enrolment/create-enrolment", OK)
 
-          val result = connector.createSubscription(updatedUserAnswers)
+          val result = connector.createEnrolment(updatedUserAnswers)
           result.futureValue.status mustBe OK
       }
     }
@@ -66,7 +66,7 @@ class SubscriptionConnectorSpec extends SpecBase
           val updatedUserAnswers = userAnswers.set(SubscriptionIDPage, "XADAC0000123456").success.value
           stubResponse(s"/register-for-cross-border-arrangements/enrolment/create-enrolment", BAD_REQUEST)
 
-          val result = connector.createSubscription(updatedUserAnswers)
+          val result = connector.createEnrolment(updatedUserAnswers)
           result.futureValue.status mustBe BAD_REQUEST
       }
     }
@@ -79,7 +79,7 @@ class SubscriptionConnectorSpec extends SpecBase
           val updatedUserAnswers = userAnswers.set(SubscriptionIDPage, "XADAC0000123456").success.value
           stubResponse(s"/register-for-cross-border-arrangements/enrolment/create-enrolment", INTERNAL_SERVER_ERROR)
 
-          val result = connector.createSubscription(updatedUserAnswers)
+          val result = connector.createEnrolment(updatedUserAnswers)
           result.futureValue.status mustBe INTERNAL_SERVER_ERROR
       }
     }
@@ -116,14 +116,14 @@ class SubscriptionConnectorSpec extends SpecBase
 
         stubPostResponse("/register-for-cross-border-arrangements/subscription/create-dac-subscription", OK, expectedBody)
 
-        val result = connector.createEISSubscription(userAnswers)
+        val result = connector.createSubscription(userAnswers)
         result.futureValue mustBe Some(response)
       }
 
       "must return None if status is not OK and subscription fails" in {
         stubPostResponse("/register-for-cross-border-arrangements/subscription/create-dac-subscription", SERVICE_UNAVAILABLE, "")
 
-        val result = connector.createEISSubscription(userAnswers)
+        val result = connector.createSubscription(userAnswers)
         result.futureValue mustBe None
         }
     }
