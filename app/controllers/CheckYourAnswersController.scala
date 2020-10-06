@@ -163,12 +163,12 @@ class CheckYourAnswersController @Inject()(
       (request.userAnswers.get(DoYouHaveUTRPage), request.userAnswers.get(RegistrationTypePage),
         request.userAnswers.get(DoYouHaveANationalInsuranceNumberPage)) match {
 
-        case (Some(true), None, None) => createEnrolment(request.userAnswers)
-        case (Some(false), Some(Individual), Some(true)) => createEnrolment(request.userAnswers)
+        case (Some(true), None, None) => createEnrolment(request.userAnswers, createSubscription = true)
+        case (Some(false), Some(Individual), Some(true)) => createEnrolment(request.userAnswers, createSubscription = true)
 
         case (Some(false), _, Some(false) | None) => registrationService.sendRegistration(request.userAnswers) flatMap {
           case Some(response) => response.status match {
-            case OK => createEnrolment(request.userAnswers)
+            case OK => createEnrolment(request.userAnswers, createSubscription = false)
             case _ => Future.successful(Redirect(routes.ProblemWithServiceController.onPageLoad()))
           }
           case _ => Future.successful(Redirect(routes.ProblemWithServiceController.onPageLoad()))
@@ -177,11 +177,16 @@ class CheckYourAnswersController @Inject()(
       }
   }
 
-  private def updateUserAnswers(userAnswers: UserAnswers, safeID: String): Future[UserAnswers] = {
-    for {
-      updatedUserAnswers <- Future.fromTry(userAnswers.set(SubscriptionIDPage, safeID))
-      _                  <- sessionRepository.set(updatedUserAnswers)
-    } yield updatedUserAnswers
+  private def updateUserAnswers(userAnswers: UserAnswers)(implicit hc: HeaderCarrier): Future[UserAnswers] = {
+    subscriptionConnector.createSubscription(userAnswers).flatMap {
+      response =>
+        val safeID = response.get.createSubscriptionForDACResponse.responseDetail.subscriptionID
+
+        for {
+          updatedUserAnswers <- Future.fromTry(userAnswers.set(SubscriptionIDPage, safeID))
+          _ <- sessionRepository.set(updatedUserAnswers)
+        } yield updatedUserAnswers
+    }
   }
 
   private def logEmailResponse(emailResponse: Option[HttpResponse]): Unit = {
@@ -193,32 +198,45 @@ class CheckYourAnswersController @Inject()(
 
   }
 
-  def createEnrolment(userAnswers: UserAnswers)(implicit hc: HeaderCarrier): Future[Result] = {
-    subscriptionConnector.createSubscription(userAnswers).flatMap {
-      response =>
-        val safeID = response.get.createSubscriptionForDACResponse.responseDetail.subscriptionID
+  def createEnrolment(userAnswers: UserAnswers, createSubscription: Boolean)(implicit hc: HeaderCarrier): Future[Result] = {
 
-        updateUserAnswers(userAnswers, safeID).flatMap {
-          updatedUserAnswers =>
-            subscriptionConnector.createEnrolment(updatedUserAnswers).flatMap {
-              subscriptionResponse =>
-                if (subscriptionResponse.status.equals(NO_CONTENT)) {
-                  emailService.sendEmail(updatedUserAnswers).map {
-                    emailResponse =>
-                      logEmailResponse(emailResponse)
-                      Redirect(routes.RegistrationSuccessfulController.onPageLoad())
-                  }.recover {
-                    case e: Exception => Redirect(routes.RegistrationSuccessfulController.onPageLoad())
-                  }
-                } else {
-                  Future(Redirect(routes.ProblemWithServiceController.onPageLoad()))
+    if (createSubscription) {
+      updateUserAnswers(userAnswers).flatMap {
+        updatedUserAnswers =>
+          subscriptionConnector.createEnrolment(updatedUserAnswers).flatMap {
+            subscriptionResponse =>
+              if (subscriptionResponse.status.equals(NO_CONTENT)) {
+                emailService.sendEmail(updatedUserAnswers).map {
+                  emailResponse =>
+                    logEmailResponse(emailResponse)
+                    Redirect(routes.RegistrationSuccessfulController.onPageLoad())
+                }.recover {
+                  case e: Exception => Redirect(routes.RegistrationSuccessfulController.onPageLoad())
                 }
+              } else {
+                Future(Redirect(routes.ProblemWithServiceController.onPageLoad()))
+              }
+          }
+      }.recover {
+        case e: Exception =>
+          logger.warn("Unable to create an EIS subscription", e)
+          Redirect(routes.ProblemWithServiceController.onPageLoad())
+      }
+    } else {
+      subscriptionConnector.createEnrolment(userAnswers).flatMap {
+        subscriptionResponse =>
+          if (subscriptionResponse.status.equals(NO_CONTENT)) {
+            emailService.sendEmail(userAnswers).map {
+              emailResponse =>
+                logEmailResponse(emailResponse)
+                Redirect(routes.RegistrationSuccessfulController.onPageLoad())
+            }.recover {
+              case e: Exception => Redirect(routes.RegistrationSuccessfulController.onPageLoad())
             }
-        }
-    }.recover {
-      case e: Exception =>
-        logger.warn("Unable to create an EIS subscription", e)
-        Redirect(routes.ProblemWithServiceController.onPageLoad())
+          } else {
+            Future(Redirect(routes.ProblemWithServiceController.onPageLoad()))
+          }
+      }
     }
 
   }
