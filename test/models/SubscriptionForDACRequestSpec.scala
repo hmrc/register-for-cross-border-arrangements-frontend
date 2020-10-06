@@ -16,13 +16,12 @@
 
 package models
 
-import generators.Generators
 import helpers.JsonFixtures._
 import org.scalatest.{FreeSpec, MustMatchers}
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import play.api.libs.json.Json
 
-class SubscriptionForDACRequestSpec extends FreeSpec with MustMatchers with ScalaCheckPropertyChecks with Generators {
+class SubscriptionForDACRequestSpec extends FreeSpec with MustMatchers with ScalaCheckPropertyChecks {
 
   val requestParameter = Seq(RequestParameter("Name", "Value"))
   val primaryContactForInd: PrimaryContact = PrimaryContact(
