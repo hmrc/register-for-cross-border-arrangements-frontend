@@ -420,7 +420,8 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach {
 
       }
 
-    "must send email and redirect to the confirmation page when OK response received for organisation" in {
+    "must send email and redirect to the confirmation page when OK response received for organisation and " +
+      "EIS subscription returned a subscription/safe ID" in {
 
       val userAnswers: UserAnswers = UserAnswers(userAnswersId)
         .set(DoYouHaveUTRPage, false)
