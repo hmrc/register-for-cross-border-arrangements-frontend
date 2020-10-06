@@ -40,7 +40,7 @@ object SubscriptionInfo {
     private def getSafeID(userAnswers: UserAnswers) = {
       userAnswers.get(SubscriptionIDPage) match {
         case Some(id) => id
-        case None => throw new Exception("Unable to retrieve Safe ID")
+        case None => ""
       }
     }
 
