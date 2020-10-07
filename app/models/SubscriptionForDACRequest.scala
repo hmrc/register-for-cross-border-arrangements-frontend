@@ -28,9 +28,10 @@ import scala.util.Random
 case class OrganisationDetails(organisationName: String)
 object OrganisationDetails {
   def buildOrganisationDetails(userAnswers: UserAnswers): OrganisationDetails = {
-    userAnswers.get(BusinessNamePage) match {
-      case Some(name) => new OrganisationDetails(name)
-      case None => throw new Exception("Organisation name can't be empty when creating a subscription")
+    (userAnswers.get(BusinessNamePage), userAnswers.get(BusinessWithoutIDNamePage)) match {
+      case (Some(name), _) => new OrganisationDetails(name)
+      case (_, Some(name)) => new OrganisationDetails(name)
+      case _ => throw new Exception("Organisation name can't be empty when creating a subscription")
     }
   }
 
@@ -220,11 +221,9 @@ object SubscriptionForDACRequest {
       case None => true
     }
 
-    val (idType, idNumber) = getIdTypeAndNumber(userAnswers)
-
     RequestDetail(
-      idType = idType,
-      idNumber = idNumber,
+      idType = "SAFEID",
+      idNumber = getNumber(userAnswers),
       tradingName = None,
       isGBUser = isGBUser,
       primaryContact = createPrimaryContact(userAnswers),
@@ -232,12 +231,10 @@ object SubscriptionForDACRequest {
     )
   }
 
-  private def getIdTypeAndNumber(userAnswers: UserAnswers): (String, String) = {
-    (userAnswers.get(NinoPage), userAnswers.get(SelfAssessmentUTRPage), userAnswers.get(CorporationTaxUTRPage)) match {
-      case (Some(nino), _, _) => ("NINO", nino.toString().capitalize)
-      case (_, Some(selfAssessmentUTRPage), _) => ("UTR", selfAssessmentUTRPage.uniqueTaxPayerReference)
-      case (_, _, Some(corporationTaxUTRPage)) => ("UTR", corporationTaxUTRPage.uniqueTaxPayerReference)
-      case _ => throw new Exception("Error retrieving ID type and number")
+  private def getNumber(userAnswers: UserAnswers): String = {
+    userAnswers.get(SafeIDPage) match {
+      case Some(id) => id
+      case None => throw new Exception("Error retrieving ID number")
     }
   }
 
@@ -273,7 +270,7 @@ object SubscriptionForDACRequest {
 
       val contactNumber = userAnswers.get(ContactTelephoneNumberPage)
 
-      if (getIdTypeAndNumber(userAnswers)._1 == "NINO") {
+      if (userAnswers.get(NinoPage).isDefined) {
         ContactInformationForIndividual(
           individual = IndividualDetails.buildIndividualDetails(userAnswers),
           email = email,
