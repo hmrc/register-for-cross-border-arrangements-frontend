@@ -16,7 +16,7 @@
 
 package models
 
-import pages.{CorporationTaxUTRPage, NinoPage, SelfAssessmentUTRPage, SubscriptionIDPage, WhatIsYourAddressPage}
+import pages._
 import play.api.libs.json.{Json, OFormat}
 
 case class SubscriptionInfo(safeID: String,
@@ -37,10 +37,10 @@ object SubscriptionInfo {
       nonUkPostcode = getNonUkPostCodeIfProvided(userAnswers))
   }
 
-    private def getSafeID(userAnswers: UserAnswers) = {
-      userAnswers.get(SubscriptionIDPage) match {
+    private def getSafeID(userAnswers: UserAnswers): String = {
+      userAnswers.get(SafeIDPage) match {
         case Some(id) => id
-        case None => ""
+        case None => throw new Exception("Safe ID can't be retrieved")
       }
     }
 
