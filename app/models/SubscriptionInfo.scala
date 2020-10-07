@@ -38,7 +38,7 @@ object SubscriptionInfo {
   }
 
     private def getSafeID(userAnswers: UserAnswers): String = {
-      userAnswers.get(SafeIDPage) match {
+      userAnswers.get(SubscriptionIDPage) match {
         case Some(id) => id
         case None => throw new Exception("Safe ID can't be retrieved")
       }

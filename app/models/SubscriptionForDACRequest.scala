@@ -222,7 +222,7 @@ object SubscriptionForDACRequest {
     }
 
     RequestDetail(
-      idType = "SAFEID",
+      idType = "SAFE",
       idNumber = getNumber(userAnswers),
       tradingName = None,
       isGBUser = isGBUser,

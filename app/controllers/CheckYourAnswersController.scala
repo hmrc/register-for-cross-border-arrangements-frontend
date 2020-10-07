@@ -24,7 +24,7 @@ import models.{PayloadRegistrationWithoutIDResponse, RegisterWithIDResponse, Reg
 import org.slf4j.LoggerFactory
 import pages._
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.libs.json.Json
+import play.api.libs.json.{JsError, JsSuccess, Json}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import renderer.Renderer
 import repositories.SessionRepository
@@ -163,18 +163,14 @@ class CheckYourAnswersController @Inject()(
       (request.userAnswers.get(DoYouHaveUTRPage), request.userAnswers.get(RegistrationTypePage),
         request.userAnswers.get(DoYouHaveANationalInsuranceNumberPage)) match {
 
-        case (Some(true), None, None) => createEnrolment(request.userAnswers, withoutID = true)
-        case (Some(false), Some(Individual), Some(true)) => createEnrolment(request.userAnswers, withoutID = true)
+        case (Some(true), None, None) => createEnrolment(request.userAnswers)
+        case (Some(false), Some(Individual), Some(true)) => createEnrolment(request.userAnswers)
 
         case (Some(false), _, Some(false) | None) => registrationService.sendRegistration(request.userAnswers) flatMap {
           case Some(response) => response.status match {
             case OK =>
-              val registerWithIDResponse = response.json.validate[PayloadRegistrationWithoutIDResponse].get
-
-              updateUserAnswersTest(request.userAnswers, registerWithIDResponse).flatMap {
-                userAnswersWithSafeID =>
-                createEnrolment(userAnswersWithSafeID, withoutID = false)
-              }
+              println(s"\n\nResponse: ${response.body}\n\n")
+              createSubscriptionThenEnrolment(request.userAnswers, Some(response))
             case _ => Future.successful(Redirect(routes.ProblemWithServiceController.onPageLoad()))
           }
           case _ => Future.successful(Redirect(routes.ProblemWithServiceController.onPageLoad()))
@@ -183,21 +179,72 @@ class CheckYourAnswersController @Inject()(
       }
   }
 
-  private def updateUserAnswersTest(userAnswers: UserAnswers, registerWithoutIDResponse: PayloadRegistrationWithoutIDResponse)
-                                   (implicit hc: HeaderCarrier): Future[UserAnswers] = {
-    val safeID = if(registerWithoutIDResponse.registerWithoutIDResponse.responseDetail.isDefined) {
-      registerWithoutIDResponse.registerWithoutIDResponse.responseDetail.get.SAFEID
-    } else {
-      ""
-    }
+  private def createSubscriptionThenEnrolment(userAnswers: UserAnswers,
+                                              response: Option[HttpResponse] = None)
+                                              (implicit hc: HeaderCarrier): Future[Result] = {
 
-    for {
-      updatedUserAnswers <- Future.fromTry(userAnswers.set(SafeIDPage, safeID))
-      _ <- sessionRepository.set(updatedUserAnswers)
-    } yield updatedUserAnswers
+    if (response.isDefined) {
+      //Without id journey
+      response.get.json.validate[PayloadRegistrationWithoutIDResponse] match {
+        case JsSuccess(registerWithoutIDResponse, _) =>
+          updateUserAnswersWithSafeID(userAnswers, Some(registerWithoutIDResponse)).flatMap {
+            userAnswersWithSafeID =>
+              createEISSubscription(userAnswersWithSafeID).flatMap {
+                userAnswersWithSubscriptionID =>
+                  createEnrolment(userAnswersWithSubscriptionID)
+              }
+          }.recover {
+            case e: Exception =>
+              logger.warn("Unable to update UserAnswers with SafeID", e)
+              Redirect(routes.ProblemWithServiceController.onPageLoad())
+          }
+        case JsError(errors) =>
+          logger.warn("Unable to deserialise into PayloadRegistrationWithoutIDResponse", errors)
+          Future.successful(Redirect(routes.ProblemWithServiceController.onPageLoad()))
+      }
+    } else {
+      //With id journey
+      updateUserAnswersWithSafeID(userAnswers, None).flatMap {
+        userAnswersWithSafeID =>
+          createEISSubscription(userAnswersWithSafeID).flatMap {
+            userAnswersWithSubscriptionID =>
+              createEnrolment(userAnswersWithSubscriptionID)
+          }
+      }.recover {
+        case e: Exception =>
+          logger.warn("Unable to update UserAnswers with SafeID", e)
+          Redirect(routes.ProblemWithServiceController.onPageLoad())
+      }
+    }
   }
 
-  private def updateUserAnswers(userAnswers: UserAnswers)(implicit hc: HeaderCarrier): Future[UserAnswers] = {
+  private def updateUserAnswersWithSafeID(userAnswers: UserAnswers,
+                                          registerWithoutIDResponse: Option[PayloadRegistrationWithoutIDResponse])
+                                          (implicit hc: HeaderCarrier): Future[UserAnswers] = {
+    if(registerWithoutIDResponse.isDefined) {
+      val safeID = if (registerWithoutIDResponse.get.registerWithoutIDResponse.responseDetail.isDefined) {
+        registerWithoutIDResponse.get.registerWithoutIDResponse.responseDetail.get.SAFEID
+      } else {
+        throw new Exception("Unable to retrieve Safe ID")
+      }
+
+      for {
+        updatedUserAnswers <- Future.fromTry(userAnswers.set(SafeIDPage, safeID))
+        _ <- sessionRepository.set(updatedUserAnswers)
+      } yield updatedUserAnswers
+    } else {
+      userAnswers.get(SafeIDPage) match {
+        case Some(id) =>
+          for {
+            updatedUserAnswers <- Future.fromTry(userAnswers.set(SafeIDPage, id))
+            _ <- sessionRepository.set(updatedUserAnswers)
+          } yield updatedUserAnswers
+        case None => throw new Exception("Unable to retrieve Safe ID")
+      }
+    }
+  }
+
+  private def createEISSubscription(userAnswers: UserAnswers)(implicit hc: HeaderCarrier): Future[UserAnswers] = {
     subscriptionConnector.createSubscription(userAnswers).flatMap {
       response =>
         val subscriptionID = response.get.createSubscriptionForDACResponse.responseDetail.subscriptionID
@@ -206,6 +253,10 @@ class CheckYourAnswersController @Inject()(
           updatedUserAnswers <- Future.fromTry(userAnswers.set(SubscriptionIDPage, subscriptionID))
           _ <- sessionRepository.set(updatedUserAnswers)
         } yield updatedUserAnswers
+    }.recover {
+      case e: Exception =>
+        logger.warn("Unable to create an EIS subscription", e)
+        throw e
     }
   }
 
@@ -218,45 +269,20 @@ class CheckYourAnswersController @Inject()(
 
   }
 
-  def createEnrolment(userAnswers: UserAnswers, withoutID: Boolean)(implicit hc: HeaderCarrier): Future[Result] = {
-
-    if (withoutID) {
-      subscriptionConnector.createEnrolment(userAnswers).flatMap {
-        subscriptionResponse =>
-          if (subscriptionResponse.status.equals(NO_CONTENT)) {
-            emailService.sendEmail(userAnswers).map {
-              emailResponse =>
-                logEmailResponse(emailResponse)
-                Redirect(routes.RegistrationSuccessfulController.onPageLoad())
-            }.recover {
-              case e: Exception => Redirect(routes.RegistrationSuccessfulController.onPageLoad())
-            }
-          } else {
-            Future(Redirect(routes.ProblemWithServiceController.onPageLoad()))
+  def createEnrolment(userAnswers: UserAnswers)(implicit hc: HeaderCarrier): Future[Result] = {
+    subscriptionConnector.createEnrolment(userAnswers).flatMap {
+      subscriptionResponse =>
+        if (subscriptionResponse.status.equals(NO_CONTENT)) {
+          emailService.sendEmail(userAnswers).map {
+            emailResponse =>
+              logEmailResponse(emailResponse)
+              Redirect(routes.RegistrationSuccessfulController.onPageLoad())
+          }.recover {
+            case e: Exception => Redirect(routes.RegistrationSuccessfulController.onPageLoad())
           }
-      }
-    } else {
-      updateUserAnswers(userAnswers).flatMap {
-        updatedUserAnswers =>
-          subscriptionConnector.createEnrolment(updatedUserAnswers).flatMap {
-            subscriptionResponse =>
-              if (subscriptionResponse.status.equals(NO_CONTENT)) {
-                emailService.sendEmail(updatedUserAnswers).map {
-                  emailResponse =>
-                    logEmailResponse(emailResponse)
-                    Redirect(routes.RegistrationSuccessfulController.onPageLoad())
-                }.recover {
-                  case e: Exception => Redirect(routes.RegistrationSuccessfulController.onPageLoad())
-                }
-              } else {
-                Future(Redirect(routes.ProblemWithServiceController.onPageLoad()))
-              }
-          }
-      }.recover {
-        case e: Exception =>
-          logger.warn("Unable to create an EIS subscription", e)
-          Redirect(routes.ProblemWithServiceController.onPageLoad())
-      }
+        } else {
+          Future(Redirect(routes.ProblemWithServiceController.onPageLoad()))
+        }
     }
 
   }
