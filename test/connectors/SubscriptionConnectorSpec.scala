@@ -21,7 +21,7 @@ import com.github.tomakehurst.wiremock.client.WireMock.{aResponse, post, put, ur
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import generators.Generators
 import helpers.WireMockServerHandler
-import models.{BusinessType, CreateSubscriptionForDACResponse, ResponseCommon, ResponseDetailForDACSubscription, SubscriptionForDACResponse, UniqueTaxpayerReference, UserAnswers}
+import models.{CreateSubscriptionForDACResponse, ResponseCommon, ResponseDetailForDACSubscription, SubscriptionForDACResponse, UserAnswers}
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import pages._
@@ -87,10 +87,9 @@ class SubscriptionConnectorSpec extends SpecBase
     "when calling createEISSubscription" - {
 
       val userAnswers = UserAnswers(userAnswersId)
-        .set(BusinessTypePage, BusinessType.Partnership).success.value
-        .set(SelfAssessmentUTRPage, UniqueTaxpayerReference("0123456789")).success.value
         .set(BusinessNamePage, "Pizza for you").success.value
         .set(ContactEmailAddressPage, "email@email.com").success.value
+        .set(SafeIDPage, "XE0000123456789").success.value
 
       "must return status OK for submission of valid registration details" in {
 

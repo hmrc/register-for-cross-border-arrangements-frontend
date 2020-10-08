@@ -270,7 +270,12 @@ object SubscriptionForDACRequest {
 
       val contactNumber = userAnswers.get(ContactTelephoneNumberPage)
 
-      if (userAnswers.get(NinoPage).isDefined) {
+      val individualRegistration = userAnswers.get(RegistrationTypePage) match {
+        case Some(RegistrationType.Individual) => true
+        case _ => false
+      }
+
+      if (individualRegistration) {
         ContactInformationForIndividual(
           individual = IndividualDetails.buildIndividualDetails(userAnswers),
           email = email,
