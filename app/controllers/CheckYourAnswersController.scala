@@ -186,7 +186,7 @@ class CheckYourAnswersController @Inject()(
     if (response.isDefined) {
       //Without id journey
       response.get.json.validate[PayloadRegistrationWithoutIDResponse] match {
-        case JsSuccess(registerWithoutIDResponse, _) =>
+        case JsSuccess(registerWithoutIDResponse, _) if registerWithoutIDResponse.registerWithoutIDResponse.responseDetail.isDefined =>
           updateUserAnswersWithSafeID(userAnswers, Some(registerWithoutIDResponse)).flatMap {
             userAnswersWithSafeID =>
               createEISSubscription(userAnswersWithSafeID).flatMap {
@@ -198,6 +198,9 @@ class CheckYourAnswersController @Inject()(
               logger.warn("Unable to update UserAnswers with SafeID", e)
               Redirect(routes.ProblemWithServiceController.onPageLoad())
           }
+        case JsSuccess(_, _) =>
+          logger.warn("Response detail is missing from PayloadRegistrationWithoutIDResponse")
+          Future.successful(Redirect(routes.ProblemWithServiceController.onPageLoad()))
         case JsError(errors) =>
           logger.warn("Unable to deserialise into PayloadRegistrationWithoutIDResponse", errors)
           Future.successful(Redirect(routes.ProblemWithServiceController.onPageLoad()))
@@ -222,11 +225,7 @@ class CheckYourAnswersController @Inject()(
                                           registerWithoutIDResponse: Option[PayloadRegistrationWithoutIDResponse])
                                           (implicit hc: HeaderCarrier): Future[UserAnswers] = {
     if(registerWithoutIDResponse.isDefined) {
-      val safeID = if (registerWithoutIDResponse.get.registerWithoutIDResponse.responseDetail.isDefined) {
-        registerWithoutIDResponse.get.registerWithoutIDResponse.responseDetail.get.SAFEID
-      } else {
-        throw new Exception("Unable to retrieve Safe ID")
-      }
+      val safeID = registerWithoutIDResponse.get.registerWithoutIDResponse.responseDetail.get.SAFEID
 
       for {
         updatedUserAnswers <- Future.fromTry(userAnswers.set(SafeIDPage, safeID))
