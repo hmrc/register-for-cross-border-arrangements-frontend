@@ -20,11 +20,12 @@ import connectors.RegistrationConnector
 import javax.inject.Inject
 import models.{BusinessDetails, BusinessType, PayloadRegisterWithID, PayloadRegistrationWithIDResponse, UniqueTaxpayerReference, UserAnswers}
 import pages.{BusinessTypePage, CorporationTaxUTRPage, NinoPage, SelfAssessmentUTRPage}
+import repositories.SessionRepository
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class BusinessMatchingService @Inject()(registrationConnector: RegistrationConnector) {
+class BusinessMatchingService @Inject()(registrationConnector: RegistrationConnector, sessionRepository: SessionRepository) {
 
   def sendIndividualMatchingInformation(userAnswers: UserAnswers)
                                        (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[Exception, Option[PayloadRegistrationWithIDResponse]]] =
@@ -40,7 +41,7 @@ class BusinessMatchingService @Inject()(registrationConnector: RegistrationConne
     }
 
   def sendBusinessMatchingInformation(userAnswers: UserAnswers)
-                                     (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[BusinessDetails]] = {
+                                     (implicit hc: HeaderCarrier, ec: ExecutionContext):  Future[(Option[BusinessDetails], String)] = {
 
     val utr: UniqueTaxpayerReference = (userAnswers.get(SelfAssessmentUTRPage), userAnswers.get(CorporationTaxUTRPage)) match {
       case (Some(utr), _) => utr
@@ -48,7 +49,7 @@ class BusinessMatchingService @Inject()(registrationConnector: RegistrationConne
     }
 
     //Note: ETMP data suggests sole trader business partner accounts are individual records
-    val payload = userAnswers.get(BusinessTypePage) match {
+    val payload: Option[PayloadRegisterWithID] = userAnswers.get(BusinessTypePage) match {
       case Some(BusinessType.NotSpecified) =>
         PayloadRegisterWithID.createIndividualSubmission(userAnswers, "UTR", utr.uniqueTaxPayerReference)
       case _ =>
@@ -59,13 +60,22 @@ class BusinessMatchingService @Inject()(registrationConnector: RegistrationConne
   }
 
   def callEndPoint(payload: Option[PayloadRegisterWithID])
-                  (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[BusinessDetails]] = {
+                  (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[(Option[BusinessDetails], String)] = {
     payload match {
       case Some(request) => registrationConnector.registerWithID(request).map {
-        _.flatMap(BusinessDetails.fromRegistrationMatch)
+        response =>
+          val safeId = retrieveSafeID(response)
+          (response.flatMap(BusinessDetails.fromRegistrationMatch), safeId)
         //Do we need a logger message for failed extraction?
       }
-      case None => Future.successful(None)
+      case None => Future.successful(None, "")
+    }
+  }
+
+  def retrieveSafeID(payloadRegisterWithIDResponse: Option[PayloadRegistrationWithIDResponse]): String = {
+    payloadRegisterWithIDResponse match {
+        case Some(value) => value.registerWithIDResponse.responseDetail.fold(throw new Exception("unable to retreive SAFEID"))(_.SAFEID)
+        case _ => throw new Exception("unable to use payload")
     }
   }
 }
