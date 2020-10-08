@@ -20,7 +20,7 @@ import com.google.inject.Inject
 import connectors.SubscriptionConnector
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction, NotEnrolledForDAC6Action}
 import models.RegistrationType.Individual
-import models.{PayloadRegistrationWithoutIDResponse, RegisterWithIDResponse, RegistrationType, UserAnswers}
+import models.{PayloadRegistrationWithoutIDResponse, RegistrationType, UserAnswers}
 import org.slf4j.LoggerFactory
 import pages._
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -163,8 +163,8 @@ class CheckYourAnswersController @Inject()(
       (request.userAnswers.get(DoYouHaveUTRPage), request.userAnswers.get(RegistrationTypePage),
         request.userAnswers.get(DoYouHaveANationalInsuranceNumberPage)) match {
 
-        case (Some(true), None, None) => createEnrolment(request.userAnswers)
-        case (Some(false), Some(Individual), Some(true)) => createEnrolment(request.userAnswers)
+        case (Some(true), None, None) => createSubscriptionThenEnrolment(request.userAnswers)
+        case (Some(false), Some(Individual), Some(true)) => createSubscriptionThenEnrolment(request.userAnswers)
 
         case (Some(false), _, Some(false) | None) => registrationService.sendRegistration(request.userAnswers) flatMap {
           case Some(response) => response.status match {
@@ -204,17 +204,11 @@ class CheckYourAnswersController @Inject()(
       }
     } else {
       //With id journey
-      updateUserAnswersWithSafeID(userAnswers, None).flatMap {
-        userAnswersWithSafeID =>
-          createEISSubscription(userAnswersWithSafeID).flatMap {
+          createEISSubscription(userAnswers).flatMap {
             userAnswersWithSubscriptionID =>
+              println("$$$$CREATESUBSCRIPTION THEN ENROLMENT: \n\n\n" + userAnswers)
               createEnrolment(userAnswersWithSubscriptionID)
           }
-      }.recover {
-        case e: Exception =>
-          logger.warn("Unable to update UserAnswers with SafeID", e)
-          Redirect(routes.ProblemWithServiceController.onPageLoad())
-      }
     }
   }
 
@@ -245,10 +239,13 @@ class CheckYourAnswersController @Inject()(
   }
 
   private def createEISSubscription(userAnswers: UserAnswers)(implicit hc: HeaderCarrier): Future[UserAnswers] = {
+
+    println("$$$$createEISSUBSCRIPTION UA:\n\n\n" + userAnswers)
+
+
     subscriptionConnector.createSubscription(userAnswers).flatMap {
       response =>
         val subscriptionID = response.get.createSubscriptionForDACResponse.responseDetail.subscriptionID
-
         for {
           updatedUserAnswers <- Future.fromTry(userAnswers.set(SubscriptionIDPage, subscriptionID))
           _ <- sessionRepository.set(updatedUserAnswers)

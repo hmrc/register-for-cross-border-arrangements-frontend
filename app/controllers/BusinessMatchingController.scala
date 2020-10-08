@@ -54,7 +54,8 @@ class BusinessMatchingController @Inject()(
       }
   }
 
-  def matchBusiness(mode: Mode): Action[AnyContent] = (identify andThen notEnrolled andThen getData andThen requireData).async {
+  def matchBusiness(mode: Mode): Action[AnyContent] =
+    (identify andThen notEnrolled andThen getData andThen requireData).async {
     implicit request =>
 
       /*Note: Needs business type, name and utr to business match
@@ -67,15 +68,17 @@ class BusinessMatchingController @Inject()(
 
       if (utrExist) {
         businessMatchingService.sendBusinessMatchingInformation(request.userAnswers) flatMap {
-          case Some(details) =>
+
+          case (Some(details), id) =>
             for {
-              updatedAnswers     <- Future.fromTry(request.userAnswers.set(BusinessAddressPage, details.address.toAddress))
-              updatedNameAnswers <- Future.fromTry(updatedAnswers.set(RetrievedNamePage, details.name))
-              _                  <- sessionRepository.set(updatedNameAnswers)
+              updatedAnswersWithBusinessDetails <- Future.fromTry(request.userAnswers.set(BusinessAddressPage, details.address.toAddress))
+              updatedAnswersWithBusinessDetails <- Future.fromTry(updatedAnswersWithBusinessDetails.set(RetrievedNamePage, details.name))
+              updatedAnswersWithSafeID <- Future.fromTry(updatedAnswersWithBusinessDetails.set(SafeIDPage, id))
+              _                  <- sessionRepository.set(updatedAnswersWithSafeID)
             } yield {
               Redirect(routes.ConfirmBusinessController.onPageLoad(NormalMode))
             }
-          case None => Future.successful(Redirect(routes.BusinessNotConfirmedController.onPageLoad()))
+          case (None, _) => Future.successful(Redirect(routes.BusinessNotConfirmedController.onPageLoad()))
         } recover {
           case _ => Redirect(routes.BusinessNotConfirmedController.onPageLoad()) //TODO Redirect to error page when it's ready
         }
