@@ -41,7 +41,7 @@ class BusinessMatchingService @Inject()(registrationConnector: RegistrationConne
     }
 
   def sendBusinessMatchingInformation(userAnswers: UserAnswers)
-                                     (implicit hc: HeaderCarrier, ec: ExecutionContext):  Future[(Option[BusinessDetails], String)] = {
+                                     (implicit hc: HeaderCarrier, ec: ExecutionContext):  Future[(Option[BusinessDetails], Option[String])] = {
 
     val utr: UniqueTaxpayerReference = (userAnswers.get(SelfAssessmentUTRPage), userAnswers.get(CorporationTaxUTRPage)) match {
       case (Some(utr), _) => utr
@@ -60,7 +60,7 @@ class BusinessMatchingService @Inject()(registrationConnector: RegistrationConne
   }
 
   def callEndPoint(payload: Option[PayloadRegisterWithID])
-                  (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[(Option[BusinessDetails], String)] = {
+                  (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[(Option[BusinessDetails], Option[String])] = {
     payload match {
       case Some(request) => registrationConnector.registerWithID(request).map {
         response =>
@@ -68,14 +68,14 @@ class BusinessMatchingService @Inject()(registrationConnector: RegistrationConne
           (response.flatMap(BusinessDetails.fromRegistrationMatch), safeId)
         //Do we need a logger message for failed extraction?
       }
-      case None => Future.successful(None, "")
+      case _ => Future.successful(None, None)
     }
   }
 
-  def retrieveSafeID(payloadRegisterWithIDResponse: Option[PayloadRegistrationWithIDResponse]): String = {
+  def retrieveSafeID(payloadRegisterWithIDResponse: Option[PayloadRegistrationWithIDResponse]): Option[String]  = {
     payloadRegisterWithIDResponse match {
-        case Some(value) => value.registerWithIDResponse.responseDetail.fold(throw new Exception("unable to retreive SAFEID"))(_.SAFEID)
-        case _ => throw new Exception("unable to use payload")
+      case Some(value) => value.registerWithIDResponse.responseDetail.map(_.SAFEID)
+      case _ => throw new Exception("unable to retrieve SafeID")
     }
   }
 }
