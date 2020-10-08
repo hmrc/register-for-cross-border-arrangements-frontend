@@ -146,8 +146,10 @@ class BusinessMatchingControllerSpec extends SpecBase
           name = "My Company",
           address = BusinessAddress("1 Address Street", None, None, None, "NE11 1BB", "GB"))
 
+        val safeId = "XE0001234567890"
+
         when(mockBusinessMatchingService.sendBusinessMatchingInformation(any())(any(), any()))
-          .thenReturn(Future.successful(Some(businessDetails)))
+          .thenReturn(Future.successful(Some(businessDetails), Some(safeId)))
 
         val result = route(application, getRequest(businessMatchingRoute)).value
 
@@ -177,8 +179,10 @@ class BusinessMatchingControllerSpec extends SpecBase
           name = "My Company",
           address = BusinessAddress("1 Address Street", None, None, None, "NE11 1BB", "GB"))
 
+        val safeId = "XE0001234567890"
+
         when(mockBusinessMatchingService.sendBusinessMatchingInformation(any())(any(), any()))
-          .thenReturn(Future.successful(Some(businessDetails)))
+          .thenReturn(Future.successful(Some(businessDetails), Some(safeId)))
 
         val result = route(application, getRequest(businessMatchingRoute)).value
 
@@ -191,13 +195,15 @@ class BusinessMatchingControllerSpec extends SpecBase
 
       "must redirect the user to the can't find business page" in {
 
+        val safeId = "XE0001234567890"
+
         val application = applicationBuilder(userAnswers = Some(businessUserAnswers))
           .overrides(
             bind[BusinessMatchingService].toInstance(mockBusinessMatchingService)
           ).build()
 
         when(mockBusinessMatchingService.sendBusinessMatchingInformation(any())(any(), any()))
-          .thenReturn(Future.successful(None))
+          .thenReturn(Future.successful(None, None))
 
         val result = route(application, getRequest(businessMatchingRoute)).value
 
@@ -244,7 +250,7 @@ class BusinessMatchingControllerSpec extends SpecBase
           ).build()
 
         when(mockBusinessMatchingService.sendBusinessMatchingInformation(any())(any(), any()))
-          .thenReturn(Future.successful(None))
+          .thenReturn(Future.successful(None, None))
 
         val result = route(application, getRequest(businessMatchingRoute)).value
 
