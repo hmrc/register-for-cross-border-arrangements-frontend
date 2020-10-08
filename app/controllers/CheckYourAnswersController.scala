@@ -205,10 +205,14 @@ class CheckYourAnswersController @Inject()(
       }
     } else {
       //With id journey
-          createEISSubscription(userAnswers).flatMap {
-            userAnswersWithSubscriptionID =>
-              createEnrolment(userAnswersWithSubscriptionID)
-          }
+      createEISSubscription(userAnswers).flatMap {
+        userAnswersWithSubscriptionID =>
+          createEnrolment(userAnswersWithSubscriptionID)
+      }.recover {
+        case e: Exception =>
+          logger.warn("Unable to create an EIS subscription", e)
+          Redirect(routes.ProblemWithServiceController.onPageLoad())
+      }
     }
   }
 
