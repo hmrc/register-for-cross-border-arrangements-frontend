@@ -168,9 +168,7 @@ class CheckYourAnswersController @Inject()(
 
         case (Some(false), _, Some(false) | None) => registrationService.sendRegistration(request.userAnswers) flatMap {
           case Some(response) => response.status match {
-            case OK =>
-              println(s"\n\nResponse: ${response.body}\n\n")
-              createSubscriptionThenEnrolment(request.userAnswers, Some(response))
+            case OK => createSubscriptionThenEnrolment(request.userAnswers, Some(response))
             case _ => Future.successful(Redirect(routes.ProblemWithServiceController.onPageLoad()))
           }
           case _ => Future.successful(Redirect(routes.ProblemWithServiceController.onPageLoad()))
@@ -206,7 +204,6 @@ class CheckYourAnswersController @Inject()(
       //With id journey
           createEISSubscription(userAnswers).flatMap {
             userAnswersWithSubscriptionID =>
-              println("$$$$CREATESUBSCRIPTION THEN ENROLMENT: \n\n\n" + userAnswers)
               createEnrolment(userAnswersWithSubscriptionID)
           }
     }
@@ -239,10 +236,6 @@ class CheckYourAnswersController @Inject()(
   }
 
   private def createEISSubscription(userAnswers: UserAnswers)(implicit hc: HeaderCarrier): Future[UserAnswers] = {
-
-    println("$$$$createEISSUBSCRIPTION UA:\n\n\n" + userAnswers)
-
-
     subscriptionConnector.createSubscription(userAnswers).flatMap {
       response =>
         val subscriptionID = response.get.createSubscriptionForDACResponse.responseDetail.subscriptionID
@@ -263,7 +256,6 @@ class CheckYourAnswersController @Inject()(
       case Some(HttpResponse(BAD_REQUEST, _, _)) => logger.warn("Missing email or name parameter")
       case _ => Unit
     }
-
   }
 
   def createEnrolment(userAnswers: UserAnswers)(implicit hc: HeaderCarrier): Future[Result] = {

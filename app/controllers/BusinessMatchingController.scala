@@ -69,7 +69,7 @@ class BusinessMatchingController @Inject()(
       if (utrExist) {
         businessMatchingService.sendBusinessMatchingInformation(request.userAnswers) flatMap {
 
-          case (Some(details), id) =>
+          case (Some(details), Some(id)) =>
             for {
               updatedAnswersWithBusinessDetails <- Future.fromTry(request.userAnswers.set(BusinessAddressPage, details.address.toAddress))
               updatedAnswersWithBusinessDetails <- Future.fromTry(updatedAnswersWithBusinessDetails.set(RetrievedNamePage, details.name))
