@@ -93,7 +93,7 @@ class BusinessMatchingServiceSpec extends SpecBase
             val result = businessMatchingService.sendIndividualMatchingInformation(answers)
 
             whenReady(result){
-              _.map(_.get) mustBe Right(response)
+              _.map(_._1.get) mustBe Right(response)
             }
         }
       }

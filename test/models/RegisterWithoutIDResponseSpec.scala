@@ -25,7 +25,7 @@ class RegisterWithoutIDResponseSpec extends FreeSpec with MustMatchers with Scal
 
   val responseCommon: ResponseCommon = ResponseCommon(status = "OK", statusText = Some("Success"),
     processingDate = "2020-09-01T01:00:00Z", returnParameters = None)
-  val responseDetail: RegisterWithoutIDResponseDetail = RegisterWithoutIDResponseDetail(SAFEID = "123456789012345", ARN = None)
+  val responseDetail: RegisterWithoutIDResponseDetail = RegisterWithoutIDResponseDetail(SAFEID = "XE0000123456789", ARN = None)
 
   val registerWithoutID: PayloadRegistrationWithoutIDResponse = PayloadRegistrationWithoutIDResponse(
     RegisterWithoutIDResponse(responseCommon, Some(responseDetail))

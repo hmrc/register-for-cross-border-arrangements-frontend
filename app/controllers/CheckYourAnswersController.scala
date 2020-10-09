@@ -185,7 +185,7 @@ class CheckYourAnswersController @Inject()(
       //Without id journey
       response.get.json.validate[PayloadRegistrationWithoutIDResponse] match {
         case JsSuccess(registerWithoutIDResponse, _) if registerWithoutIDResponse.registerWithoutIDResponse.responseDetail.isDefined =>
-          updateUserAnswersWithSafeID(userAnswers, Some(registerWithoutIDResponse)).flatMap {
+          updateUserAnswersWithSafeID(userAnswers, registerWithoutIDResponse).flatMap {
             userAnswersWithSafeID =>
               createEISSubscription(userAnswersWithSafeID).flatMap {
                 userAnswersWithSubscriptionID =>
@@ -217,25 +217,14 @@ class CheckYourAnswersController @Inject()(
   }
 
   private def updateUserAnswersWithSafeID(userAnswers: UserAnswers,
-                                          registerWithoutIDResponse: Option[PayloadRegistrationWithoutIDResponse])
+                                          registerWithoutIDResponse: PayloadRegistrationWithoutIDResponse)
                                           (implicit hc: HeaderCarrier): Future[UserAnswers] = {
-    if(registerWithoutIDResponse.isDefined) {
-      val safeID = registerWithoutIDResponse.get.registerWithoutIDResponse.responseDetail.get.SAFEID
+      val safeID = registerWithoutIDResponse.registerWithoutIDResponse.responseDetail.get.SAFEID
 
       for {
         updatedUserAnswers <- Future.fromTry(userAnswers.set(SafeIDPage, safeID))
         _ <- sessionRepository.set(updatedUserAnswers)
       } yield updatedUserAnswers
-    } else {
-      userAnswers.get(SafeIDPage) match {
-        case Some(id) =>
-          for {
-            updatedUserAnswers <- Future.fromTry(userAnswers.set(SafeIDPage, id))
-            _ <- sessionRepository.set(updatedUserAnswers)
-          } yield updatedUserAnswers
-        case None => throw new Exception("Unable to retrieve Safe ID")
-      }
-    }
   }
 
   private def createEISSubscription(userAnswers: UserAnswers)(implicit hc: HeaderCarrier): Future[UserAnswers] = {
