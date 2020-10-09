@@ -16,7 +16,7 @@
 
 package models
 
-import play.api.libs.json.{Format, Json, OWrites, Reads, Writes, __}
+import play.api.libs.json._
 
 sealed trait PartnerDetailsResponse
 
@@ -68,7 +68,6 @@ case class ResponseDetail(
                           )
 
 object ResponseDetail {
-  import play.api.libs.functional.syntax._
   implicit lazy val responseDetailsWrites: Writes[ResponseDetail] = Writes[ResponseDetail] {
     case ResponseDetail(safeid, arn, isEditable, isAnAgent, isAnASAgent, isAnIndividual,
     individual@IndividualResponse(_,_,_,_), address, contactDetails) =>

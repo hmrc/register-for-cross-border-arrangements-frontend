@@ -54,7 +54,7 @@ class BusinessMatchingController @Inject()(
           } yield {
             Redirect(routes.IdentityConfirmedController.onPageLoad()) //TODO: may need more data collected for Cardiff team
           }
-        case Right((None, _)) => Future.successful(Redirect(routes.IndividualNotConfirmedController.onPageLoad()))
+        case Right(_) => Future.successful(Redirect(routes.IndividualNotConfirmedController.onPageLoad()))
         //we are missing a name or a date of birth take them back to fill it in
         case Left(_) => Future.successful(Redirect(routes.NameController.onPageLoad(NormalMode)))
       }
@@ -84,7 +84,7 @@ class BusinessMatchingController @Inject()(
             } yield {
               Redirect(routes.ConfirmBusinessController.onPageLoad(NormalMode))
             }
-          case (None, _) => Future.successful(Redirect(routes.BusinessNotConfirmedController.onPageLoad()))
+          case _ => Future.successful(Redirect(routes.BusinessNotConfirmedController.onPageLoad()))
         } recover {
           case _ => Redirect(routes.BusinessNotConfirmedController.onPageLoad()) //TODO Redirect to error page when it's ready
         }
