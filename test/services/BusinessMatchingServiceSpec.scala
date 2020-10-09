@@ -150,17 +150,17 @@ class BusinessMatchingServiceSpec extends SpecBase
             val payload = PayloadRegistrationWithIDResponse(
               RegisterWithIDResponse(
                 ResponseCommon("", None, "", None),
-                Some(ResponseDetail("", None, false, false, None, false,
+                Some(ResponseDetail("XE0001234567890", None, false, false, None, false,
                 OrganisationResponse(businessName, false, None, None),
-                AddressResponse("1 TestStreet", Some("Test"), None, None, Some("AA11BB"), "GB"),
+                AddressResponse("1 TestStreet", Some("Test"), Some("Test"), None, Some("AA11BB"), "GB"),
                 ContactDetails(None, None, None, None)))
               )
             )
 
-            val businessDetails = BusinessDetails(
+            val businessDetailsWithSafeID = (Some(BusinessDetails(
               businessName,
-              BusinessAddress("1 TestStreet", Some("Test"), None, None, "AA11BB", "GB")
-            )
+              BusinessAddress("1 TestStreet", Some("Test"), Some("Test"), None, "AA11BB", "GB")
+            )), Some("XE0001234567890"))
 
             when(mockRegistrationConnector.registerWithID(any())(any(), any()))
               .thenReturn(
@@ -169,7 +169,7 @@ class BusinessMatchingServiceSpec extends SpecBase
             val result = businessMatchingService.sendBusinessMatchingInformation(answers)
 
             whenReady(result){ result =>
-              result mustBe Some(businessDetails)
+              result mustBe businessDetailsWithSafeID
             }
         }
       }
@@ -195,17 +195,17 @@ class BusinessMatchingServiceSpec extends SpecBase
             val payload = PayloadRegistrationWithIDResponse(
               RegisterWithIDResponse(
                 ResponseCommon("", None, "", None),
-                Some(ResponseDetail("", None, false, false, None, false,
+                Some(ResponseDetail("XE0001234567890", None, false, false, None, false,
                   IndividualResponse("Bobby", None, "Bob", None),
                   AddressResponse("1 TestStreet", Some("Test"), None, None, Some("AA11BB"), "GB"),
                   ContactDetails(None, None, None, None)))
               )
             )
 
-            val businessDetails = BusinessDetails(
+            val businessDetailsWithSafeID = (Some(BusinessDetails(
               "Bobby Bob",
               BusinessAddress("1 TestStreet", Some("Test"), None, None, "AA11BB", "GB")
-            )
+            )), Some("XE0001234567890"))
 
             when(mockRegistrationConnector.registerWithID(any())(any(), any()))
               .thenReturn(
@@ -215,12 +215,12 @@ class BusinessMatchingServiceSpec extends SpecBase
             val result = businessMatchingService.sendBusinessMatchingInformation(answers)
 
             whenReady(result){ result =>
-              result mustBe Some(businessDetails)
+              result mustBe businessDetailsWithSafeID
             }
         }
       }
 
-      "should return a future None if business can't be found" in {
+      "should throw exception for retrevial of SafeID if business can't be found" in {
         forAll(arbitrary[UserAnswers], arbitrary[UniqueTaxpayerReference], arbitrary[String], arbitrary[Name]){
           (userAnswers, utr, businessName, soleTraderName) =>
             val getRandomBusinessTypeNoSoleTrader = Random.shuffle(businessTypesNoSoleTrader).head
@@ -239,18 +239,16 @@ class BusinessMatchingServiceSpec extends SpecBase
               .success
               .value
 
-
             when(mockRegistrationConnector.registerWithID(any())(any(), any()))
               .thenReturn(Future.successful(None))
 
             val result = businessMatchingService.sendBusinessMatchingInformation(answers)
 
-            whenReady(result){ result =>
-              result mustBe None
+            assertThrows[Exception] {
+              result.futureValue
             }
         }
       }
     }
-
   }
 }
