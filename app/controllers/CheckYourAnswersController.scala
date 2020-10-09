@@ -217,8 +217,7 @@ class CheckYourAnswersController @Inject()(
   }
 
   private def updateUserAnswersWithSafeID(userAnswers: UserAnswers,
-                                          registerWithoutIDResponse: PayloadRegistrationWithoutIDResponse)
-                                          (implicit hc: HeaderCarrier): Future[UserAnswers] = {
+                                          registerWithoutIDResponse: PayloadRegistrationWithoutIDResponse): Future[UserAnswers] = {
       val safeID = registerWithoutIDResponse.registerWithoutIDResponse.responseDetail.get.SAFEID
 
       for {

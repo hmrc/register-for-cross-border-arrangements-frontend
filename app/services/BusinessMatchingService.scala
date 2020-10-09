@@ -36,7 +36,7 @@ class BusinessMatchingService @Inject()(registrationConnector: RegistrationConne
           case Some(request) => registrationConnector.registerWithID(request).map {
             response =>
               val safeId = retrieveSafeID(response)
-              Right(response, safeId)
+              Right((response, safeId))
           }
           case None =>
             Future.successful(Left(new Exception("Couldn't Create Payload for Register With ID"))            )
@@ -72,7 +72,7 @@ class BusinessMatchingService @Inject()(registrationConnector: RegistrationConne
           (response.flatMap(BusinessDetails.fromRegistrationMatch), safeId)
         //Do we need a logger message for failed extraction?
       }
-      case _ => Future.successful(None, None)
+      case _ => Future.successful((None, None))
     }
   }
 

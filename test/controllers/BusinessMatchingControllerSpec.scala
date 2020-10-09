@@ -86,14 +86,15 @@ class BusinessMatchingControllerSpec extends SpecBase
 
         when(mockBusinessMatchingService.sendIndividualMatchingInformation(any())(any(), any()))
           .thenReturn(
-            Future.successful(Right(Some(
+            Future.successful(Right((Some(
               PayloadRegistrationWithIDResponse(
                 RegisterWithIDResponse(
                   ResponseCommon("OK", None, "", None),
                   None
                 )
               )
-            ), Some("XE0000123456789")))
+              ), Some("XE0000123456789"))
+            ))
           )
 
         val result = route(application, getRequest(individualMatchingRoute)).value
@@ -124,7 +125,7 @@ class BusinessMatchingControllerSpec extends SpecBase
           ).build()
 
         when(mockBusinessMatchingService.sendIndividualMatchingInformation(any())(any(), any()))
-          .thenReturn(Future.successful(Right(None, None)))
+          .thenReturn(Future.successful(Right((None, None))))
 
         val result = route(application, getRequest(individualMatchingRoute)).value
 
@@ -149,7 +150,7 @@ class BusinessMatchingControllerSpec extends SpecBase
         val safeId = "XE0001234567890"
 
         when(mockBusinessMatchingService.sendBusinessMatchingInformation(any())(any(), any()))
-          .thenReturn(Future.successful(Some(businessDetails), Some(safeId)))
+          .thenReturn(Future.successful((Some(businessDetails), Some(safeId))))
 
         val result = route(application, getRequest(businessMatchingRoute)).value
 
@@ -182,7 +183,7 @@ class BusinessMatchingControllerSpec extends SpecBase
         val safeId = "XE0001234567890"
 
         when(mockBusinessMatchingService.sendBusinessMatchingInformation(any())(any(), any()))
-          .thenReturn(Future.successful(Some(businessDetails), Some(safeId)))
+          .thenReturn(Future.successful((Some(businessDetails), Some(safeId))))
 
         val result = route(application, getRequest(businessMatchingRoute)).value
 
@@ -195,15 +196,13 @@ class BusinessMatchingControllerSpec extends SpecBase
 
       "must redirect the user to the can't find business page" in {
 
-        val safeId = "XE0001234567890"
-
         val application = applicationBuilder(userAnswers = Some(businessUserAnswers))
           .overrides(
             bind[BusinessMatchingService].toInstance(mockBusinessMatchingService)
           ).build()
 
         when(mockBusinessMatchingService.sendBusinessMatchingInformation(any())(any(), any()))
-          .thenReturn(Future.successful(None, None))
+          .thenReturn(Future.successful((None, None)))
 
         val result = route(application, getRequest(businessMatchingRoute)).value
 
@@ -250,7 +249,7 @@ class BusinessMatchingControllerSpec extends SpecBase
           ).build()
 
         when(mockBusinessMatchingService.sendBusinessMatchingInformation(any())(any(), any()))
-          .thenReturn(Future.successful(None, None))
+          .thenReturn(Future.successful((None, None)))
 
         val result = route(application, getRequest(businessMatchingRoute)).value
 
