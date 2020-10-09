@@ -85,15 +85,26 @@ class BusinessMatchingServiceSpec extends SpecBase
               .success
               .value
 
+            val registerWithSafeId = response.registerWithIDResponse.copy(
+              responseDetail = Some(
+                ResponseDetail("XE0001234567890", None, false, false, None, false,
+                  IndividualResponse("Bobby", None, "Bob", None),
+                  AddressResponse("1 TestStreet", Some("Test"), None, None, Some("AA11BB"), "GB"),
+                  ContactDetails(None, None, None, None)))
+            )
+            val responseWithSafeId = response.copy(registerWithSafeId)
+
             when(mockRegistrationConnector.registerWithID(any())(any(), any()))
               .thenReturn(
-                Future.successful(Some(response))
+                Future.successful(Some(responseWithSafeId))
               )
 
             val result = businessMatchingService.sendIndividualMatchingInformation(answers)
 
             whenReady(result){
-              _.map(_._1.get) mustBe Right(response)
+              res =>
+                res.map(_._1.get) mustBe Right(responseWithSafeId)
+                res.map(_._2.get) mustBe Right("XE0001234567890")
             }
         }
       }
@@ -220,7 +231,7 @@ class BusinessMatchingServiceSpec extends SpecBase
         }
       }
 
-      "should throw exception for retrevial of SafeID if business can't be found" in {
+      "should throw exception for retrieval of SafeID if business can't be found" in {
         forAll(arbitrary[UserAnswers], arbitrary[UniqueTaxpayerReference], arbitrary[String], arbitrary[Name]){
           (userAnswers, utr, businessName, soleTraderName) =>
             val getRandomBusinessTypeNoSoleTrader = Random.shuffle(businessTypesNoSoleTrader).head
