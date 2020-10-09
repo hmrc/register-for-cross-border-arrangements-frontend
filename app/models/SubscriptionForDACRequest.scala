@@ -28,9 +28,10 @@ import scala.util.Random
 case class OrganisationDetails(organisationName: String)
 object OrganisationDetails {
   def buildOrganisationDetails(userAnswers: UserAnswers): OrganisationDetails = {
-    (userAnswers.get(BusinessNamePage), userAnswers.get(BusinessWithoutIDNamePage)) match {
-      case (Some(name), _) => new OrganisationDetails(name)
-      case (_, Some(name)) => new OrganisationDetails(name)
+    (userAnswers.get(BusinessNamePage), userAnswers.get(BusinessWithoutIDNamePage), userAnswers.get(SoleTraderNamePage)) match {
+      case (Some(name), _, _) => new OrganisationDetails(name)
+      case (_, Some(name), _) => new OrganisationDetails(name)
+      case (_, _, Some(name)) => new OrganisationDetails(s"${name.firstName} ${name.secondName}")
       case _ => throw new Exception("Organisation name can't be empty when creating a subscription")
     }
   }

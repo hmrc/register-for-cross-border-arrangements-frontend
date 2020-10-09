@@ -491,7 +491,7 @@ object JsonFixtures {
       |      "processingDate": "2020-09-01T01:00:00Z"
       |    },
       |    "responseDetail": {
-      |      "SAFEID": "123456789012345"
+      |      "SAFEID": "XE0000123456789"
       |    }
       |  }
       |}
@@ -505,7 +505,7 @@ object JsonFixtures {
         "processingDate" -> "2020-09-01T01:00:00Z"
       ),
       "responseDetail" -> Json.obj(
-        "SAFEID" -> "123456789012345"
+        "SAFEID" -> "XE0000123456789"
       )
     )
   )
