@@ -182,7 +182,7 @@ class CheckYourAnswersController @Inject()(
                                               (implicit hc: HeaderCarrier): Future[Result] = {
 
     if (response.isDefined) {
-      //Without id journey
+      //Without id journeys
       response.get.json.validate[PayloadRegistrationWithoutIDResponse] match {
         case JsSuccess(registerWithoutIDResponse, _) if registerWithoutIDResponse.registerWithoutIDResponse.responseDetail.isDefined =>
           updateUserAnswersWithSafeID(userAnswers, registerWithoutIDResponse).flatMap {
@@ -204,7 +204,7 @@ class CheckYourAnswersController @Inject()(
           Future.successful(Redirect(routes.ProblemWithServiceController.onPageLoad()))
       }
     } else {
-      //With id journey
+      //With id journeys
       createEISSubscription(userAnswers).flatMap {
         userAnswersWithSubscriptionID =>
           createEnrolment(userAnswersWithSubscriptionID)
