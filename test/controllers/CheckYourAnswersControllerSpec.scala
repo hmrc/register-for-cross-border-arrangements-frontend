@@ -316,8 +316,42 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach {
 
     "OnSubmit" - {
 
+      "must send email and redirect to the confirmation page when OK response received for individual" in {
+
+        val userAnswers: UserAnswers = UserAnswers(userAnswersId)
+          .set(DoYouHaveUTRPage, false)
+          .success.value
+          .set(RegistrationTypePage, Individual)
+          .success.value
+          .set(DoYouHaveANationalInsuranceNumberPage, true)
+          .success.value
+
+        val application = applicationBuilder(userAnswers = Some(userAnswers))
+          .overrides(bind[EmailService]
+            .toInstance(mockEmailService),
+            bind[SubscriptionConnector]
+              .toInstance(mockSubscriptionConnector))
+          .build()
+
+        when(mockSubscriptionConnector.createSubscription(any())(any(), any()))
+          .thenReturn(Future.successful(Some(dacSubscriptionResponse)))
+
+        when(mockEmailService.sendEmail(any())(any()))
+          .thenReturn(Future.successful(Some(HttpResponse(OK, ""))))
+
+        when(mockSubscriptionConnector.createEnrolment(any())(any(), any()))
+          .thenReturn(Future.successful(HttpResponse(NO_CONTENT, "")))
+
+        val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit().url)
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result) mustBe Some("/register-for-cross-border-arrangements/register/confirm-registration")
+        verify(mockEmailService, times(1)).sendEmail(any())(any())
+      }
+
       "must send email and redirect to the confirmation page when OK response received for individual (no nino) and " +
-        "EIS subscription returned a subscription/safe ID" in {
+        "EIS subscription returned a subscription ID" in {
 
         val userAnswers: UserAnswers = UserAnswers(userAnswersId)
           .set(DoYouHaveUTRPage, false)
@@ -393,8 +427,6 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach {
       "must redirect to the problem with service page if registration response throws a JsError" in {
         val userAnswers: UserAnswers = UserAnswers(userAnswersId)
           .set(DoYouHaveUTRPage, false)
-          .success.value
-          .set(RegistrationTypePage, Business)
           .success.value
 
         val application = applicationBuilder(userAnswers = Some(userAnswers))
@@ -507,8 +539,37 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach {
 
       }
 
+      "must send email and redirect to the confirmation page when OK response received for organisation" in {
+
+        val userAnswers: UserAnswers = UserAnswers(userAnswersId)
+          .set(DoYouHaveUTRPage, true)
+          .success.value
+
+        val application = applicationBuilder(userAnswers = Some(userAnswers))
+          .overrides(bind[EmailService]
+            .toInstance(mockEmailService),
+            bind[SubscriptionConnector]
+              .toInstance(mockSubscriptionConnector))
+          .build()
+
+        when(mockSubscriptionConnector.createSubscription(any())(any(), any()))
+          .thenReturn(Future.successful(Some(dacSubscriptionResponse)))
+
+        when(mockEmailService.sendEmail(any())(any()))
+          .thenReturn(Future.successful(Some(HttpResponse(OK, ""))))
+
+        when(mockSubscriptionConnector.createEnrolment(any())(any(), any()))
+          .thenReturn(Future.successful(HttpResponse(NO_CONTENT, "")))
+
+        val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit().url)
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result) mustBe Some("/register-for-cross-border-arrangements/register/confirm-registration")
+      }
+
     "must send email and redirect to the confirmation page when OK response received for organisation (no utr) and " +
-      "EIS subscription returned a subscription/safe ID" in {
+      "EIS subscription returned a subscription ID" in {
 
       val userAnswers: UserAnswers = UserAnswers(userAnswersId)
         .set(DoYouHaveUTRPage, false)

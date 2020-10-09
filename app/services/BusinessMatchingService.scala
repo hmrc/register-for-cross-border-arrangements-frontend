@@ -20,20 +20,24 @@ import connectors.RegistrationConnector
 import javax.inject.Inject
 import models.{BusinessDetails, BusinessType, PayloadRegisterWithID, PayloadRegistrationWithIDResponse, UniqueTaxpayerReference, UserAnswers}
 import pages.{BusinessTypePage, CorporationTaxUTRPage, NinoPage, SelfAssessmentUTRPage}
-import repositories.SessionRepository
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class BusinessMatchingService @Inject()(registrationConnector: RegistrationConnector, sessionRepository: SessionRepository) {
+class BusinessMatchingService @Inject()(registrationConnector: RegistrationConnector) {
 
   def sendIndividualMatchingInformation(userAnswers: UserAnswers)
-                                       (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[Exception, Option[PayloadRegistrationWithIDResponse]]] =
+                                       (implicit hc: HeaderCarrier,
+                                        ec: ExecutionContext): Future[Either[Exception, (Option[PayloadRegistrationWithIDResponse], Option[String])]] =
     userAnswers.get(NinoPage) match {
       case Some(nino) =>
         val payloadForIndividual = PayloadRegisterWithID.createIndividualSubmission(userAnswers, "NINO", nino.nino)
         payloadForIndividual match {
-          case Some(request) => registrationConnector.registerWithID(request).map(Right(_))
+          case Some(request) => registrationConnector.registerWithID(request).map {
+            response =>
+              val safeId = retrieveSafeID(response)
+              Right(response, safeId)
+          }
           case None =>
             Future.successful(Left(new Exception("Couldn't Create Payload for Register With ID"))            )
         }
