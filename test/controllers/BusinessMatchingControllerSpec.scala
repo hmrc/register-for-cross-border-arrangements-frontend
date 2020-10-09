@@ -194,9 +194,7 @@ class BusinessMatchingControllerSpec extends SpecBase
     "when a correct submission can be created and returns no business match" - {
 
       "must redirect the user to the can't find business page" in {
-
-        val safeId = "XE0001234567890"
-
+        
         val application = applicationBuilder(userAnswers = Some(businessUserAnswers))
           .overrides(
             bind[BusinessMatchingService].toInstance(mockBusinessMatchingService)

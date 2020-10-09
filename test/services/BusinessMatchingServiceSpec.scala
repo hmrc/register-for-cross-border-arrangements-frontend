@@ -250,5 +250,29 @@ class BusinessMatchingServiceSpec extends SpecBase
         }
       }
     }
+
+    "when retrieveSafeId is called" - {
+      "must return SafeID given a valid payload response" in {
+
+        val payload = PayloadRegistrationWithIDResponse(
+          RegisterWithIDResponse(
+            ResponseCommon("", None, "", None),
+            Some(ResponseDetail("XE0001234567890", None, false, false, None, false,
+              IndividualResponse("Bobby", None, "Bob", None),
+              AddressResponse("1 TestStreet", Some("Test"), None, None, Some("AA11BB"), "GB"),
+              ContactDetails(None, None, None, None)))
+          )
+        )
+        businessMatchingService.retrieveSafeID(Some(payload)) mustEqual Some("XE0001234567890")
+      }
+
+      "must throw Exception given an invalid payload response" in {
+
+        val ex = intercept[Exception] {
+          businessMatchingService.retrieveSafeID(None)
+        }
+        ex.getMessage.mustEqual("unable to retrieve SafeID")
+      }
+    }
   }
 }
