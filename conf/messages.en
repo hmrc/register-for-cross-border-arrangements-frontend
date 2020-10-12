@@ -444,7 +444,7 @@ secondaryContactName.heading = What is the name of the individual or team we sho
 secondaryContactName.checkYourAnswersLabel = Additional contact name
 secondaryContactName.hint = For example, ‘DAC6 team’ or ‘Ashley Smith’.
 secondaryContactName.error.required = Enter the name of the individual or team we should contact
-secondaryContactName.error.invalid = Name of the individual or team must only include letters a to z, apostrophes, grave accents, ampersands, hyphens, backslashes, carets and spaces
+secondaryContactName.error.invalid = Name of the individual or team must only include letters a to z, numbers 0 to 9, apostrophes, grave accents, ampersands, hyphens, backslashes, carets and spaces
 secondaryContactName.error.length = Individual or team must be 35 characters or less
 
 secondaryContactPreference.title = How can we contact them?

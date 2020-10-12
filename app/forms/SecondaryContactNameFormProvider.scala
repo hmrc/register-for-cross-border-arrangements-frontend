@@ -29,6 +29,6 @@ class SecondaryContactNameFormProvider @Inject() extends Mappings with RegexCons
     Form(
       "secondaryContactName" -> validatedText("secondaryContactName.error.required",
         "secondaryContactName.error.invalid",
-        "secondaryContactName.error.length", apiNameRegex, maxLength)
+        "secondaryContactName.error.length", nonApiNameRegex, maxLength)
     )
 }
