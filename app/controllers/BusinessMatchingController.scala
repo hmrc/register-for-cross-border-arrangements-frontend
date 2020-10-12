@@ -77,9 +77,9 @@ class BusinessMatchingController @Inject()(
 
           case (Some(details), Some(id)) =>
             for {
-              updatedAnswersWithBusinessDetails <- Future.fromTry(request.userAnswers.set(BusinessAddressPage, details.address.toAddress))
-              updatedAnswersWithBusinessDetails <- Future.fromTry(updatedAnswersWithBusinessDetails.set(RetrievedNamePage, details.name))
-              updatedAnswersWithSafeID <- Future.fromTry(updatedAnswersWithBusinessDetails.set(SafeIDPage, id))
+              updatedAnswersWithBusinessAddress <- Future.fromTry(request.userAnswers.set(BusinessAddressPage, details.address.toAddress))
+              updatedAnswersWithBusinessName <- Future.fromTry(updatedAnswersWithBusinessAddress.set(RetrievedNamePage, details.name))
+              updatedAnswersWithSafeID <- Future.fromTry(updatedAnswersWithBusinessName.set(SafeIDPage, id))
               _                  <- sessionRepository.set(updatedAnswersWithSafeID)
             } yield {
               Redirect(routes.ConfirmBusinessController.onPageLoad(NormalMode))
