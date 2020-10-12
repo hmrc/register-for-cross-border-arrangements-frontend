@@ -16,7 +16,7 @@
 
 package models
 
-import play.api.libs.json.{Json, OFormat, OWrites, Reads, __}
+import play.api.libs.json.{Json, OFormat}
 
 
 case class ResponseDetailForDACSubscription(subscriptionID: String)
@@ -26,15 +26,7 @@ object ResponseDetailForDACSubscription {
 
 case class SubscriptionForDACResponse(responseCommon: ResponseCommon, responseDetail: ResponseDetailForDACSubscription)
 object SubscriptionForDACResponse {
-  implicit val reads: Reads[SubscriptionForDACResponse] = {
-    import play.api.libs.functional.syntax._
-    (
-      (__ \ "responseCommon").read[ResponseCommon] and
-        (__ \ "responseDetail").read[ResponseDetailForDACSubscription]
-    )((responseCommon, responseDetail) => SubscriptionForDACResponse(responseCommon, responseDetail))
-  }
-
-  implicit val writes: OWrites[SubscriptionForDACResponse] = Json.writes[SubscriptionForDACResponse]
+  implicit val format: OFormat[SubscriptionForDACResponse] = Json.format[SubscriptionForDACResponse]
 }
 
 case class CreateSubscriptionForDACResponse(createSubscriptionForDACResponse: SubscriptionForDACResponse)

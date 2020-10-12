@@ -253,7 +253,7 @@ object SubscriptionForDACRequest {
     if (secondaryContact) {
       val secondaryEmail = userAnswers.get(SecondaryContactEmailAddressPage) match {
         case Some(email) => email
-        case None => throw new Exception("Unable to retrieve secondary email address")
+        case None => ""
       }
 
       val secondaryContactNumber = userAnswers.get(SecondaryContactTelephoneNumberPage)
@@ -262,7 +262,7 @@ object SubscriptionForDACRequest {
         organisation = OrganisationDetails.buildOrganisationDetails(userAnswers),
         email = secondaryEmail,
         phone = secondaryContactNumber,
-        mobile = secondaryContactNumber)
+        mobile = None)
     } else {
       val email = userAnswers.get(ContactEmailAddressPage) match {
         case Some(email) => email
