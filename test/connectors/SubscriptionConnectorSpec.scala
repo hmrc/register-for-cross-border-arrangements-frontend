@@ -86,45 +86,57 @@ class SubscriptionConnectorSpec extends SpecBase
 
     "when calling createEISSubscription" - {
 
-      val userAnswers = UserAnswers(userAnswersId)
-        .set(BusinessNamePage, "Pizza for you").success.value
-        .set(ContactEmailAddressPage, "email@email.com").success.value
-        .set(SafeIDPage, "XE0000123456789").success.value
-
       "must return status OK for submission of valid registration details" in {
 
-        val response = CreateSubscriptionForDACResponse(
-          SubscriptionForDACResponse(
-            responseCommon = ResponseCommon("OK", None, "2020-09-23T16:12:11Z", None),
-            responseDetail = ResponseDetailForDACSubscription("XADAC0000123456"))
-        )
+        forAll(arbitrary[UserAnswers], validBusinessName, validEmailAddress, validSafeID) {
+          (userAnswers, businessName, email, safeID) =>
+            val updatedUserAnswers = userAnswers.set(BusinessNamePage, businessName).success.value
+              .set(ContactEmailAddressPage, email).success.value
+              .set(SafeIDPage, safeID).success.value
+              .remove(RegistrationTypePage).success.value
 
-        val expectedBody =
-          """
-            |{
-            | "createSubscriptionForDACResponse": {
-            |   "responseCommon": {
-            |     "status": "OK",
-            |     "processingDate": "2020-09-23T16:12:11Z"
-            |   },
-            |   "responseDetail": {
-            |      "subscriptionID": "XADAC0000123456"
-            |   }
-            | }
-            |}""".stripMargin
+            val response = CreateSubscriptionForDACResponse(
+              SubscriptionForDACResponse(
+                responseCommon = ResponseCommon("OK", None, "2020-09-23T16:12:11Z", None),
+                responseDetail = ResponseDetailForDACSubscription("XADAC0000123456"))
+            )
 
-        stubPostResponse("/register-for-cross-border-arrangements/subscription/create-dac-subscription", OK, expectedBody)
+            val expectedBody =
+              """
+                |{
+                | "createSubscriptionForDACResponse": {
+                |   "responseCommon": {
+                |     "status": "OK",
+                |     "processingDate": "2020-09-23T16:12:11Z"
+                |   },
+                |   "responseDetail": {
+                |      "subscriptionID": "XADAC0000123456"
+                |   }
+                | }
+                |}""".stripMargin
 
-        val result = connector.createSubscription(userAnswers)
-        result.futureValue mustBe Some(response)
+            stubPostResponse("/register-for-cross-border-arrangements/subscription/create-dac-subscription", OK, expectedBody)
+
+            val result = connector.createSubscription(updatedUserAnswers)
+            result.futureValue mustBe Some(response)
+        }
       }
 
       "must return None if status is not OK and subscription fails" in {
-        stubPostResponse("/register-for-cross-border-arrangements/subscription/create-dac-subscription", SERVICE_UNAVAILABLE, "")
 
-        val result = connector.createSubscription(userAnswers)
-        result.futureValue mustBe None
+        forAll(arbitrary[UserAnswers], validBusinessName, validEmailAddress, validSafeID) {
+          (userAnswers, businessName, email, safeID) =>
+            val updatedUserAnswers = userAnswers.set(BusinessNamePage, businessName).success.value
+              .set(ContactEmailAddressPage, email).success.value
+              .set(SafeIDPage, safeID).success.value
+              .remove(RegistrationTypePage).success.value
+
+            stubPostResponse("/register-for-cross-border-arrangements/subscription/create-dac-subscription", SERVICE_UNAVAILABLE, "")
+
+            val result = connector.createSubscription(updatedUserAnswers)
+            result.futureValue mustBe None
         }
+      }
     }
   }
 

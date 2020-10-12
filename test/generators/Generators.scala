@@ -190,4 +190,6 @@ trait Generators extends UserAnswersGenerator with PageGenerators with ModelGene
   def validNonApiName: Gen[String] = RegexpGen.from(nonApiNameRegex)
 
   def validUtr: Gen[String] = RegexpGen.from(utrRegex)
+
+  def validSafeID: Gen[String] = RegexpGen.from(safeIDRegex)
 }

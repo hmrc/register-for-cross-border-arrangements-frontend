@@ -175,21 +175,7 @@ case class SubscriptionForDACRequest(requestCommon: RequestCommonForSubscription
                                      requestDetail: RequestDetail)
 object SubscriptionForDACRequest {
 
-  implicit val reads: Reads[SubscriptionForDACRequest] = {
-    import play.api.libs.functional.syntax._
-    (
-      (__ \ "requestCommon").read[RequestCommonForSubscription] and
-        (__ \ "requestDetail").read[RequestDetail]
-    )((requestCommon, requestDetail) => SubscriptionForDACRequest(requestCommon, requestDetail))
-  }
-
-  implicit val writes: OWrites[SubscriptionForDACRequest] = OWrites[SubscriptionForDACRequest] {
-    dacRequest =>
-      Json.obj(
-        "requestCommon" -> dacRequest.requestCommon,
-        "requestDetail" -> dacRequest.requestDetail
-      )
-  }
+  implicit val format: OFormat[SubscriptionForDACRequest] = Json.format[SubscriptionForDACRequest]
 
   def createEnrolment(userAnswers: UserAnswers): SubscriptionForDACRequest = {
 

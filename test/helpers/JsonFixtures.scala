@@ -17,7 +17,7 @@
 package helpers
 
 import models.{AddressResponse, ContactDetails, IndividualResponse, PayloadRegisterWithID, PayloadRegistrationWithIDResponse, RegisterWithIDRequest, RegisterWithIDResponse, RequestCommon, RequestParameters, RequestWithIDDetails, ResponseCommon, ResponseDetail, ReturnParameters, WithIDIndividual}
-import play.api.libs.json.{JsObject, Json}
+import play.api.libs.json.{JsObject, JsString, Json}
 
 object JsonFixtures {
 
@@ -222,9 +222,46 @@ object JsonFixtures {
   )
   )
 
-  //For creating an EIS subscription below
-  val jsonPayloadForInd: String =
-    """
+
+  /*********************For creating an EIS subscription below *********************/
+
+  def jsonPayloadForInd(firstName: JsString,
+                        lastName:JsString,
+                        primaryEmail: JsString): String = {
+    s"""
+       |{
+       |  "createSubscriptionForDACRequest": {
+       |    "requestCommon": {
+       |      "regime": "DAC",
+       |      "receiptDate": "2020-09-23T16:12:11Z",
+       |      "acknowledgementReference": "AB123c",
+       |      "originatingSystem": "MDTP",
+       |      "requestParameters": [{
+       |        "paramName":"Name",
+       |        "paramValue":"Value"
+       |      }]
+       |    },
+       |    "requestDetail": {
+       |      "idType": "idType",
+       |      "idNumber": "idNumber",
+       |      "isGBUser": true,
+       |      "primaryContact": {
+       |        "individual": {
+       |          "firstName": $firstName,
+       |          "lastName": $lastName
+       |        },
+       |        "email": $primaryEmail
+       |      }
+       |    }
+       |  }
+       |}
+       |""".stripMargin
+  }
+
+  def jsonPayloadForOrg(organisationName: JsString,
+                        primaryEmail: JsString,
+                        phone: JsString): String = {
+    s"""
       |{
       |  "createSubscriptionForDACRequest": {
       |    "requestCommon": {
@@ -242,117 +279,102 @@ object JsonFixtures {
       |      "idNumber": "idNumber",
       |      "isGBUser": true,
       |      "primaryContact": {
-      |        "individual": {
-      |          "firstName": "Fairy",
-      |          "lastName": "Liquid"
-      |        },
-      |        "email": "email2@email.com"
-      |      }
-      |    }
-      |  }
-      |}
-      |""".stripMargin
-
-  val jsonPayloadForOrg: String =
-    """
-      |{
-      |  "createSubscriptionForDACRequest": {
-      |    "requestCommon": {
-      |      "regime": "DAC",
-      |      "receiptDate": "2020-09-23T16:12:11Z",
-      |      "acknowledgementReference": "AB123c",
-      |      "originatingSystem": "MDTP",
-      |      "requestParameters": [{
-      |        "paramName":"Name",
-      |        "paramValue":"Value"
-      |      }]
-      |    },
-      |    "requestDetail": {
-      |      "idType": "idType",
-      |      "idNumber": "idNumber",
-      |      "isGBUser": true,
-      |      "primaryContact": {
       |        "organisation": {
-      |          "organisationName": "Pizza for you"
+      |          "organisationName": $organisationName
       |        },
-      |        "email": "email@email.com",
-      |        "phone": "0191 111 2222",
-      |        "mobile": "07111111111"
+      |        "email": $primaryEmail,
+      |        "phone": $phone,
+      |        "mobile": $phone
       |      }
       |    }
       |  }
       |}
       |""".stripMargin
+  }
 
-  val jsonPayloadForIndWithSecondaryContact: String =
-    """
-      |{
-      |  "createSubscriptionForDACRequest": {
-      |    "requestCommon": {
-      |      "regime": "DAC",
-      |      "receiptDate": "2020-09-23T16:12:11Z",
-      |      "acknowledgementReference": "AB123c",
-      |      "originatingSystem": "MDTP"
-      |    },
-      |    "requestDetail": {
-      |      "idType": "idType",
-      |      "idNumber": "idNumber",
-      |      "isGBUser": true,
-      |      "primaryContact": {
-      |        "individual": {
-      |          "firstName": "Fairy",
-      |          "lastName": "Liquid"
-      |        },
-      |        "email": "email2@email.com"
-      |      },
-      |      "secondaryContact": {
-      |        "organisation": {
-      |          "organisationName": "Pizza for you"
-      |        },
-      |        "email": "email@email.com",
-      |        "phone": "0191 111 2222",
-      |        "mobile": "07111111111"
-      |      }
-      |    }
-      |  }
-      |}
-      |""".stripMargin
+  def jsonPayloadForIndWithSecondaryContact(firstName: JsString,
+                                            lastName:JsString,
+                                            organisationName: JsString,
+                                            primaryEmail: JsString,
+                                            secondaryEmail: JsString,
+                                            phone: JsString): String = {
+    s"""
+       |{
+       |  "createSubscriptionForDACRequest": {
+       |    "requestCommon": {
+       |      "regime": "DAC",
+       |      "receiptDate": "2020-09-23T16:12:11Z",
+       |      "acknowledgementReference": "AB123c",
+       |      "originatingSystem": "MDTP"
+       |    },
+       |    "requestDetail": {
+       |      "idType": "idType",
+       |      "idNumber": "idNumber",
+       |      "isGBUser": true,
+       |      "primaryContact": {
+       |        "individual": {
+       |          "firstName": $firstName,
+       |          "lastName": $lastName
+       |        },
+       |        "email": $primaryEmail
+       |      },
+       |      "secondaryContact": {
+       |        "organisation": {
+       |          "organisationName": $organisationName
+       |        },
+       |        "email": $secondaryEmail,
+       |        "phone": $phone,
+       |        "mobile": $phone
+       |      }
+       |    }
+       |  }
+       |}
+       |""".stripMargin
+  }
 
-  val jsonPayloadForOrgWithSecondaryContact: String =
-    """
-      |{
-      |  "createSubscriptionForDACRequest": {
-      |    "requestCommon": {
-      |      "regime": "DAC",
-      |      "receiptDate": "2020-09-23T16:12:11Z",
-      |      "acknowledgementReference": "AB123c",
-      |      "originatingSystem": "MDTP"
-      |    },
-      |    "requestDetail": {
-      |      "idType": "idType",
-      |      "idNumber": "idNumber",
-      |      "isGBUser": true,
-      |      "primaryContact": {
-      |        "organisation": {
-      |          "organisationName": "Pizza for you"
-      |        },
-      |        "email": "email@email.com",
-      |        "phone": "0191 111 2222",
-      |        "mobile": "07111111111"
-      |      },
-      |      "secondaryContact": {
-      |        "individual": {
-      |          "firstName": "Fairy",
-      |          "lastName": "Liquid"
-      |        },
-      |        "email": "email2@email.com"
-      |      }
-      |    }
-      |  }
-      |}
-      |""".stripMargin
+  def jsonPayloadForOrgWithSecondaryContact(firstName: JsString,
+                                            lastName:JsString,
+                                            organisationName: JsString,
+                                            primaryEmail: JsString,
+                                            secondaryEmail: JsString,
+                                            phone: JsString): String = {
+    s"""
+       |{
+       |  "createSubscriptionForDACRequest": {
+       |    "requestCommon": {
+       |      "regime": "DAC",
+       |      "receiptDate": "2020-09-23T16:12:11Z",
+       |      "acknowledgementReference": "AB123c",
+       |      "originatingSystem": "MDTP"
+       |    },
+       |    "requestDetail": {
+       |      "idType": "idType",
+       |      "idNumber": "idNumber",
+       |      "isGBUser": true,
+       |      "primaryContact": {
+       |        "organisation": {
+       |          "organisationName": $organisationName
+       |        },
+       |        "email": $primaryEmail,
+       |        "phone": $phone,
+       |        "mobile": $phone
+       |      },
+       |      "secondaryContact": {
+       |        "individual": {
+       |          "firstName": $firstName,
+       |          "lastName": $lastName
+       |        },
+       |        "email": $secondaryEmail
+       |      }
+       |    }
+       |  }
+       |}
+       |""".stripMargin
+  }
 
-  val indRequestJson: JsObject = {
+  def indRequestJson(firstName: String,
+                     lastName:String,
+                     primaryEmail: String): JsObject = {
     Json.obj(
       "createSubscriptionForDACRequest" -> Json.obj(
         "requestCommon" -> Json.obj(
@@ -373,17 +395,19 @@ object JsonFixtures {
           "isGBUser" -> true,
           "primaryContact" -> Json.obj(
             "individual" -> Json.obj(
-              "firstName" -> "Fairy",
-              "lastName" -> "Liquid"
+              "firstName" -> firstName,
+              "lastName" -> lastName
             ),
-            "email" -> "email2@email.com"
+            "email" -> primaryEmail
           )
         )
       )
     )
   }
 
-  val orgRequestJson: JsObject = {
+  def orgRequestJson(organisationName: String,
+                     primaryEmail: String,
+                     phone: String): JsObject = {
     Json.obj(
       "createSubscriptionForDACRequest" -> Json.obj(
         "requestCommon" -> Json.obj(
@@ -404,18 +428,23 @@ object JsonFixtures {
           "isGBUser" -> true,
           "primaryContact" -> Json.obj(
             "organisation" -> Json.obj(
-              "organisationName" -> "Pizza for you"
+              "organisationName" -> organisationName
             ),
-            "email" -> "email@email.com",
-            "phone" -> "0191 111 2222",
-            "mobile" -> "07111111111"
+            "email" -> primaryEmail,
+            "phone" -> phone,
+            "mobile" -> phone
           )
         )
       )
     )
   }
 
-  val indWithSecondaryContactJson: JsObject = {
+  def indWithSecondaryContactJson(firstName: String,
+                                  lastName:String,
+                                  organisationName: String,
+                                  primaryEmail: String,
+                                  secondaryEmail: String,
+                                  phone: String): JsObject = {
     Json.obj(
       "createSubscriptionForDACRequest" -> Json.obj(
         "requestCommon" -> Json.obj(
@@ -430,25 +459,30 @@ object JsonFixtures {
           "isGBUser" -> true,
           "primaryContact" -> Json.obj(
             "individual" -> Json.obj(
-              "firstName" -> "Fairy",
-              "lastName" -> "Liquid"
+              "firstName" -> firstName,
+              "lastName" -> lastName
             ),
-            "email" -> "email2@email.com"
+            "email" -> primaryEmail
           ),
           "secondaryContact" -> Json.obj(
             "organisation" -> Json.obj(
-              "organisationName" -> "Pizza for you"
+              "organisationName" -> organisationName
             ),
-            "email" -> "email@email.com",
-            "phone" -> "0191 111 2222",
-            "mobile" -> "07111111111"
+            "email" -> secondaryEmail,
+            "phone" -> phone,
+            "mobile" -> phone
           )
         )
       )
     )
   }
 
-  val orgWithSecondaryContactJson: JsObject = {
+  def orgWithSecondaryContactJson(firstName: String,
+                                  lastName:String,
+                                  organisationName: String,
+                                  primaryEmail: String,
+                                  secondaryEmail: String,
+                                  phone: String): JsObject = {
     Json.obj(
       "createSubscriptionForDACRequest" -> Json.obj(
         "requestCommon" -> Json.obj(
@@ -463,18 +497,18 @@ object JsonFixtures {
           "isGBUser" -> true,
           "primaryContact" -> Json.obj(
             "organisation" -> Json.obj(
-              "organisationName" -> "Pizza for you"
+              "organisationName" -> organisationName
             ),
-            "email" -> "email@email.com",
-            "phone" -> "0191 111 2222",
-            "mobile" -> "07111111111"
+            "email" -> primaryEmail,
+            "phone" -> phone,
+            "mobile" -> phone
           ),
           "secondaryContact" -> Json.obj(
             "individual" -> Json.obj(
-              "firstName" -> "Fairy",
-              "lastName" -> "Liquid"
+              "firstName" -> firstName,
+              "lastName" -> lastName
             ),
-            "email" -> "email2@email.com"
+            "email" -> secondaryEmail
           )
         )
       )

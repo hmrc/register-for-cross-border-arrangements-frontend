@@ -16,26 +16,15 @@
 
 package models
 
+import base.SpecBase
+import generators.Generators
 import helpers.JsonFixtures._
-import org.scalatest.{FreeSpec, MustMatchers}
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
-import play.api.libs.json.Json
+import play.api.libs.json.{JsString, Json}
 
-class SubscriptionForDACRequestSpec extends FreeSpec with MustMatchers with ScalaCheckPropertyChecks {
+class SubscriptionForDACRequestSpec extends SpecBase with Generators with ScalaCheckPropertyChecks {
 
   val requestParameter = Seq(RequestParameter("Name", "Value"))
-  val primaryContactForInd: PrimaryContact = PrimaryContact(
-    ContactInformationForIndividual(IndividualDetails("Fairy", None, "Liquid"), "email2@email.com", None, None)
-  )
-  val primaryContactForOrg: PrimaryContact = PrimaryContact(
-    ContactInformationForOrganisation(OrganisationDetails("Pizza for you"), "email@email.com", Some("0191 111 2222"), Some("07111111111"))
-  )
-  val secondaryContactForInd: SecondaryContact = SecondaryContact(
-    ContactInformationForOrganisation(OrganisationDetails("Pizza for you"), "email@email.com", Some("0191 111 2222"), Some("07111111111"))
-  )
-  val secondaryContactForOrg: SecondaryContact = SecondaryContact(
-    ContactInformationForIndividual(IndividualDetails("Fairy", None, "Liquid"), "email2@email.com", None, None)
-  )
 
   val requestCommon: RequestCommonForSubscription = RequestCommonForSubscription(
     regime = "DAC",
@@ -45,71 +34,206 @@ class SubscriptionForDACRequestSpec extends FreeSpec with MustMatchers with Scal
     requestParameters = Some(requestParameter)
   )
 
-  val requestDetail: RequestDetail = RequestDetail(
-    idType = "idType",
-    idNumber = "idNumber",
-    tradingName = None,
-    isGBUser = true,
-    primaryContact = primaryContactForOrg,
-    secondaryContact = None)
-
-
-  val indRequest: CreateSubscriptionForDACRequest = CreateSubscriptionForDACRequest(
-    SubscriptionForDACRequest(
-      requestCommon = requestCommon,
-      requestDetail = requestDetail.copy(primaryContact = primaryContactForInd))
-  )
-
-  val orgRequest: CreateSubscriptionForDACRequest = CreateSubscriptionForDACRequest(
-    SubscriptionForDACRequest(
-      requestCommon = requestCommon,
-      requestDetail = requestDetail)
-  )
-
-  val indWithSecondaryContact: CreateSubscriptionForDACRequest = CreateSubscriptionForDACRequest(
-    SubscriptionForDACRequest(
-      requestCommon = requestCommon.copy(requestParameters = None),
-      requestDetail = requestDetail.copy(primaryContact = primaryContactForInd, secondaryContact = Some(secondaryContactForInd)))
-  )
-
-  val orgWithSecondaryContact: CreateSubscriptionForDACRequest = CreateSubscriptionForDACRequest(
-    SubscriptionForDACRequest(
-      requestCommon = requestCommon.copy(requestParameters = None),
-      requestDetail = requestDetail.copy(secondaryContact = Some(secondaryContactForOrg)))
-  )
+  private def requestDetail(primaryContact: PrimaryContact, secondaryContact: Option[SecondaryContact] = None): RequestDetail = {
+    RequestDetail(
+      idType = "idType",
+      idNumber = "idNumber",
+      tradingName = None,
+      isGBUser = true,
+      primaryContact = primaryContact,
+      secondaryContact = secondaryContact)
+  }
 
   "CreateSubscriptionForDACRequest" - {
 
     "must deserialise CreateSubscriptionForDACRequest (with Request parameters) for an individual without a secondary contact" in {
-      Json.parse(jsonPayloadForInd).validate[CreateSubscriptionForDACRequest].get mustBe indRequest
+
+      forAll(validPersonalName, validPersonalName, validEmailAddress) {
+        (firstName, lastName, primaryEmail) =>
+
+          val primaryContactForInd: PrimaryContact = PrimaryContact(
+            ContactInformationForIndividual(IndividualDetails(firstName, None, lastName), primaryEmail, None, None)
+          )
+
+          val indRequest: CreateSubscriptionForDACRequest = CreateSubscriptionForDACRequest(
+            SubscriptionForDACRequest(
+              requestCommon = requestCommon,
+              requestDetail = requestDetail(primaryContactForInd))
+          )
+
+          val jsonPayload = jsonPayloadForInd(JsString(firstName), JsString(lastName), JsString(primaryEmail))
+
+          Json.parse(jsonPayload).validate[CreateSubscriptionForDACRequest].get mustBe indRequest
+      }
     }
 
     "must deserialise CreateSubscriptionForDACRequest (with Request parameters) for an organisation without a secondary contact" in {
-      Json.parse(jsonPayloadForOrg).validate[CreateSubscriptionForDACRequest].get mustBe orgRequest
+
+      forAll(validBusinessName, validEmailAddress, validPhoneNumber) {
+        (organisationName, primaryEmail, phoneNumber) =>
+
+          val primaryContactForOrg: PrimaryContact = PrimaryContact(
+            ContactInformationForOrganisation(OrganisationDetails(organisationName), primaryEmail, Some(phoneNumber), Some(phoneNumber))
+          )
+
+          val orgRequest: CreateSubscriptionForDACRequest = CreateSubscriptionForDACRequest(
+            SubscriptionForDACRequest(
+              requestCommon = requestCommon,
+              requestDetail = requestDetail(primaryContact = primaryContactForOrg))
+          )
+
+          val jsonPayload = jsonPayloadForOrg(JsString(organisationName), JsString(primaryEmail), JsString(phoneNumber))
+
+          Json.parse(jsonPayload).validate[CreateSubscriptionForDACRequest].get mustBe orgRequest
+      }
+
     }
 
     "must deserialise CreateSubscriptionForDACRequest for an individual with a secondary contact" in {
-      Json.parse(jsonPayloadForIndWithSecondaryContact).validate[CreateSubscriptionForDACRequest].get mustBe indWithSecondaryContact
+
+      forAll(validPersonalName, validPersonalName, validBusinessName, validEmailAddress, validEmailAddress, validPhoneNumber) {
+        (firstName, lastName, organisationName, primaryEmail, secondaryEmail, phoneNumber) =>
+
+          val primaryContactForInd: PrimaryContact = PrimaryContact(
+            ContactInformationForIndividual(IndividualDetails(firstName, None, lastName), primaryEmail, None, None)
+          )
+
+          val secondaryContactForInd: SecondaryContact = SecondaryContact(
+            ContactInformationForOrganisation(OrganisationDetails(organisationName), secondaryEmail, Some(phoneNumber), Some(phoneNumber))
+          )
+
+          val indWithSecondaryContact: CreateSubscriptionForDACRequest = CreateSubscriptionForDACRequest(
+            SubscriptionForDACRequest(
+              requestCommon = requestCommon.copy(requestParameters = None),
+              requestDetail = requestDetail(primaryContact = primaryContactForInd, secondaryContact = Some(secondaryContactForInd)))
+          )
+
+          val jsonPayload = jsonPayloadForIndWithSecondaryContact(JsString(firstName), JsString(lastName), JsString(organisationName),
+            JsString(primaryEmail), JsString(secondaryEmail), JsString(phoneNumber))
+
+          Json.parse(jsonPayload).validate[CreateSubscriptionForDACRequest].get mustBe indWithSecondaryContact
+      }
+
     }
 
     "must deserialise CreateSubscriptionForDACRequest for an organisation with a secondary contact" in {
-      Json.parse(jsonPayloadForOrgWithSecondaryContact).validate[CreateSubscriptionForDACRequest].get mustBe orgWithSecondaryContact
+
+      forAll(validPersonalName, validPersonalName, validBusinessName, validEmailAddress, validEmailAddress, validPhoneNumber) {
+        (firstName, lastName, organisationName, primaryEmail, secondaryEmail, phoneNumber) =>
+
+          val primaryContactForOrg: PrimaryContact = PrimaryContact(
+            ContactInformationForOrganisation(OrganisationDetails(organisationName), primaryEmail, Some(phoneNumber), Some(phoneNumber))
+          )
+
+          val secondaryContactForOrg: SecondaryContact = SecondaryContact(
+            ContactInformationForIndividual(IndividualDetails(firstName, None, lastName), secondaryEmail, None, None)
+          )
+
+          val orgWithSecondaryContact: CreateSubscriptionForDACRequest = CreateSubscriptionForDACRequest(
+            SubscriptionForDACRequest(
+              requestCommon = requestCommon.copy(requestParameters = None),
+              requestDetail = requestDetail(primaryContact = primaryContactForOrg, secondaryContact = Some(secondaryContactForOrg)))
+          )
+
+          val jsonPayload = jsonPayloadForOrgWithSecondaryContact(JsString(firstName), JsString(lastName), JsString(organisationName),
+            JsString(primaryEmail), JsString(secondaryEmail), JsString(phoneNumber))
+
+          Json.parse(jsonPayload).validate[CreateSubscriptionForDACRequest].get mustBe orgWithSecondaryContact
+      }
     }
 
     "must serialise subscription request for individual - exclude null fields for optional contact details" in {
-      Json.toJson(indRequest) mustBe indRequestJson
+
+      forAll(validPersonalName, validPersonalName, validEmailAddress) {
+        (firstName, lastName, primaryEmail) =>
+
+          val primaryContactForInd: PrimaryContact = PrimaryContact(
+            ContactInformationForIndividual(IndividualDetails(firstName, None, lastName), primaryEmail, None, None)
+          )
+
+          val indRequest: CreateSubscriptionForDACRequest = CreateSubscriptionForDACRequest(
+            SubscriptionForDACRequest(
+              requestCommon = requestCommon,
+              requestDetail = requestDetail(primaryContact = primaryContactForInd))
+          )
+
+          Json.toJson(indRequest) mustBe indRequestJson(firstName, lastName, primaryEmail)
+      }
     }
 
     "must serialise subscription request for organisation - exclude null fields for optional contact details" in {
-      Json.toJson(orgRequest) mustBe orgRequestJson
+
+      forAll(validBusinessName, validEmailAddress, validPhoneNumber) {
+        (organisationName, primaryEmail, phoneNumber) =>
+
+          val primaryContactForOrg: PrimaryContact = PrimaryContact(
+            ContactInformationForOrganisation(OrganisationDetails(organisationName), primaryEmail, Some(phoneNumber), Some(phoneNumber))
+          )
+
+          val orgRequest: CreateSubscriptionForDACRequest = CreateSubscriptionForDACRequest(
+            SubscriptionForDACRequest(
+              requestCommon = requestCommon,
+              requestDetail = requestDetail(primaryContact = primaryContactForOrg))
+          )
+
+          Json.toJson(orgRequest) mustBe orgRequestJson(organisationName, primaryEmail, phoneNumber)
+      }
     }
 
     "must serialise subscription request for individual - exclude null fields for requestParameters and contact numbers" in {
-      Json.toJson(indWithSecondaryContact) mustBe indWithSecondaryContactJson
+
+      forAll(validPersonalName, validPersonalName, validBusinessName, validEmailAddress, validEmailAddress, validPhoneNumber) {
+        (firstName, lastName, organisationName, primaryEmail, secondaryEmail, phoneNumber) =>
+
+          val primaryContactForInd: PrimaryContact = PrimaryContact(
+            ContactInformationForIndividual(IndividualDetails(firstName, None, lastName), primaryEmail, None, None)
+          )
+
+          val secondaryContactForInd: SecondaryContact = SecondaryContact(
+            ContactInformationForOrganisation(OrganisationDetails(organisationName), secondaryEmail, Some(phoneNumber), Some(phoneNumber))
+          )
+
+          val indWithSecondaryContact: CreateSubscriptionForDACRequest = CreateSubscriptionForDACRequest(
+            SubscriptionForDACRequest(
+              requestCommon = requestCommon.copy(requestParameters = None),
+              requestDetail = requestDetail(primaryContact = primaryContactForInd, secondaryContact = Some(secondaryContactForInd)))
+          )
+
+          Json.toJson(indWithSecondaryContact) mustBe
+            indWithSecondaryContactJson(firstName, lastName, organisationName, primaryEmail, secondaryEmail, phoneNumber)
+      }
     }
 
     "must serialise subscription request for organisation - exclude null fields for requestParameters and contact numbers" in {
-      Json.toJson(orgWithSecondaryContact) mustBe orgWithSecondaryContactJson
+
+      forAll(validPersonalName, validPersonalName, validBusinessName, validEmailAddress, validEmailAddress, validPhoneNumber) {
+        (firstName, lastName, organisationName, primaryEmail, secondaryEmail, phoneNumber) =>
+
+          val primaryContactForOrg: PrimaryContact = PrimaryContact(
+            ContactInformationForOrganisation(OrganisationDetails(organisationName), primaryEmail, Some(phoneNumber), Some(phoneNumber))
+          )
+
+          val secondaryContactForOrg: SecondaryContact = SecondaryContact(
+            ContactInformationForIndividual(IndividualDetails(firstName, None, lastName), secondaryEmail, None, None)
+          )
+
+          val requestDetail: RequestDetail = RequestDetail(
+            idType = "idType",
+            idNumber = "idNumber",
+            tradingName = None,
+            isGBUser = true,
+            primaryContact = primaryContactForOrg,
+            secondaryContact = None)
+
+          val orgWithSecondaryContact: CreateSubscriptionForDACRequest = CreateSubscriptionForDACRequest(
+            SubscriptionForDACRequest(
+              requestCommon = requestCommon.copy(requestParameters = None),
+              requestDetail = requestDetail.copy(secondaryContact = Some(secondaryContactForOrg)))
+          )
+
+          Json.toJson(orgWithSecondaryContact) mustBe
+            orgWithSecondaryContactJson(firstName, lastName, organisationName, primaryEmail, secondaryEmail, phoneNumber)
+      }
     }
 
     "must serialise RequestCommon" in {
@@ -132,6 +256,10 @@ class SubscriptionForDACRequestSpec extends FreeSpec with MustMatchers with Scal
 
     "must serialise RequestDetail - not displaying null fields for secondary contact" in {
 
+      val primaryContactForOrg: PrimaryContact = PrimaryContact(
+        ContactInformationForOrganisation(OrganisationDetails("Pizza for you"), "email@email.com", Some("0191 111 2222"), Some("07111111111"))
+      )
+
       val json = Json.obj(
         "idType" -> "idType",
         "idNumber" -> "idNumber",
@@ -146,7 +274,7 @@ class SubscriptionForDACRequestSpec extends FreeSpec with MustMatchers with Scal
         )
       )
 
-      Json.toJson(requestDetail) mustBe json
+      Json.toJson(requestDetail(primaryContact = primaryContactForOrg)) mustBe json
     }
 
   }
