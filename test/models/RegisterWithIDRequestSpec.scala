@@ -20,6 +20,8 @@ import helpers.JsonFixtures._
 import org.scalatest.{FreeSpec, MustMatchers}
 import play.api.libs.json.Json
 
+import scala.util.matching.Regex
+
 class RegisterWithIDRequestSpec extends FreeSpec with MustMatchers {
 
   "RegisterWithIDRequest" - {
@@ -29,6 +31,18 @@ class RegisterWithIDRequestSpec extends FreeSpec with MustMatchers {
 
     "marshal to json" in {
       Json.toJson(registrationWithRequest) mustBe registerWithIDJson
+    }
+
+    "response common must generate correct values to spec" in {
+      val requestCommon = RequestCommon.forService
+
+      val ackRefLength = requestCommon.acknowledgementReference.length
+      ackRefLength >= 1 && ackRefLength <= 32 mustBe true
+
+      requestCommon.regime mustBe "DAC"
+
+      val date: Regex = raw"[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z".r
+      date.findAllIn(requestCommon.receiptDate).toList.nonEmpty mustBe true
     }
   }
 }

@@ -16,10 +16,11 @@
 
 package models
 
+import java.time.format.DateTimeFormatter
+import java.time.{ZoneId, ZonedDateTime}
 import java.util.UUID
 
 import models.RegistrationType.Business
-import org.joda.time.{DateTime, DateTimeZone}
 import pages._
 import play.api.libs.json._
 
@@ -104,8 +105,12 @@ object RequestCommon {
   implicit val format = Json.format[RequestCommon]
 
   def forService: RequestCommon = {
-    val acknRef: String = UUID.randomUUID().toString
-    val dateTime: String = DateTime.now(DateTimeZone.UTC).toString
+    val acknRef: String = UUID.randomUUID().toString.replaceAll("-", "") //uuids are 36 and spec demands 32
+    //Format: ISO 8601 YYYY-MM-DDTHH:mm:ssZ e.g. 2020-09-23T16:12:11Z
+    val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'")
+    val dateTime: String = ZonedDateTime
+      .now(ZoneId.of("UTC"))
+      .format(formatter)
     RequestCommon(dateTime, "DAC", acknRef, None)
   }
 }
