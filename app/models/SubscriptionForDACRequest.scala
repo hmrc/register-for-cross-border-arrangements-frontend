@@ -146,8 +146,8 @@ object RequestCommonForSubscription {
   implicit val format: OFormat[RequestCommonForSubscription] = Json.format[RequestCommonForSubscription]
 }
 
-case class RequestDetail(idType: String,
-                         idNumber: String,
+case class RequestDetail(IDType: String,
+                         IDNumber: String,
                          tradingName: Option[String],
                          isGBUser: Boolean,
                          primaryContact: PrimaryContact,
@@ -157,8 +157,8 @@ object RequestDetail {
   implicit val reads: Reads[RequestDetail] = {
     import play.api.libs.functional.syntax._
     (
-      (__ \ "idType").read[String] and
-      (__ \ "idNumber").read[String] and
+      (__ \ "IDType").read[String] and
+      (__ \ "IDNumber").read[String] and
       (__ \ "tradingName").readNullable[String] and
       (__ \ "isGBUser").read[Boolean] and
       (__ \ "primaryContact").read[PrimaryContact] and
@@ -209,8 +209,8 @@ object SubscriptionForDACRequest {
     }
 
     RequestDetail(
-      idType = "SAFE",
-      idNumber = getNumber(userAnswers),
+      IDType = "SAFE",
+      IDNumber = getNumber(userAnswers),
       tradingName = None,
       isGBUser = isGBUser,
       primaryContact = createPrimaryContact(userAnswers),

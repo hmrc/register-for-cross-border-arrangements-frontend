@@ -242,8 +242,8 @@ object JsonFixtures {
        |      }]
        |    },
        |    "requestDetail": {
-       |      "idType": "idType",
-       |      "idNumber": "idNumber",
+       |      "IDType": "idType",
+       |      "IDNumber": "idNumber",
        |      "isGBUser": true,
        |      "primaryContact": {
        |        "individual": {
@@ -275,8 +275,8 @@ object JsonFixtures {
       |      }]
       |    },
       |    "requestDetail": {
-      |      "idType": "idType",
-      |      "idNumber": "idNumber",
+      |      "IDType": "idType",
+      |      "IDNumber": "idNumber",
       |      "isGBUser": true,
       |      "primaryContact": {
       |        "organisation": {
@@ -308,8 +308,8 @@ object JsonFixtures {
        |      "originatingSystem": "MDTP"
        |    },
        |    "requestDetail": {
-       |      "idType": "idType",
-       |      "idNumber": "idNumber",
+       |      "IDType": "idType",
+       |      "IDNumber": "idNumber",
        |      "isGBUser": true,
        |      "primaryContact": {
        |        "individual": {
@@ -348,8 +348,8 @@ object JsonFixtures {
        |      "originatingSystem": "MDTP"
        |    },
        |    "requestDetail": {
-       |      "idType": "idType",
-       |      "idNumber": "idNumber",
+       |      "IDType": "idType",
+       |      "IDNumber": "idNumber",
        |      "isGBUser": true,
        |      "primaryContact": {
        |        "organisation": {
@@ -390,8 +390,8 @@ object JsonFixtures {
           )
         ),
         "requestDetail" -> Json.obj(
-          "idType" -> "idType",
-          "idNumber" -> "idNumber",
+          "IDType" -> "idType",
+          "IDNumber" -> "idNumber",
           "isGBUser" -> true,
           "primaryContact" -> Json.obj(
             "individual" -> Json.obj(
@@ -423,8 +423,8 @@ object JsonFixtures {
           )
         ),
         "requestDetail" -> Json.obj(
-          "idType" -> "idType",
-          "idNumber" -> "idNumber",
+          "IDType" -> "idType",
+          "IDNumber" -> "idNumber",
           "isGBUser" -> true,
           "primaryContact" -> Json.obj(
             "organisation" -> Json.obj(
@@ -454,8 +454,8 @@ object JsonFixtures {
           "originatingSystem" -> "MDTP"
         ),
         "requestDetail" -> Json.obj(
-          "idType" -> "idType",
-          "idNumber" -> "idNumber",
+          "IDType" -> "idType",
+          "IDNumber" -> "idNumber",
           "isGBUser" -> true,
           "primaryContact" -> Json.obj(
             "individual" -> Json.obj(
@@ -492,8 +492,8 @@ object JsonFixtures {
           "originatingSystem" -> "MDTP"
         ),
         "requestDetail" -> Json.obj(
-          "idType" -> "idType",
-          "idNumber" -> "idNumber",
+          "IDType" -> "idType",
+          "IDNumber" -> "idNumber",
           "isGBUser" -> true,
           "primaryContact" -> Json.obj(
             "organisation" -> Json.obj(

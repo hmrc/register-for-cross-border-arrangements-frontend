@@ -39,8 +39,8 @@ class SubscriptionForDACRequestSpec extends SpecBase with Generators with ScalaC
 
   private def requestDetail(primaryContact: PrimaryContact, secondaryContact: Option[SecondaryContact] = None): RequestDetail = {
     RequestDetail(
-      idType = "idType",
-      idNumber = "idNumber",
+      IDType = "idType",
+      IDNumber = "idNumber",
       tradingName = None,
       isGBUser = true,
       primaryContact = primaryContact,
@@ -221,8 +221,8 @@ class SubscriptionForDACRequestSpec extends SpecBase with Generators with ScalaC
           )
 
           val requestDetail: RequestDetail = RequestDetail(
-            idType = "idType",
-            idNumber = "idNumber",
+            IDType = "idType",
+            IDNumber = "idNumber",
             tradingName = None,
             isGBUser = true,
             primaryContact = primaryContactForOrg,
@@ -283,8 +283,8 @@ class SubscriptionForDACRequestSpec extends SpecBase with Generators with ScalaC
       )
 
       val json = Json.obj(
-        "idType" -> "idType",
-        "idNumber" -> "idNumber",
+        "IDType" -> "idType",
+        "IDNumber" -> "idNumber",
         "isGBUser" -> true,
         "primaryContact" -> Json.obj(
           "organisation" -> Json.obj(
