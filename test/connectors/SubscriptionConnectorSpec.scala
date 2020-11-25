@@ -50,10 +50,11 @@ class SubscriptionConnectorSpec extends SpecBase
 
       forAll(arbitrary[UserAnswers]) {
         userAnswers =>
-          val updatedUserAnswers = userAnswers.set(SubscriptionIDPage, "XADAC0000123456").success.value
+          val userAnswerWithSafeId = userAnswers.set(SafeIDPage, "safeId").success.value
+          val userAnswerWithSubscriptionId = userAnswerWithSafeId.set(SubscriptionIDPage, "XADAC0000123456").success.value
           stubResponse(s"/register-for-cross-border-arrangements/enrolment/create-enrolment", OK)
 
-          val result = connector.createEnrolment(updatedUserAnswers)
+          val result = connector.createEnrolment(userAnswerWithSubscriptionId)
           result.futureValue.status mustBe OK
       }
     }
@@ -63,10 +64,11 @@ class SubscriptionConnectorSpec extends SpecBase
 
       forAll(arbitrary[UserAnswers]) {
         userAnswers =>
-          val updatedUserAnswers = userAnswers.set(SubscriptionIDPage, "XADAC0000123456").success.value
+          val userAnswerWithSafeId = userAnswers.set(SafeIDPage, "safeId").success.value
+          val userAnswerWithSubscriptionId = userAnswerWithSafeId.set(SubscriptionIDPage, "XADAC0000123456").success.value
           stubResponse(s"/register-for-cross-border-arrangements/enrolment/create-enrolment", BAD_REQUEST)
 
-          val result = connector.createEnrolment(updatedUserAnswers)
+          val result = connector.createEnrolment(userAnswerWithSubscriptionId)
           result.futureValue.status mustBe BAD_REQUEST
       }
     }
@@ -76,10 +78,11 @@ class SubscriptionConnectorSpec extends SpecBase
 
       forAll(arbitrary[UserAnswers]) {
         userAnswers =>
-          val updatedUserAnswers = userAnswers.set(SubscriptionIDPage, "XADAC0000123456").success.value
+          val userAnswerWithSafeId = userAnswers.set(SafeIDPage, "safeId").success.value
+          val userAnswerWithSubscriptionId = userAnswerWithSafeId.set(SubscriptionIDPage, "XADAC0000123456").success.value
           stubResponse(s"/register-for-cross-border-arrangements/enrolment/create-enrolment", INTERNAL_SERVER_ERROR)
 
-          val result = connector.createEnrolment(updatedUserAnswers)
+          val result = connector.createEnrolment(userAnswerWithSubscriptionId)
           result.futureValue.status mustBe INTERNAL_SERVER_ERROR
       }
     }

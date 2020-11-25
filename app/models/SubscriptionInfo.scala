@@ -23,7 +23,8 @@ case class SubscriptionInfo(safeID: String,
                             saUtr: Option[String] = None,
                             ctUtr: Option[String] = None,
                             nino: Option[String] = None,
-                            nonUkPostcode: Option[String] = None)
+                            nonUkPostcode: Option[String] = None,
+                            dac6Id: String)
 object SubscriptionInfo {
   implicit val format: OFormat[SubscriptionInfo] = Json.format[SubscriptionInfo]
 
@@ -34,13 +35,21 @@ object SubscriptionInfo {
       saUtr = getSaUtrIfProvided(userAnswers),
       ctUtr = getCtUtrIfProvided(userAnswers),
       nino = getNinoIfProvided(userAnswers),
-      nonUkPostcode = getNonUkPostCodeIfProvided(userAnswers))
+      nonUkPostcode = getNonUkPostCodeIfProvided(userAnswers),
+      dac6Id = getSubscriptionId(userAnswers))
   }
 
     private def getSafeID(userAnswers: UserAnswers): String = {
-      userAnswers.get(SubscriptionIDPage) match {
+      userAnswers.get(SafeIDPage) match {
         case Some(id) => id
         case None => throw new Exception("Safe ID can't be retrieved")
+      }
+    }
+
+  private def getSubscriptionId(userAnswers: UserAnswers): String = {
+      userAnswers.get(SubscriptionIDPage) match {
+        case Some(id) => id
+        case None => throw new Exception("Subscription ID can't be retrieved")
       }
     }
 
