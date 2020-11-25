@@ -192,4 +192,6 @@ trait Generators extends UserAnswersGenerator with PageGenerators with ModelGene
   def validUtr: Gen[String] = RegexpGen.from(utrRegex)
 
   def validSafeID: Gen[String] = RegexpGen.from(safeIDRegex)
+
+  def validSubsrciptionID: Gen[String] = RegexpGen.from(subscriptionIDRegex)
 }
