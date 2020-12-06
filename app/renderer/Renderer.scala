@@ -21,11 +21,12 @@ import javax.inject.Inject
 import play.api.libs.json.{JsObject, Json, OWrites}
 import play.api.mvc.RequestHeader
 import play.twirl.api.Html
+import uk.gov.hmrc.hmrcfrontend.config.TrackingConsentConfig
 import uk.gov.hmrc.nunjucks.NunjucksRenderer
 
 import scala.concurrent.Future
 
-class Renderer @Inject()(appConfig: FrontendAppConfig, renderer: NunjucksRenderer) {
+class Renderer @Inject()(appConfig: FrontendAppConfig, trackingConfig: TrackingConsentConfig, renderer: NunjucksRenderer) {
 
   def render(template: String)(implicit request: RequestHeader): Future[Html] =
     renderTemplate(template, Json.obj())
@@ -39,9 +40,14 @@ class Renderer @Inject()(appConfig: FrontendAppConfig, renderer: NunjucksRendere
   private def renderTemplate(template: String, ctx: JsObject)(implicit request: RequestHeader): Future[Html] =
     renderer.render(template, ctx ++ Json.obj("config" -> config))
 
-  private lazy val config: JsObject = Json.obj(
-    "betaFeedbackUnauthenticatedUrl" -> appConfig.betaFeedbackUnauthenticatedUrl,
-    "reportAProblemPartialUrl"       -> appConfig.reportAProblemPartialUrl,
-    "reportAProblemNonJSUrl"         -> appConfig.reportAProblemNonJSUrl
-  )
+  private lazy val config: JsObject =
+    Json.obj(
+      "betaFeedbackUnauthenticatedUrl" -> appConfig.betaFeedbackUnauthenticatedUrl,
+      "reportAProblemPartialUrl"       -> appConfig.reportAProblemPartialUrl,
+      "reportAProblemNonJSUrl"         -> appConfig.reportAProblemNonJSUrl,
+      "trackingConsentScriptUrl"    -> trackingConfig.trackingUrl().get,
+      "gtmContainer"   -> trackingConfig.gtmContainer.get
+    )
+
+
 }
