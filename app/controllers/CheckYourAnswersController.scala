@@ -20,15 +20,15 @@ import com.google.inject.Inject
 import connectors.SubscriptionConnector
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction, NotEnrolledForDAC6Action}
 import models.RegistrationType.Individual
-import models.{PayloadRegistrationWithoutIDResponse, RegistrationType, UserAnswers}
+import models.{CreateSubscriptionForDACRequest, PayloadRegistrationWithoutIDResponse, RegistrationType, SubscriptionAudit, SubscriptionForDACRequest, UserAnswers}
 import org.slf4j.LoggerFactory
 import pages._
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.libs.json.{JsError, JsSuccess, Json}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request, Result}
 import renderer.Renderer
 import repositories.SessionRepository
-import services.{EmailService, RegistrationService}
+import services.{AuditService, EmailService, RegistrationService}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.viewmodels.{NunjucksSupport, SummaryList}
@@ -47,6 +47,7 @@ class CheckYourAnswersController @Inject()(
                                             emailService: EmailService,
                                             registrationService: RegistrationService,
                                             subscriptionConnector: SubscriptionConnector,
+                                            auditService: AuditService,
                                             renderer: Renderer
                                           )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with NunjucksSupport {
 
@@ -179,7 +180,7 @@ class CheckYourAnswersController @Inject()(
 
   private def subscribeAndEnrol(userAnswers: UserAnswers,
                                 response: Option[HttpResponse] = None)
-                                (implicit hc: HeaderCarrier): Future[Result] = {
+                               (implicit request: Request[_]): Future[Result] = {
 
     response.map(_.json.validate[PayloadRegistrationWithoutIDResponse]) match {
       case Some(JsSuccess(registerWithoutIDResponse, _)) if registerWithoutIDResponse.registerWithoutIDResponse.responseDetail.isDefined =>
@@ -212,7 +213,7 @@ class CheckYourAnswersController @Inject()(
       } yield updatedUserAnswers
   }
 
-  private def createSubscriptionThenEnrolment(userAnswers: UserAnswers)(implicit hc: HeaderCarrier): Future[Result] = {
+  private def createSubscriptionThenEnrolment(userAnswers: UserAnswers)(implicit request: Request[_]): Future[Result] = {
     createEISSubscription(userAnswers).flatMap {
       userAnswersWithSubscriptionID =>
         createEnrolment(userAnswersWithSubscriptionID)
@@ -223,13 +224,19 @@ class CheckYourAnswersController @Inject()(
     }
   }
 
-  private def createEISSubscription(userAnswers: UserAnswers)(implicit hc: HeaderCarrier): Future[UserAnswers] = {
+  private def createEISSubscription(userAnswers: UserAnswers)(implicit request: Request[_]): Future[UserAnswers] = {
     subscriptionConnector.createSubscription(userAnswers).flatMap {
       response =>
         val subscriptionID = response.createSubscriptionForDACResponse.responseDetail.subscriptionID
         for {
           updatedUserAnswers <- Future.fromTry(userAnswers.set(SubscriptionIDPage, subscriptionID))
           _ <- sessionRepository.set(updatedUserAnswers)
+          _ <- auditService.sendAuditEvent(
+            "SubscriptionSubmission",
+            Json.toJson(SubscriptionAudit.fromRequestDetail(SubscriptionForDACRequest.createSubscription(userAnswers).requestDetail)),
+            "/register-for-cross-border-arrangements/subscription",
+            "/register-for-cross-border-arrangements/subscription"
+          )
         } yield updatedUserAnswers
     }.recoverWith {
       case e: Exception =>
