@@ -36,15 +36,6 @@ class AuditService @Inject()(appConfig: FrontendAppConfig, auditConnector: Audit
 
   def sendAuditEvent(eventName: String, detail: JsValue, transactionName: String, path: String)(implicit hc: HeaderCarrier, request: Request[_]): Future[AuditResult] = {
 
-    println(s"****** Output: ${ExtendedDataEvent(
-      auditSource = appConfig.appName,
-      auditType = eventName,
-      detail = detail,
-      tags = AuditExtensions.auditHeaderCarrier(hc).toAuditDetails()
-        ++ AuditExtensions.auditHeaderCarrier(hc).toAuditTags(transactionName, path)
-    )}")
-
-
     auditConnector.sendExtendedEvent(ExtendedDataEvent(
       auditSource = appConfig.appName,
       auditType = eventName,
