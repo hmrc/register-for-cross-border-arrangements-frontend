@@ -49,7 +49,7 @@ class AuditServiceSpec extends SpecBase
     "call the audit connector and sendExtendedEvent" in {
       when(mockAuditConnector.sendExtendedEvent(any())(any(),any())).thenReturn(Future.successful(Success))
       val request = FakeRequest(GET, "/")
-      auditService.sendAuditEvent("dummy app",eventDetail)(hc, request)
+      auditService.sendAuditEvent("dummy app",eventDetail, "transactionName", "path")(hc, request)
       verify(mockAuditConnector,times(1)).sendExtendedEvent(any())(any(),any())
     }
   }

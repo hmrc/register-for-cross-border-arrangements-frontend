@@ -44,7 +44,6 @@ class SubscriptionConnector @Inject()(val config: FrontendAppConfig, val http: H
                         (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[CreateSubscriptionForDACResponse] = {
 
     val submissionUrl = s"${config.businessMatchingUrl}/subscription/create-dac-subscription"
-
     try {
       http.POST[CreateSubscriptionForDACRequest, HttpResponse](
         submissionUrl,

@@ -20,11 +20,10 @@ import base.SpecBase
 import connectors.SubscriptionConnector
 import generators.Generators
 import matchers.JsonMatchers
-import models.readSubscription.{ContactInformationForIndividual, ContactInformationForOrganisation, DisplaySubscriptionForDACResponse, IndividualDetails, OrganisationDetails, PrimaryContact, ReadSubscriptionForDACResponse, ResponseDetailForReadSubscription, SecondaryContact}
+import models.readSubscription._
 import models.{BusinessAddress, BusinessDetails, BusinessType, Name, NormalMode, PayloadRegistrationWithIDResponse, RegisterWithIDResponse, ResponseCommon, UniqueTaxpayerReference, UserAnswers}
 import org.mockito.Matchers._
 import org.mockito.Mockito._
-import org.scalacheck.Arbitrary.arbitrary
 import org.scalatestplus.mockito.MockitoSugar
 import pages._
 import play.api.inject._
@@ -33,7 +32,7 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import repositories.SessionRepository
 import services.{BusinessMatchingService, EmailService}
-import uk.gov.hmrc.domain.{Generator, Nino}
+import uk.gov.hmrc.domain.Generator
 import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.viewmodels.NunjucksSupport
 

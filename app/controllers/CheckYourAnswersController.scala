@@ -205,7 +205,7 @@ class CheckYourAnswersController @Inject()(
 
   private def updateUserAnswersWithSafeID(userAnswers: UserAnswers,
                                           registerWithoutIDResponse: PayloadRegistrationWithoutIDResponse): Future[UserAnswers] = {
-      val safeID = registerWithoutIDResponse.registerWithoutIDResponse.responseDetail.get.SAFEID
+    val safeID = registerWithoutIDResponse.registerWithoutIDResponse.responseDetail.get.SAFEID
 
       for {
         updatedUserAnswers <- Future.fromTry(userAnswers.set(SafeIDPage, safeID))

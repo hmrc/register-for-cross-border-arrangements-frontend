@@ -14,10 +14,9 @@
  * limitations under the License.
  */
 
-package connectors
+package controllers.actions
 
 import com.google.inject.Inject
-import controllers.actions.IdentifierAction
 import controllers.routes
 import models.requests.UserRequest
 import org.mockito.Matchers.any
@@ -33,8 +32,8 @@ import play.api.mvc.{Action, AnyContent, InjectedController}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.{redirectLocation, status, _}
 import uk.gov.hmrc.auth.core.AffinityGroup.{Agent, Organisation}
-import uk.gov.hmrc.auth.core.retrieve.{Credentials, ~}
 import uk.gov.hmrc.auth.core._
+import uk.gov.hmrc.auth.core.retrieve.~
 import utils.RetrievalOps._
 
 import scala.concurrent.Future

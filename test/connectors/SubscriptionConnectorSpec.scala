@@ -21,21 +21,17 @@ import com.github.tomakehurst.wiremock.client.WireMock.{aResponse, post, put, ur
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import generators.Generators
 import helpers.WireMockServerHandler
-import models.readSubscription.{ContactInformationForIndividual, ContactInformationForOrganisation, DisplaySubscriptionForDACResponse, IndividualDetails, OrganisationDetails, PrimaryContact, ReadSubscriptionForDACResponse, ResponseDetailForReadSubscription, SecondaryContact}
-import models.{CreateSubscriptionForDACResponse, Name, RegistrationType, ResponseCommon, ResponseDetail, ResponseDetailForDACSubscription, SubscriptionForDACResponse, UserAnswers}
-import org.mockito.Matchers.any
-import org.mockito.Mockito.when
+import models.readSubscription._
+import models.{CreateSubscriptionForDACResponse, Name, RegistrationType, ResponseCommon, ResponseDetailForDACSubscription, SubscriptionForDACResponse, UserAnswers}
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import pages._
 import play.api.Application
-import play.api.http.Status.{BAD_REQUEST, INTERNAL_SERVER_ERROR, OK, SERVICE_UNAVAILABLE, NOT_FOUND }
+import play.api.http.Status._
 import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.libs.json.{JsString, JsValue}
-import uk.gov.hmrc.http.HttpResponse
+import play.api.libs.json.JsString
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
 
 class SubscriptionConnectorSpec extends SpecBase
   with WireMockServerHandler
