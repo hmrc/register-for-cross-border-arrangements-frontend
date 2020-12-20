@@ -570,7 +570,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach {
           .success.value
           .set(ContactEmailAddressPage, "")
           .success.value
-          .set(ContactNamePage, Name("", ""))
+          .set(ContactNamePage, "")
           .success.value
 
         val application = applicationBuilder(userAnswers = Some(userAnswers))
@@ -613,7 +613,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach {
         .success.value
         .set(ContactEmailAddressPage, "")
         .success.value
-        .set(ContactNamePage, Name("", ""))
+        .set(ContactNamePage, "")
         .success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers))
