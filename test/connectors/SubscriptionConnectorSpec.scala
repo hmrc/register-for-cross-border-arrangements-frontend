@@ -119,9 +119,10 @@ class SubscriptionConnectorSpec extends SpecBase
 
       "must return status OK for submission of valid registration details" in {
 
-        forAll(arbitrary[UserAnswers], validPersonalName, validEmailAddress, validSafeID) {
-          (userAnswers, name, email, safeID) =>
-            val updatedUserAnswers = userAnswers.set(ContactNamePage, name).success.value
+        forAll(validPersonalName, validEmailAddress, validSafeID) {
+          (name, email, safeID) =>
+            val updatedUserAnswers = UserAnswers("internalId")
+              .set(ContactNamePage, name).success.value
               .set(ContactEmailAddressPage, email).success.value
               .set(HaveSecondContactPage, false).success.value
               .set(SafeIDPage, safeID).success.value
