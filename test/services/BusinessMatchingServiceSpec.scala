@@ -16,13 +16,11 @@
 
 package services
 
-import java.time.LocalDate
-
 import base.SpecBase
 import connectors.{RegistrationConnector, SubscriptionConnector}
 import generators.Generators
 import models.BusinessType._
-import models.readSubscription.{ContactInformationForIndividual, ContactInformationForOrganisation, DisplaySubscriptionForDACResponse, IndividualDetails, OrganisationDetails, PrimaryContact, ReadSubscriptionForDACResponse, ResponseDetailForReadSubscription, SecondaryContact}
+import models.readSubscription._
 import models.{AddressResponse, BusinessAddress, BusinessDetails, BusinessType, ContactDetails, IndividualResponse, Name, OrganisationResponse, PayloadRegistrationWithIDResponse, RegisterWithIDResponse, ResponseCommon, ResponseDetail, UniqueTaxpayerReference, UserAnswers}
 import org.mockito.Matchers._
 import org.mockito.Mockito.{reset, _}
@@ -33,10 +31,10 @@ import pages._
 import play.api.Application
 import play.api.inject._
 import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.libs.json.JsString
 import uk.gov.hmrc.domain.Nino
 import wolfendale.scalacheck.regexp.RegexpGen
 
+import java.time.LocalDate
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.util.Random
@@ -463,46 +461,5 @@ class BusinessMatchingServiceSpec extends SpecBase
         businessMatchingService.retrieveSafeID(None) mustBe None
       }
     }
-  }
-  private def displaySubscriptionPayload(subscriptionID: JsString,
-                                         firstName: JsString,
-                                         lastName:JsString,
-                                         organisationName: JsString,
-                                         primaryEmail: JsString,
-                                         secondaryEmail: JsString,
-                                         phone: JsString): String = {
-    s"""
-       |{
-       |  "displaySubscriptionForDACResponse": {
-       |    "responseCommon": {
-       |      "status": "OK",
-       |      "processingDate": "2020-08-09T11:23:45Z"
-       |    },
-       |    "responseDetail": {
-       |      "subscriptionID": $subscriptionID,
-       |      "tradingName": "Trading Name",
-       |      "isGBUser": true,
-       |      "primaryContact": [
-       |        {
-       |          "email": $primaryEmail,
-       |          "phone": $phone,
-       |          "mobile": $phone,
-       |          "individual": {
-       |            "lastName": $lastName,
-       |            "firstName": $firstName
-       |          }
-       |        }
-       |      ],
-       |      "secondaryContact": [
-       |        {
-       |          "email": $secondaryEmail,
-       |          "organisation": {
-       |            "organisationName": $organisationName
-       |          }
-       |        }
-       |      ]
-       |    }
-       |  }
-       |}""".stripMargin
   }
 }

@@ -24,7 +24,7 @@ import helpers.WireMockServerHandler
 import models.error.RegisterError
 import models.error.RegisterError.UnableToCreateEMTPSubscriptionError
 import models.readSubscription._
-import models.{CreateSubscriptionForDACResponse, Name, RegistrationType, ResponseCommon, ResponseDetailForDACSubscription, SubscriptionForDACResponse, UserAnswers}
+import models.{Name, RegistrationType, ResponseCommon, UserAnswers}
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import pages._
@@ -35,8 +35,6 @@ import play.api.libs.json.JsString
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import scala.util.Success
-import scala.xml.Elem
 
 class SubscriptionConnectorSpec extends SpecBase
   with WireMockServerHandler
@@ -132,12 +130,6 @@ class SubscriptionConnectorSpec extends SpecBase
               .set(ContactEmailAddressPage, email).success.value
               .set(HaveSecondContactPage, false).success.value
               .set(SafeIDPage, safeID).success.value
-
-            val response = CreateSubscriptionForDACResponse(
-              SubscriptionForDACResponse(
-                responseCommon = ResponseCommon("OK", None, "2020-09-23T16:12:11Z", None),
-                responseDetail = ResponseDetailForDACSubscription(subscriptionID))
-            )
 
             def expectedBody(subscriptionID: String): String =
               s"""

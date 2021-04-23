@@ -19,8 +19,6 @@ package controllers
 import controllers.actions._
 import forms.RegistrationTypeFormProvider
 import helpers.JourneyHelpers.redirectToSummary
-
-import javax.inject.Inject
 import models.{Mode, RegistrationType, UserAnswersHelper}
 import navigation.Navigator
 import pages.RegistrationTypePage
@@ -32,7 +30,8 @@ import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.viewmodels.NunjucksSupport
 
-import scala.concurrent.{ExecutionContext, Future}
+import javax.inject.Inject
+import scala.concurrent.ExecutionContext
 
 class RegistrationTypeController @Inject()(
                                             override val messagesApi: MessagesApi,

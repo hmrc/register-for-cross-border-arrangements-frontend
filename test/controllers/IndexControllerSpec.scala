@@ -18,7 +18,6 @@ package controllers
 
 import base.SpecBase
 import models.NormalMode
-import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.any
 import org.mockito.Mockito._
 import play.api.test.FakeRequest

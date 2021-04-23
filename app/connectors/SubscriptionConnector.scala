@@ -19,15 +19,14 @@ package connectors
 import config.FrontendAppConfig
 import models.error.RegisterError
 import models.error.RegisterError.{DuplicateSubmisisonError, UnableToCreateEMTPSubscriptionError}
-
-import javax.inject.Inject
 import models.readSubscription.{DisplaySubscriptionDetails, DisplaySubscriptionForDACRequest, DisplaySubscriptionForDACResponse}
-import models.{CacheCreateSubscriptionForDACRequest, CreateSubscriptionForDACRequest, CreateSubscriptionForDACResponse, ErrorDetail, SubscriptionForDACRequest, SubscriptionForDACResponse, SubscriptionInfo, UserAnswers}
+import models.{CacheCreateSubscriptionForDACRequest, CreateSubscriptionForDACRequest, CreateSubscriptionForDACResponse, SubscriptionForDACRequest, SubscriptionInfo, UserAnswers}
 import org.slf4j.LoggerFactory
 import play.api.http.Status.{CONFLICT, OK}
-import play.api.libs.json.{JsError, JsSuccess, Json}
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpException, HttpResponse}
+import play.api.libs.json.{JsError, JsSuccess}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse}
 
+import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
 
