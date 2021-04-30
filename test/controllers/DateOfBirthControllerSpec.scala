@@ -187,36 +187,6 @@ class DateOfBirthControllerSpec extends SpecBase with MockitoSugar with Nunjucks
       application.stop()
     }
 
-    "must redirect to the Check your answers page when mode is CheckMode and user is an Individual without ID" in {
-
-      val dateOfBirthRoute: String = routes.DateOfBirthController.onPageLoad(CheckMode).url
-      val userAnswers = UserAnswers(userAnswersId)
-        .set(DoYouHaveANationalInsuranceNumberPage, false)
-        .success
-        .value
-        .set(DateOfBirthPage, validAnswer)
-        .success
-        .value
-
-      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
-
-      val application =
-        applicationBuilder(userAnswers = Some(userAnswers))
-          .overrides(
-            bind[Navigator].toInstance(new FakeNavigator(onwardRoute, appConfig = mockFrontendAppConfig)),
-            bind[SessionRepository].toInstance(mockSessionRepository)
-          )
-          .build()
-
-      val result = route(application, postRequest(dateOfBirthRoute)).value
-
-      status(result) mustEqual SEE_OTHER
-
-      redirectLocation(result).value mustEqual routes.CheckYourAnswersController.onPageLoad().url
-
-      application.stop()
-    }
-
     "must go through business matching again when user doesn't change their answer and is an Individual with ID" in {
 
       val dateOfBirthRoute: String = routes.DateOfBirthController.onPageLoad(CheckMode).url
