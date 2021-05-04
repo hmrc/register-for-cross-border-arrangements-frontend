@@ -83,23 +83,12 @@ class DateOfBirthController @Inject()(
           renderer.render("dateOfBirth.njk", json).map(BadRequest(_))
         },
         value => {
-          val redirectToSummary =
-            (request.userAnswers.get(DoYouHaveANationalInsuranceNumberPage),
-              request.userAnswers.get(DateOfBirthPage)) match {
-              case (Some(false), Some(_)) if mode == CheckMode => true //Individual without ID
-              case (Some(true), Some(ans)) if (ans == value) && (mode == CheckMode) => false //Individual with ID
-              case _ => false //Normal mode journey
-            }
 
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(DateOfBirthPage, value))
             _              <- sessionRepository.set(updatedAnswers)
           } yield {
-            if (redirectToSummary) {
-              Redirect(routes.CheckYourAnswersController.onPageLoad())
-            } else {
               Redirect(navigator.nextPage(DateOfBirthPage, mode, updatedAnswers))
-            }
           }
         }
       )
