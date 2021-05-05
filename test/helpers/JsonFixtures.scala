@@ -17,7 +17,7 @@
 package helpers
 
 import models.{AddressResponse, ContactDetails, IndividualResponse, PayloadRegisterWithID, PayloadRegistrationWithIDResponse, RegisterWithIDRequest, RegisterWithIDResponse, RequestCommon, RequestParameters, RequestWithIDDetails, ResponseCommon, ResponseDetail, ReturnParameters, WithIDIndividual}
-import play.api.libs.json.{JsObject, JsString, Json}
+import play.api.libs.json.{JsNull, JsObject, JsString, Json}
 
 object JsonFixtures {
 
@@ -200,6 +200,7 @@ object JsonFixtures {
         "isEditable" -> true,
         "isAnAgent" -> false,
         "isAnIndividual" -> true,
+        "isAnASAgent" -> JsNull,
         "individual" -> Json.obj(
           "firstName" -> "Ron",
           "middleName" -> "Madisson",
