@@ -11,7 +11,8 @@
   timeout: config.timeout,
   countdown: config.countdown,
   keepAliveUrl: routes.controllers.KeepAliveController.keepAlive().url,
-  signOutUrl: routes.controllers.SignOutController.signOut().url
+  signOutUrl: routes.controllers.SignOutController.signOut().url,
+  timeoutUrl: routes.controllers.SignOutController.timedOutSignOut().url
 }) }}
   {% include "includes/head.njk" %}
 {% endblock %}

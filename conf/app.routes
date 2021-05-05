@@ -8,6 +8,8 @@ GET        /language/:lang                                controllers.LanguageSw
 
 GET        /sign-out                                      controllers.SignOutController.signOut
 
+GET        /time-out                                      controllers.SignOutController.timedOutSignOut
+
 GET        /this-service-has-been-reset                   controllers.SessionExpiredController.onPageLoad
 
 GET        /keep-alive                                   controllers.KeepAliveController.keepAlive
