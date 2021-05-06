@@ -50,7 +50,7 @@
           </p>
         </div>
 
-        <form action="{{ routes.controllers.CheckYourAnswersController.onSubmit.url }}" method="post">
+        <form action="{{ routes.controllers.CheckYourAnswersController.onSubmit().url }}" method="post">
             {{ csrf() | safe }}
 
             {{ govukButton({
