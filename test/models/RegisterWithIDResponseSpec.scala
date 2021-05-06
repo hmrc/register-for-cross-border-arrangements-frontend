@@ -21,13 +21,13 @@ import org.scalatest.{FreeSpec, MustMatchers}
 import play.api.libs.json.Json
 
 class RegisterWithIDResponseSpec extends FreeSpec with MustMatchers {
+
   "RegisterWithIDResponse" - {
     "must marshall from json" in {
       Json.parse(withIDResponse).validate[PayloadRegistrationWithIDResponse].get mustBe payloadModel
     }
 
-    "must serialise to json" ignore {
-      //nulls are being written out - not important as we arent writing out our model
+    "must serialise to json" in {
       Json.toJson(payloadModel) mustBe withIDResponseJson
     }
   }
