@@ -35,9 +35,4 @@ extends FrontendBaseController
     implicit request =>
       Future.successful(Redirect(config.signOutUrl).withNewSession)
   }
-
-  def timedOutSignOut: Action[AnyContent] = Action.async {
-    implicit request =>
-      Future.successful(Redirect(routes.SessionExpiredController.onPageLoad()).withNewSession)
-  }
 }

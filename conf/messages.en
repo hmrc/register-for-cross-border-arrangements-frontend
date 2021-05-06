@@ -57,6 +57,7 @@ index.guidance = Welcome to your new frontend. Please see the README file for a 
 session_expired.title = For your security, this service has been reset
 session_expired.heading = For your security, this service has been reset
 session_expired.guidance = Your answers have not been saved.
+session_expired.link = Back to disclose cross-border arrangements
 
 unauthorised.title = You can’t access this service with this account
 unauthorised.heading = You can’t access this service with this account
