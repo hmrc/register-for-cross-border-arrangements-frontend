@@ -51,7 +51,7 @@ class SessionExpiredControllerSpec extends SpecBase {
       verify(mockRenderer, times(1)).render(templateCaptor.capture(), jsonCaptor.capture())(any())
 
       val expectedJson = Json.obj(
-        "startUrl" -> "/register-for-cross-border-arrangements/register/have-utr"
+        "startUrl" -> "/register-for-cross-border-arrangements/register/have-utrme"
       )
 
       templateCaptor.getValue mustEqual "session-expired.njk"

@@ -54,8 +54,8 @@ index.title = register-for-cross-border-arrangements-frontend
 index.heading = register-for-cross-border-arrangements-frontend
 index.guidance = Welcome to your new frontend. Please see the README file for a guide to getting started.
 
-session_expired.title = For your security, this service has been reset
-session_expired.heading = For your security, this service has been reset
+session_expired.title = For your security, we signed you out
+session_expired.heading = For your security, we signed you out
 session_expired.guidance = Your answers have not been saved.
 session_expired.link = Back to disclose cross-border arrangements
 
