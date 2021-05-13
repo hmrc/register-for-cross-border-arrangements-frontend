@@ -20,7 +20,7 @@ import base.SpecBase
 import generators.Generators
 import helpers.JsonFixtures._
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
-import pages.{ContactEmailAddressPage, ContactNamePage, SafeIDPage}
+import pages.{ContactEmailAddressPage, ContactNamePage, DoYouLiveInTheUKPage, NonUkNamePage, SafeIDPage}
 import play.api.libs.json.{JsString, Json}
 
 import scala.util.matching.Regex
@@ -299,5 +299,57 @@ class SubscriptionForDACRequestSpec extends SpecBase with Generators with ScalaC
       Json.toJson(requestDetail(primaryContact = primaryContactForOrg)) mustBe json
     }
 
+    "must create a request with the isGBUser flag set to true by DoYouLiveInTheUK" in {
+        val userAnswers = UserAnswers("")
+        val updatedUserAnswers = userAnswers
+          .set(SafeIDPage, "a").success.value
+          .set(ContactEmailAddressPage, "hello").success.value
+          .set(ContactNamePage, "Name Name").success.value
+          .set(DoYouLiveInTheUKPage, true).success.value
+          .set(NonUkNamePage, Name("fred", "smith")).success.value
+
+        val request = SubscriptionForDACRequest.createSubscription(updatedUserAnswers).requestDetail
+
+        request.isGBUser mustBe true
+      }
+
+    "must create a request with the isGBUser flag set to false by DoYouLiveInTheUK" in {
+      val userAnswers = UserAnswers("")
+      val updatedUserAnswers = userAnswers
+        .set(SafeIDPage, "a").success.value
+        .set(ContactEmailAddressPage, "hello").success.value
+        .set(ContactNamePage, "Name Name").success.value
+        .set(DoYouLiveInTheUKPage, false).success.value
+        .set(NonUkNamePage, Name("fred", "smith")).success.value
+
+      val request = SubscriptionForDACRequest.createSubscription(updatedUserAnswers).requestDetail
+
+      request.isGBUser mustBe false
+    }
+
+    "must create a request with the isGBUser flag set to false by NonUkName" in {
+      val userAnswers = UserAnswers("")
+      val updatedUserAnswers = userAnswers
+        .set(SafeIDPage, "a").success.value
+        .set(ContactEmailAddressPage, "hello").success.value
+        .set(ContactNamePage, "Name Name").success.value
+        .set(NonUkNamePage, Name("fred", "smith")).success.value
+
+      val request = SubscriptionForDACRequest.createSubscription(updatedUserAnswers).requestDetail
+
+      request.isGBUser mustBe false
+    }
+
+    "must create a request with the isGBUser flag set to true when criteria is missing" in {
+      val userAnswers = UserAnswers("")
+      val updatedUserAnswers = userAnswers
+        .set(SafeIDPage, "a").success.value
+        .set(ContactEmailAddressPage, "hello").success.value
+        .set(ContactNamePage, "Name Name").success.value
+
+      val request = SubscriptionForDACRequest.createSubscription(updatedUserAnswers).requestDetail
+
+      request.isGBUser mustBe true
+    }
   }
 }

@@ -207,9 +207,13 @@ object SubscriptionForDACRequest {
   }
 
   private def createRequestDetail(userAnswers: UserAnswers): RequestDetail = {
-    val isGBUser = userAnswers.get(NonUkNamePage) match {
-      case Some(_) => false
-      case None => true
+    val isGBUser = userAnswers.get(DoYouLiveInTheUKPage) match {
+      case Some(doYouLiveInTheUK) => doYouLiveInTheUK
+      case None =>
+        userAnswers.get(NonUkNamePage) match {
+          case Some(_) => false
+          case None => true
+        }
     }
 
     RequestDetail(
