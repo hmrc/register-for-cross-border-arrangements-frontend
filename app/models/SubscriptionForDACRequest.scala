@@ -210,9 +210,12 @@ object SubscriptionForDACRequest {
     val isGBUser = userAnswers.get(DoYouLiveInTheUKPage) match {
       case Some(doYouLiveInTheUK) => doYouLiveInTheUK
       case None =>
-        userAnswers.get(NonUkNamePage) match {
-          case Some(_) => false
-          case None => true
+        userAnswers.get(BusinessAddressPage) match {
+          case Some(address) => address.isGB
+          case _ =>         userAnswers.get(NonUkNamePage) match {
+            case Some(_) => false
+            case None => true
+          }
         }
     }
 

@@ -20,7 +20,7 @@ import base.SpecBase
 import generators.Generators
 import helpers.JsonFixtures._
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
-import pages.{ContactEmailAddressPage, ContactNamePage, DoYouLiveInTheUKPage, NonUkNamePage, SafeIDPage}
+import pages.{BusinessAddressPage, ContactEmailAddressPage, ContactNamePage, DoYouLiveInTheUKPage, NonUkNamePage, SafeIDPage}
 import play.api.libs.json.{JsString, Json}
 
 import scala.util.matching.Regex
@@ -325,6 +325,34 @@ class SubscriptionForDACRequestSpec extends SpecBase with Generators with ScalaC
       val request = SubscriptionForDACRequest.createSubscription(updatedUserAnswers).requestDetail
 
       request.isGBUser mustBe false
+    }
+
+    "must create a request with the isGBUser flag set to false by BusinessAddress" in {
+      val businessAddress = Address("", None,"",None,None,Country("valid","DE","Germany"))
+      val userAnswers = UserAnswers("")
+      val updatedUserAnswers = userAnswers
+        .set(SafeIDPage, "a").success.value
+        .set(ContactEmailAddressPage, "hello").success.value
+        .set(ContactNamePage, "Name Name").success.value
+        .set(BusinessAddressPage, businessAddress).success.value
+
+      val request = SubscriptionForDACRequest.createSubscription(updatedUserAnswers).requestDetail
+
+      request.isGBUser mustBe false
+    }
+
+    "must create a request with the isGBUser flag set to true by BusinessAddress" in {
+      val businessAddress = Address("", None,"",None,None,Country("valid","GB","United Kingdom"))
+      val userAnswers = UserAnswers("")
+      val updatedUserAnswers = userAnswers
+        .set(SafeIDPage, "a").success.value
+        .set(ContactEmailAddressPage, "hello").success.value
+        .set(ContactNamePage, "Name Name").success.value
+        .set(BusinessAddressPage, businessAddress).success.value
+
+      val request = SubscriptionForDACRequest.createSubscription(updatedUserAnswers).requestDetail
+
+      request.isGBUser mustBe true
     }
 
     "must create a request with the isGBUser flag set to false by NonUkName" in {
