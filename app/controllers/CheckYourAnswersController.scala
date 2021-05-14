@@ -22,7 +22,7 @@ import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierA
 import models.RegistrationType.Individual
 import models.error.RegisterError
 import models.error.RegisterError.DuplicateSubmisisonError
-import models.{PayloadRegistrationWithoutIDResponse, RegistrationType, SubscriptionAudit, SubscriptionForDACRequest, UserAnswers}
+import models.{NormalMode, PayloadRegistrationWithoutIDResponse, RegistrationType, SubscriptionAudit, SubscriptionForDACRequest, UserAnswers}
 import org.slf4j.LoggerFactory
 import pages._
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -58,9 +58,11 @@ class CheckYourAnswersController @Inject()(
   def onPageLoad(): Action[AnyContent] = (identify andThen notEnrolled andThen getData andThen requireData).async {
     implicit request =>
 
-      val helper = new CheckYourAnswersHelper(request.userAnswers)
-      val businessDetails: Seq[SummaryList.Row] = buildDetails(helper)
-      val contactDetails: Seq[SummaryList.Row] = buildContactDetails(helper)
+      if (request.userAnswers.get(ContactEmailAddressPage).isDefined) {
+
+        val helper = new CheckYourAnswersHelper(request.userAnswers)
+        val businessDetails: Seq[SummaryList.Row] = buildDetails(helper)
+        val contactDetails: Seq[SummaryList.Row] = buildContactDetails(helper)
 
       val header: String =
         (request.userAnswers.get(BusinessTypePage), request.userAnswers.get(RegistrationTypePage)) match {
@@ -69,14 +71,19 @@ class CheckYourAnswersController @Inject()(
           case _ => "checkYourAnswers.individualDetails.h2"
         }
 
-      renderer.render(
-        "check-your-answers.njk",
-        Json.obj(
-          "header" -> header,
-          "businessDetailsList" -> businessDetails,
-          "contactDetailsList" -> contactDetails,
-        )
-      ).map(Ok(_))
+        renderer.render(
+          "check-your-answers.njk",
+          Json.obj(
+            "header" -> header,
+            "businessDetailsList" -> businessDetails,
+            "contactDetailsList" -> contactDetails,
+          )
+        ).map(Ok(_))
+      }
+      else {
+        Future.successful(Redirect(controllers.routes.DoYouHaveUTRController.onPageLoad(NormalMode)))
+      }
+
   }
 
   private def buildDetails(helper: CheckYourAnswersHelper): Seq[SummaryList.Row] = {
