@@ -19,9 +19,9 @@ package controllers
 import controllers.actions._
 import forms.DateOfBirthFormProvider
 import javax.inject.Inject
-import models.{CheckMode, Mode}
+import models.Mode
 import navigation.Navigator
-import pages.{DateOfBirthPage, DoYouHaveANationalInsuranceNumberPage}
+import pages.DateOfBirthPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}

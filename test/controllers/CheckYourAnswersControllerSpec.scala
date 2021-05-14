@@ -16,15 +16,17 @@
 
 package controllers
 
+import java.time.LocalDate
+
 import base.SpecBase
 import connectors.SubscriptionConnector
+import generators.Generators
 import models.RegistrationType.{Business, Individual}
 import models.error.RegisterError.UnableToCreateEMTPSubscriptionError
-import models.{Address, BusinessType, Country, CreateSubscriptionForDACResponse, Name, RegistrationType, ResponseCommon, ResponseDetailForDACSubscription, SubscriptionForDACResponse, UserAnswers}
+import models.{Address, BusinessType, Country, CreateSubscriptionForDACResponse, Name, NormalMode, RegistrationType, ResponseCommon, ResponseDetailForDACSubscription, SubscriptionForDACResponse, UserAnswers}
 import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.any
 import org.mockito.Mockito.{reset, times, verify, when}
-import generators.Generators
 import org.scalatest.BeforeAndAfterEach
 import pages._
 import play.api.inject.bind
@@ -38,7 +40,6 @@ import uk.gov.hmrc.domain.{Generator, Nino}
 import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.play.audit.http.connector.AuditResult
 
-import java.time.LocalDate
 import scala.concurrent.Future
 
 class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach with Generators {
@@ -153,6 +154,37 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach wi
       contactDetails.contains("Does your additional contact have a telephone number?") mustBe true
       contactDetails.contains("Additional contact email address") mustBe true
       contactDetails.contains("Additional contact telephone number") mustBe true
+
+      application.stop()
+    }
+
+    "must return SEE_OTHER and redirect to have UTR page if email address is not present in user answers" in {
+
+      when(mockRenderer.render(any(), any())(any()))
+        .thenReturn(Future.successful(Html("foo")))
+
+      val userAnswers: UserAnswers = UserAnswers(userAnswersId)
+        .set(DoYouHaveUTRPage, false)
+        .success.value
+        .set(RegistrationTypePage, Individual)
+        .success.value
+        .set(DoYouHaveANationalInsuranceNumberPage, true)
+        .success.value
+        .set(NinoPage, nino)
+        .success.value
+        .set(NamePage, name)
+        .success.value
+        .set(DateOfBirthPage, LocalDate.now())
+        .success.value
+
+      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
+
+      val request = FakeRequest(GET, routes.IndexController.onPageLoad().url)
+
+      val result = route(application, request).value
+
+      status(result) mustEqual SEE_OTHER
+      redirectLocation(result).get mustEqual controllers.routes.DoYouHaveUTRController.onPageLoad(NormalMode).url
 
       application.stop()
     }
