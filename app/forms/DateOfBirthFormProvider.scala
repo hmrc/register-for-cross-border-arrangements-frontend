@@ -16,24 +16,25 @@
 
 package forms
 
-import java.time.LocalDate
-
+import java.time.{LocalDate, ZoneId, ZonedDateTime}
 import forms.mappings.Mappings
 import helpers.DateHelper._
+
 import javax.inject.Inject
 import play.api.data.Form
 
 class DateOfBirthFormProvider @Inject() extends Mappings {
 
-  def apply(): Form[LocalDate] =
+  def apply(): Form[LocalDate] = {
+    val todayWithZone = ZonedDateTime.now(ZoneId.of("Europe/London")).toLocalDate
     Form(
       "value" -> localDate(
         invalidKey     = "dateOfBirth.error.invalid",
         allRequiredKey = "dateOfBirth.error.required.all",
         twoRequiredKey = "dateOfBirth.error.required.two",
         requiredKey    = "dateOfBirth.error.required"
-      ).verifying(maxDate(today, "dateOfBirth.error.futureDate", formatDateToString(today)))
+      ).verifying(maxDate(todayWithZone, "dateOfBirth.error.futureDate", formatDateToString(todayWithZone)))
        .verifying(minDate(LocalDate.of(1909,1,1),"dateOfBirth.error.pastDate"))
     )
-
+  }
 }

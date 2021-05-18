@@ -16,12 +16,12 @@
 
 package forms
 
-import java.time.{LocalDate, ZoneOffset}
-
 import forms.behaviours.DateBehaviours
 import helpers.DateHelper
 import helpers.DateHelper._
 import play.api.data.FormError
+
+import java.time.{LocalDate, ZoneId, ZonedDateTime}
 
 class DateOfBirthFormProviderSpec extends DateBehaviours {
 
@@ -33,7 +33,7 @@ class DateOfBirthFormProviderSpec extends DateBehaviours {
 
     val validData = datesBetween(
       min = LocalDate.of(1909, 1, 1),
-      max = LocalDate.now(ZoneOffset.UTC)
+      max = ZonedDateTime.now(ZoneId.of("Europe/London")).toLocalDate
     )
 
     behave like dateField(form, "value", validData)
