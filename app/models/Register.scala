@@ -31,7 +31,6 @@ object NoIdOrganisation {
   implicit val format: OFormat[NoIdOrganisation] = Json.format[NoIdOrganisation]
 }
 
-//ToDo This is different to one we are collecting and validating on the form this needs looked at
 case class AddressNoId(addressLine1: String,
                        addressLine2: Option[String],
                        addressLine3: String,
