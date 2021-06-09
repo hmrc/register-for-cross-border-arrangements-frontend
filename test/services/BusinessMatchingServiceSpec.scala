@@ -355,7 +355,6 @@ class BusinessMatchingServiceSpec extends SpecBase
       "should send a request to the business matching connector for a sole proprietor" in {
         forAll(arbitrary[UniqueTaxpayerReference]){
           utr =>
-            //TODO: Probably needs a date of birth to construct an individual record
             val answers = UserAnswers(userAnswersId)
               .set(BusinessTypePage, NotSpecified)
               .success
