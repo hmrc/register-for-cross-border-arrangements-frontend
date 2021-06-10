@@ -56,7 +56,7 @@ class Navigator @Inject()(appConfig: FrontendAppConfig) {
     case ContactTelephoneNumberPage => contactTelephoneNumberRoutes(NormalMode)
     case HaveSecondContactPage => haveSecondContactRoutes(NormalMode)
     case SecondaryContactNamePage => _ => Some(routes.SecondaryContactEmailAddressController.onPageLoad(NormalMode))
-    case SecondaryContactEmailAddressPage => _ => Some(routes.SecondaryContactTelephoneQuestionController.onPageLoad(NormalMode)) // TODO - redirect to does 2nd contact have phone
+    case SecondaryContactEmailAddressPage => _ => Some(routes.SecondaryContactTelephoneQuestionController.onPageLoad(NormalMode))
     case SecondaryContactTelephoneQuestionPage => secondaryContactTelephoneQuestionRoute(NormalMode)
     case SecondaryContactTelephoneNumberPage => _ => Some(routes.CheckYourAnswersController.onPageLoad())
     case _ => _ => Some(routes.IndexController.onPageLoad())
