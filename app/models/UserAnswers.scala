@@ -66,6 +66,8 @@ final case class UserAnswers(
 
 object UserAnswers {
 
+  import MongoJavatimeFormats.Implicits._
+
   val format: OFormat[UserAnswers] = OFormat(reads, writes)
 
   implicit lazy val reads: Reads[UserAnswers] = {
