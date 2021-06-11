@@ -66,7 +66,7 @@ final case class UserAnswers(
 
 object UserAnswers {
 
-  import MongoJavatimeFormats.Implicits._
+  import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats.Implicits._
 
   val format: OFormat[UserAnswers] = OFormat(reads, writes)
 
