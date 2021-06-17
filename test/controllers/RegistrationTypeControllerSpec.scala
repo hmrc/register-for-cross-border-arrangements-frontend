@@ -23,9 +23,7 @@ import matchers.JsonMatchers
 import models.{CheckMode, NormalMode, RegistrationType, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentCaptor
-import org.mockito.Matchers.any
-import org.mockito.Mockito.{times, verify, when}
-import org.scalatestplus.mockito.MockitoSugar
+import org.mockito.ArgumentMatchers.any
 import pages.RegistrationTypePage
 import play.api.data.Form
 import play.api.inject.bind
@@ -39,7 +37,7 @@ import uk.gov.hmrc.viewmodels.NunjucksSupport
 
 import scala.concurrent.Future
 
-class RegistrationTypeControllerSpec extends SpecBase with MockitoSugar with NunjucksSupport with JsonMatchers {
+class RegistrationTypeControllerSpec extends SpecBase with NunjucksSupport with JsonMatchers {
 
   def onwardRoute: Call = Call("GET", "/foo")
   val mockSessionRepository: SessionRepository = mock[SessionRepository]
@@ -70,7 +68,7 @@ class RegistrationTypeControllerSpec extends SpecBase with MockitoSugar with Nun
 
       val expectedJson = Json.obj(
         "form"   -> form,
-        "mode"   -> NormalMode,
+        "mode"   -> "NormalMode",
         "radios" -> RegistrationType.radios(form)
       )
 
@@ -101,7 +99,7 @@ class RegistrationTypeControllerSpec extends SpecBase with MockitoSugar with Nun
 
       val expectedJson = Json.obj(
         "form"   -> filledForm,
-        "mode"   -> NormalMode,
+        "mode"   -> "NormalMode",
         "radios" -> RegistrationType.radios(filledForm)
       )
 
@@ -156,7 +154,7 @@ class RegistrationTypeControllerSpec extends SpecBase with MockitoSugar with Nun
 
       val expectedJson = Json.obj(
         "form"   -> boundForm,
-        "mode"   -> NormalMode,
+        "mode"   -> "NormalMode",
         "radios" -> RegistrationType.radios(boundForm)
       )
 

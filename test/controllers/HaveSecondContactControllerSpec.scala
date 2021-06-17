@@ -23,9 +23,7 @@ import matchers.JsonMatchers
 import models.{CheckMode, NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentCaptor
-import org.mockito.Matchers.any
-import org.mockito.Mockito.{times, verify, when}
-import org.scalatestplus.mockito.MockitoSugar
+import org.mockito.ArgumentMatchers.any
 import pages.{ContactNamePage, HaveSecondContactPage}
 import play.api.data.Form
 import play.api.inject.bind
@@ -39,7 +37,7 @@ import uk.gov.hmrc.viewmodels.{NunjucksSupport, Radios}
 
 import scala.concurrent.Future
 
-class HaveSecondContactControllerSpec extends SpecBase with MockitoSugar with NunjucksSupport with JsonMatchers {
+class HaveSecondContactControllerSpec extends SpecBase with NunjucksSupport with JsonMatchers {
 
   def onwardRoute: Call = Call("GET", "/foo")
   val mockSessionRepository: SessionRepository = mock[SessionRepository]
@@ -74,7 +72,7 @@ class HaveSecondContactControllerSpec extends SpecBase with MockitoSugar with Nu
 
       val expectedJson = Json.obj(
         "form"   -> form,
-        "mode"   -> NormalMode,
+        "mode"   -> "NormalMode",
         "radios" -> Radios.yesNo(form("confirm"))
       )
 
@@ -109,7 +107,7 @@ class HaveSecondContactControllerSpec extends SpecBase with MockitoSugar with Nu
 
       val expectedJson = Json.obj(
         "form"   -> filledForm,
-        "mode"   -> NormalMode,
+        "mode"   -> "NormalMode",
         "radios" -> Radios.yesNo(filledForm("confirm"))
       )
 
@@ -193,7 +191,7 @@ class HaveSecondContactControllerSpec extends SpecBase with MockitoSugar with Nu
 
       val expectedJson = Json.obj(
         "form"   -> boundForm,
-        "mode"   -> NormalMode,
+        "mode"   -> "NormalMode",
         "radios" -> Radios.yesNo(boundForm("confirm"))
       )
 

@@ -24,7 +24,6 @@ import models.readSubscription._
 import models.{BusinessAddress, BusinessDetails, BusinessType, Name, NormalMode, PayloadRegistrationWithIDResponse, RegisterWithIDResponse, ResponseCommon, UniqueTaxpayerReference, UserAnswers}
 import org.mockito.Matchers._
 import org.mockito.Mockito._
-import org.scalatestplus.mockito.MockitoSugar
 import pages._
 import play.api.inject._
 import play.api.mvc.AnyContentAsEmpty
@@ -35,12 +34,13 @@ import services.{BusinessMatchingService, EmailService}
 import uk.gov.hmrc.domain.Generator
 import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.viewmodels.NunjucksSupport
+import org.mockito.ArgumentMatchers.any
 
 import java.time.LocalDate
 import scala.concurrent.Future
 
 class BusinessMatchingControllerSpec extends SpecBase
-  with MockitoSugar
+
   with NunjucksSupport
   with JsonMatchers
   with Generators {

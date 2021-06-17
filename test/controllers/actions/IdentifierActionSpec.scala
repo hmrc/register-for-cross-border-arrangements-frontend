@@ -16,13 +16,13 @@
 
 package controllers.actions
 
+import base.SpecBase
 import com.google.inject.Inject
 import controllers.routes
 import models.requests.UserRequest
-import org.mockito.Matchers.any
+import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{reset, when}
 import org.scalatest.{BeforeAndAfterEach, FreeSpec, MustMatchers}
-import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.Application
 import play.api.http.Status.SEE_OTHER
@@ -44,8 +44,8 @@ class Harness @Inject()(authAction: IdentifierAction) extends InjectedController
   }
 }
 
-class IdentifierActionSpec extends FreeSpec with MustMatchers with MockitoSugar with GuiceOneAppPerSuite with BeforeAndAfterEach {
-  val mockAuthConnector = mock[AuthConnector]
+class IdentifierActionSpec extends SpecBase with BeforeAndAfterEach {
+  val mockAuthConnector: AuthConnector = mock[AuthConnector]
 
   override def beforeEach: Unit =
     reset(
@@ -58,7 +58,7 @@ class IdentifierActionSpec extends FreeSpec with MustMatchers with MockitoSugar 
   .build()
 
   type AuthRetrievals = Option[String] ~ Enrolments ~ Option[AffinityGroup] ~ Option[CredentialRole]
-  val emptyEnrolments = Enrolments(Set.empty)
+  val emptyEnrolments: Enrolments = Enrolments(Set.empty)
 
 
   "An Agent" - {

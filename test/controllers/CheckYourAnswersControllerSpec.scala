@@ -22,8 +22,7 @@ import models.RegistrationType.{Business, Individual}
 import models.error.RegisterError.UnableToCreateEMTPSubscriptionError
 import models.{Address, BusinessType, Country, CreateSubscriptionForDACResponse, Name, RegistrationType, ResponseCommon, ResponseDetailForDACSubscription, SubscriptionForDACResponse, UserAnswers}
 import org.mockito.ArgumentCaptor
-import org.mockito.Matchers.any
-import org.mockito.Mockito.{reset, times, verify, when}
+import org.mockito.ArgumentMatchers.any
 import generators.Generators
 import org.scalatest.BeforeAndAfterEach
 import pages._

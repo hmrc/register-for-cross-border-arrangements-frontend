@@ -23,9 +23,7 @@ import matchers.JsonMatchers
 import models.{BusinessType, NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentCaptor
-import org.mockito.Matchers.any
-import org.mockito.Mockito.{times, verify, when}
-import org.scalatestplus.mockito.MockitoSugar
+import org.mockito.ArgumentMatchers.any
 import pages.BusinessTypePage
 import play.api.inject.bind
 import play.api.libs.json.{JsObject, Json}
@@ -38,7 +36,7 @@ import uk.gov.hmrc.viewmodels.NunjucksSupport
 
 import scala.concurrent.Future
 
-class BusinessTypeControllerSpec extends SpecBase with MockitoSugar with NunjucksSupport with JsonMatchers {
+class BusinessTypeControllerSpec extends SpecBase with NunjucksSupport with JsonMatchers {
 
   def onwardRoute = Call("GET", "/foo")
 
@@ -67,7 +65,7 @@ class BusinessTypeControllerSpec extends SpecBase with MockitoSugar with Nunjuck
 
       val expectedJson = Json.obj(
         "form"   -> form,
-        "mode"   -> NormalMode,
+        "mode"   -> "NormalMode",
         "radios" -> BusinessType.radios(form)
       )
 
@@ -98,7 +96,7 @@ class BusinessTypeControllerSpec extends SpecBase with MockitoSugar with Nunjuck
 
       val expectedJson = Json.obj(
         "form"   -> filledForm,
-        "mode"   -> NormalMode,
+        "mode"   -> "NormalMode",
         "radios" -> BusinessType.radios(filledForm)
       )
 
@@ -155,7 +153,7 @@ class BusinessTypeControllerSpec extends SpecBase with MockitoSugar with Nunjuck
 
       val expectedJson = Json.obj(
         "form"   -> boundForm,
-        "mode"   -> NormalMode,
+        "mode"   -> "NormalMode",
         "radios" -> BusinessType.radios(boundForm)
       )
 

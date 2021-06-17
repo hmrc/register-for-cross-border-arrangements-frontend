@@ -21,10 +21,9 @@ import java.io.ByteArrayInputStream
 import base.SpecBase
 import config.FrontendAppConfig
 import models.Country
-import org.mockito.Matchers.any
-import org.mockito.Mockito.when
 import play.api.Environment
 import play.api.libs.json.Json
+import org.mockito.ArgumentMatchers.any
 
 class CountryListFactorySpec extends SpecBase {
   "Factory  must " - {

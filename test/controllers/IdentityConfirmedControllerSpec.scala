@@ -20,9 +20,7 @@ import base.SpecBase
 import matchers.JsonMatchers
 import models.{BusinessType, UserAnswers}
 import org.mockito.ArgumentCaptor
-import org.mockito.Matchers.any
-import org.mockito.Mockito.{times, verify, when}
-import org.scalatestplus.mockito.MockitoSugar
+import org.mockito.ArgumentMatchers.any
 import pages.{BusinessTypePage, NinoPage}
 import play.api.libs.json.{JsObject, Json}
 import play.api.test.FakeRequest
@@ -32,7 +30,7 @@ import uk.gov.hmrc.domain.Generator
 
 import scala.concurrent.Future
 
-class IdentityConfirmedControllerSpec extends SpecBase with MockitoSugar with JsonMatchers {
+class IdentityConfirmedControllerSpec extends SpecBase with JsonMatchers {
 
   lazy val identityConfirmedRoute: String = routes.IdentityConfirmedController.onPageLoad().url
 

@@ -24,9 +24,8 @@ import matchers.JsonMatchers
 import models.{AddressLookup, NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentCaptor
-import org.mockito.Matchers.any
+import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{reset, times, verify, when}
-import org.scalatestplus.mockito.MockitoSugar
 import pages.IndividualUKPostcodePage
 import play.api.data.{Form, FormError}
 import play.api.inject.bind
@@ -40,7 +39,7 @@ import uk.gov.hmrc.viewmodels.NunjucksSupport
 
 import scala.concurrent.Future
 
-class IndividualUKPostcodeControllerSpec extends SpecBase with MockitoSugar with NunjucksSupport with JsonMatchers {
+class IndividualUKPostcodeControllerSpec extends SpecBase with NunjucksSupport with JsonMatchers {
 
   def onwardRoute = Call("GET", "/foo")
 
@@ -74,7 +73,7 @@ class IndividualUKPostcodeControllerSpec extends SpecBase with MockitoSugar with
 
       val expectedJson = Json.obj(
         "form" -> form,
-        "mode" -> NormalMode
+        "mode" -> "NormalMode"
       )
 
       templateCaptor.getValue mustEqual "individualUKPostcode.njk"
@@ -105,7 +104,7 @@ class IndividualUKPostcodeControllerSpec extends SpecBase with MockitoSugar with
 
       val expectedJson = Json.obj(
         "form" -> filledForm,
-        "mode" -> NormalMode
+        "mode" -> "NormalMode"
       )
 
       templateCaptor.getValue mustEqual "individualUKPostcode.njk"
@@ -173,7 +172,7 @@ class IndividualUKPostcodeControllerSpec extends SpecBase with MockitoSugar with
 
       val expectedJson = Json.obj(
         "form" -> boundForm,
-        "mode" -> NormalMode
+        "mode" -> "NormalMode"
       )
 
       templateCaptor.getValue mustEqual "individualUKPostcode.njk"
@@ -202,7 +201,7 @@ class IndividualUKPostcodeControllerSpec extends SpecBase with MockitoSugar with
 
       val expectedJson = Json.obj(
         "form" -> boundForm,
-        "mode" -> NormalMode
+        "mode" -> "NormalMode"
       )
 
       templateCaptor.getValue mustEqual "individualUKPostcode.njk"

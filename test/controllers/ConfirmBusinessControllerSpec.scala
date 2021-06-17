@@ -23,9 +23,7 @@ import matchers.JsonMatchers
 import models.{Address, Country, NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentCaptor
-import org.mockito.Matchers.any
-import org.mockito.Mockito.{times, verify, when}
-import org.scalatestplus.mockito.MockitoSugar
+import org.mockito.ArgumentMatchers.any
 import pages.{BusinessAddressPage, ConfirmBusinessPage, RetrievedNamePage}
 import play.api.inject.bind
 import play.api.libs.json.{JsObject, Json}
@@ -38,7 +36,7 @@ import uk.gov.hmrc.viewmodels.{NunjucksSupport, Radios}
 
 import scala.concurrent.Future
 
-class ConfirmBusinessControllerSpec extends SpecBase with MockitoSugar with NunjucksSupport with JsonMatchers {
+class ConfirmBusinessControllerSpec extends SpecBase with NunjucksSupport with JsonMatchers {
 
   def onwardRoute = Call("GET", "/foo")
 
@@ -73,7 +71,7 @@ class ConfirmBusinessControllerSpec extends SpecBase with MockitoSugar with Nunj
 
       val expectedJson = Json.obj(
         "form"   -> form,
-        "mode"   -> NormalMode,
+        "mode"   -> "NormalMode",
         "radios" -> Radios.yesNo(form("confirm"))
       )
 
@@ -112,7 +110,7 @@ class ConfirmBusinessControllerSpec extends SpecBase with MockitoSugar with Nunj
 
       val expectedJson = Json.obj(
         "form"   -> filledForm,
-        "mode"   -> NormalMode,
+        "mode"   -> "NormalMode",
         "radios" -> Radios.yesNo(filledForm("confirm"))
       )
 
@@ -180,7 +178,7 @@ class ConfirmBusinessControllerSpec extends SpecBase with MockitoSugar with Nunj
         "businessName" -> "My Business",
         "address" -> Json.toJson(address),
         "form"   -> boundForm,
-        "mode"   -> NormalMode,
+        "mode"   -> "NormalMode",
         "radios" -> Radios.yesNo(boundForm("confirm"))
       )
 

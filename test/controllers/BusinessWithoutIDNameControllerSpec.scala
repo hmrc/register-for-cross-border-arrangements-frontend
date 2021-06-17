@@ -23,9 +23,7 @@ import matchers.JsonMatchers
 import models.{CheckMode, NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentCaptor
-import org.mockito.Matchers.any
-import org.mockito.Mockito.{times, verify, when}
-import org.scalatestplus.mockito.MockitoSugar
+import org.mockito.ArgumentMatchers.any
 import pages.BusinessWithoutIDNamePage
 import play.api.data.Form
 import play.api.inject.bind
@@ -39,7 +37,7 @@ import uk.gov.hmrc.viewmodels.NunjucksSupport
 
 import scala.concurrent.Future
 
-class BusinessWithoutIDNameControllerSpec extends SpecBase with MockitoSugar with NunjucksSupport with JsonMatchers {
+class BusinessWithoutIDNameControllerSpec extends SpecBase with NunjucksSupport with JsonMatchers {
 
   def onwardRoute: Call = Call("GET", "/foo")
   val mockSessionRepository: SessionRepository = mock[SessionRepository]
@@ -75,7 +73,7 @@ class BusinessWithoutIDNameControllerSpec extends SpecBase with MockitoSugar wit
 
       val expectedJson = Json.obj(
         "form" -> form,
-        "mode" -> NormalMode
+        "mode" -> "NormalMode"
       )
 
       templateCaptor.getValue mustEqual "businessWithoutIDName.njk"
@@ -108,7 +106,7 @@ class BusinessWithoutIDNameControllerSpec extends SpecBase with MockitoSugar wit
 
       val expectedJson = Json.obj(
         "form" -> filledForm,
-        "mode" -> NormalMode
+        "mode" -> "NormalMode"
       )
 
       templateCaptor.getValue mustEqual "businessWithoutIDName.njk"
@@ -162,7 +160,7 @@ class BusinessWithoutIDNameControllerSpec extends SpecBase with MockitoSugar wit
 
       val expectedJson = Json.obj(
         "form"   -> boundForm,
-        "mode"   -> NormalMode
+        "mode"   -> "NormalMode"
       )
 
       templateCaptor.getValue mustEqual "businessWithoutIDName.njk"

@@ -19,10 +19,10 @@ package base
 import config.FrontendAppConfig
 import controllers.actions._
 import models.UserAnswers
-import org.mockito.Mockito
+import org.mockito.{Mockito, MockitoSugar}
 import org.scalatest._
+import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
-import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.guice._
 import play.api.Configuration
 import play.api.i18n.{Messages, MessagesApi}
@@ -34,14 +34,15 @@ import play.api.test.FakeRequest
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.nunjucks.NunjucksRenderer
 
-trait SpecBase extends FreeSpec
+trait SpecBase extends AnyFreeSpec
   with MustMatchers
+  with MockitoSugar
   with GuiceOneAppPerSuite
   with OptionValues
   with TryValues
   with ScalaFutures
   with IntegrationPatience
-  with MockitoSugar
+
   with BeforeAndAfterEach {
 
   override def beforeEach {
@@ -50,7 +51,7 @@ trait SpecBase extends FreeSpec
 
   val userAnswersId = "id"
 
-  def emptyUserAnswers = UserAnswers(userAnswersId, Json.obj())
+  def emptyUserAnswers: UserAnswers = UserAnswers(userAnswersId, Json.obj())
 
   def injector: Injector = app.injector
 

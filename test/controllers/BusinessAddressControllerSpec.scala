@@ -24,9 +24,7 @@ import models.Address._
 import models.{Address, CheckMode, Country, NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentCaptor
-import org.mockito.Matchers.any
-import org.mockito.Mockito.{times, verify, when}
-import org.scalatestplus.mockito.MockitoSugar
+import org.mockito.ArgumentMatchers.any
 import pages.BusinessAddressPage
 import play.api.data.Form
 import play.api.inject.bind
@@ -41,7 +39,7 @@ import utils.CountryListFactory
 
 import scala.concurrent.Future
 
-class BusinessAddressControllerSpec extends SpecBase with MockitoSugar with NunjucksSupport with JsonMatchers {
+class BusinessAddressControllerSpec extends SpecBase with NunjucksSupport with JsonMatchers {
 
   def onwardRoute: Call = Call("GET", "/foo")
 
@@ -79,7 +77,7 @@ class BusinessAddressControllerSpec extends SpecBase with MockitoSugar with Nunj
 
       val expectedJson = Json.obj(
         "form" -> form,
-        "mode" -> NormalMode
+        "mode" -> "NormalMode"
       )
 
       templateCaptor.getValue mustEqual "businessAddress.njk"
@@ -121,7 +119,7 @@ class BusinessAddressControllerSpec extends SpecBase with MockitoSugar with Nunj
 
       val expectedJson = Json.obj(
         "form" -> filledForm,
-        "mode" -> NormalMode
+        "mode" -> "NormalMode"
       )
 
       templateCaptor.getValue mustEqual "businessAddress.njk"
@@ -176,7 +174,7 @@ class BusinessAddressControllerSpec extends SpecBase with MockitoSugar with Nunj
 
       val expectedJson = Json.obj(
         "form"   -> boundForm,
-        "mode"   -> NormalMode
+        "mode"   -> "NormalMode"
       )
 
       templateCaptor.getValue mustEqual "businessAddress.njk"

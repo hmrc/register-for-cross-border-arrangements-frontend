@@ -20,9 +20,7 @@ import base.SpecBase
 import connectors.EmailConnector
 import generators.Generators
 import models.{Name, UserAnswers}
-import org.mockito.Matchers.any
-import org.mockito.Mockito.{reset, times, verify, when}
-import org.scalatestplus.mockito.MockitoSugar
+import org.mockito.ArgumentMatchers.any
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import pages._
 import play.api.Application
@@ -34,7 +32,7 @@ import uk.gov.hmrc.http.HttpResponse
 import scala.concurrent.Future
 
 class EmailServiceSpec extends SpecBase
-  with MockitoSugar
+
   with Generators
   with ScalaCheckPropertyChecks {
 

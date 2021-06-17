@@ -23,9 +23,7 @@ import matchers.JsonMatchers
 import models.{Name, NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentCaptor
-import org.mockito.Matchers.any
-import org.mockito.Mockito.{times, verify, when}
-import org.scalatestplus.mockito.MockitoSugar
+import org.mockito.ArgumentMatchers.any
 import pages.NamePage
 import play.api.data.Form
 import play.api.inject.bind
@@ -39,7 +37,7 @@ import uk.gov.hmrc.viewmodels.NunjucksSupport
 
 import scala.concurrent.Future
 
-class NameControllerSpec extends SpecBase with MockitoSugar with NunjucksSupport with JsonMatchers {
+class NameControllerSpec extends SpecBase with NunjucksSupport with JsonMatchers {
 
   def onwardRoute: Call = Call("GET", "/foo")
   val mockSessionRepository: SessionRepository = mock[SessionRepository]
@@ -70,7 +68,7 @@ class NameControllerSpec extends SpecBase with MockitoSugar with NunjucksSupport
 
       val expectedJson = Json.obj(
         "form" -> form,
-        "mode" -> NormalMode
+        "mode" -> "NormalMode"
       )
 
       templateCaptor.getValue mustEqual "name.njk"
@@ -103,7 +101,7 @@ class NameControllerSpec extends SpecBase with MockitoSugar with NunjucksSupport
 
       val expectedJson = Json.obj(
         "form" -> filledForm,
-        "mode" -> NormalMode
+        "mode" -> "NormalMode"
       )
 
       templateCaptor.getValue mustEqual "name.njk"
@@ -156,7 +154,7 @@ class NameControllerSpec extends SpecBase with MockitoSugar with NunjucksSupport
 
       val expectedJson = Json.obj(
         "form" -> boundForm,
-        "mode" -> NormalMode
+        "mode" -> "NormalMode"
       )
 
       templateCaptor.getValue mustEqual "name.njk"

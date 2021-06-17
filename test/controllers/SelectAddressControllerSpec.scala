@@ -24,9 +24,7 @@ import matchers.JsonMatchers
 import models.{AddressLookup, CheckMode, NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentCaptor
-import org.mockito.Matchers.any
-import org.mockito.Mockito.{times, verify, when}
-import org.scalatestplus.mockito.MockitoSugar
+import org.mockito.ArgumentMatchers.any
 import pages.{AddressLookupPage, SelectAddressPage}
 import play.api.data.Form
 import play.api.inject.bind
@@ -41,7 +39,7 @@ import uk.gov.hmrc.viewmodels.{NunjucksSupport, Radios}
 import scala.concurrent.Future
 
 class SelectAddressControllerSpec extends SpecBase
-  with MockitoSugar
+
   with NunjucksSupport
   with JsonMatchers {
 
@@ -91,7 +89,7 @@ class SelectAddressControllerSpec extends SpecBase
 
       val expectedJson = Json.obj(
         "form"   -> form,
-        "mode"   -> NormalMode,
+        "mode"   -> "NormalMode",
         "manualAddressURL" -> manualAddressURL,
         "radios" -> Radios(field = form("value"), items = addressRadios)
       )
@@ -130,7 +128,7 @@ class SelectAddressControllerSpec extends SpecBase
 
       val expectedJson = Json.obj(
         "form"   -> filledForm,
-        "mode"   -> NormalMode,
+        "mode"   -> "NormalMode",
         "manualAddressURL" -> manualAddressURL,
         "radios" -> Radios(field = filledForm("value"), items = addressRadios)
       )
@@ -207,7 +205,7 @@ class SelectAddressControllerSpec extends SpecBase
 
       val expectedJson = Json.obj(
         "form"   -> boundForm,
-        "mode"   -> NormalMode,
+        "mode"   -> "NormalMode",
         "manualAddressURL" -> manualAddressURL,
         "radios" -> Radios(field = boundForm("value"), items = addressRadios)
       )

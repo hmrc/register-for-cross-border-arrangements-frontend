@@ -19,9 +19,7 @@ package controllers
 import base.SpecBase
 import matchers.JsonMatchers
 import org.mockito.ArgumentCaptor
-import org.mockito.Matchers.any
-import org.mockito.Mockito.{times, verify, when}
-import org.scalatestplus.mockito.MockitoSugar
+import org.mockito.ArgumentMatchers.any
 import play.api.libs.json.{JsObject, Json}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.{GET, route, status, _}
@@ -30,7 +28,7 @@ import uk.gov.hmrc.viewmodels.NunjucksSupport
 
 import scala.concurrent.Future
 
-class BusinessNotConfirmedControllerSpec extends SpecBase with MockitoSugar with NunjucksSupport with JsonMatchers {
+class BusinessNotConfirmedControllerSpec extends SpecBase with NunjucksSupport with JsonMatchers {
 
   "Business not confirmed Controller" - {
 

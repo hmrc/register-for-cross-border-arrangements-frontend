@@ -23,9 +23,7 @@ import matchers.JsonMatchers
 import models.{NormalMode, UniqueTaxpayerReference, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentCaptor
-import org.mockito.Matchers.any
-import org.mockito.Mockito.{times, verify, when}
-import org.scalatestplus.mockito.MockitoSugar
+import org.mockito.ArgumentMatchers.any
 import pages.SelfAssessmentUTRPage
 import play.api.inject.bind
 import play.api.libs.json.{JsObject, Json}
@@ -39,7 +37,7 @@ import uk.gov.hmrc.viewmodels.NunjucksSupport
 
 import scala.concurrent.Future
 
-class SelfAssessmentUTRControllerSpec extends SpecBase with MockitoSugar with NunjucksSupport with JsonMatchers {
+class SelfAssessmentUTRControllerSpec extends SpecBase with NunjucksSupport with JsonMatchers {
 
   def onwardRoute = Call("GET", "/foo")
 
@@ -73,7 +71,7 @@ class SelfAssessmentUTRControllerSpec extends SpecBase with MockitoSugar with Nu
 
       val expectedJson = Json.obj(
         "form" -> form,
-        "mode" -> NormalMode
+        "mode" -> "NormalMode"
       )
 
       templateCaptor.getValue mustEqual "selfAssessmentUTR.njk"
@@ -106,7 +104,7 @@ class SelfAssessmentUTRControllerSpec extends SpecBase with MockitoSugar with Nu
 
       val expectedJson = Json.obj(
         "form" -> filledForm,
-        "mode" -> NormalMode
+        "mode" -> "NormalMode"
       )
 
       templateCaptor.getValue mustEqual "selfAssessmentUTR.njk"
@@ -163,7 +161,7 @@ class SelfAssessmentUTRControllerSpec extends SpecBase with MockitoSugar with Nu
 
       val expectedJson = Json.obj(
         "form"   -> boundForm,
-        "mode"   -> NormalMode
+        "mode"   -> "NormalMode"
       )
 
       templateCaptor.getValue mustEqual "selfAssessmentUTR.njk"

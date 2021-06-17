@@ -25,7 +25,7 @@ import models.{AddressResponse, BusinessAddress, BusinessDetails, BusinessType, 
 import org.mockito.Matchers._
 import org.mockito.Mockito.{reset, _}
 import org.scalacheck.Arbitrary.arbitrary
-import org.scalatestplus.mockito.MockitoSugar
+import org.mockito.ArgumentMatchers.any
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import pages._
 import play.api.Application
@@ -40,7 +40,7 @@ import scala.concurrent.Future
 import scala.util.Random
 
 class BusinessMatchingServiceSpec extends SpecBase
-  with MockitoSugar
+
   with Generators
   with ScalaCheckPropertyChecks {
 

@@ -17,12 +17,11 @@
 package controllers
 
 import base.SpecBase
-import org.mockito.Mockito.when
-import org.scalatestplus.mockito.MockitoSugar
+import org.mockito.ArgumentMatchers.any
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 
-class SignOutControllerSpec extends SpecBase with MockitoSugar {
+class SignOutControllerSpec extends SpecBase {
 
   private def signOutRoute: String = controllers.routes.SignOutController.signOut().url
   private val application = applicationBuilder().build()
