@@ -21,9 +21,7 @@ import com.google.inject.Inject
 import controllers.routes
 import models.requests.UserRequest
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.{reset, when}
-import org.scalatest.{BeforeAndAfterEach, FreeSpec, MustMatchers}
-import org.scalatestplus.play.guice.GuiceOneAppPerSuite
+import org.scalatest.BeforeAndAfterEach
 import play.api.Application
 import play.api.http.Status.SEE_OTHER
 import play.api.inject.bind

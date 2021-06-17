@@ -22,12 +22,11 @@ import com.typesafe.config.ConfigException
 import generators.Generators
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Gen
-import org.scalatest.MustMatchers
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import play.api.Configuration
 import play.api.mvc.Call
 
-class AllowlistFilterSpec extends SpecBase with MustMatchers with ScalaCheckPropertyChecks with Generators {
+class AllowlistFilterSpec extends SpecBase with ScalaCheckPropertyChecks with Generators {
 
   val mockMaterializer = mock[Materializer]
 

@@ -36,10 +36,7 @@ import java.time.LocalDate
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class RegistrationServiceSpec extends SpecBase
-
-  with Generators
-  with ScalaCheckPropertyChecks with BeforeAndAfterEach {
+class RegistrationServiceSpec extends SpecBase with Generators with ScalaCheckPropertyChecks with BeforeAndAfterEach {
 
   val mockRegistrationConnector: RegistrationConnector = mock[RegistrationConnector]
   val registrationService: RegistrationService = app.injector.instanceOf[RegistrationService]

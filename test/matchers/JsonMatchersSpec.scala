@@ -16,11 +16,12 @@
 
 package matchers
 
+import base.SpecBase
 import org.scalatest.exceptions.TestFailedException
-import org.scalatest.{FreeSpec, MustMatchers, OptionValues, Succeeded}
+import org.scalatest.{OptionValues, Succeeded}
 import play.api.libs.json.Json
 
-class JsonMatchersSpec extends FreeSpec with MustMatchers with JsonMatchers with OptionValues {
+class JsonMatchersSpec extends SpecBase with JsonMatchers with OptionValues {
 
   "contain Json" - {
 

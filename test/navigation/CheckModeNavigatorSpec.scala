@@ -24,7 +24,6 @@ import controllers.routes
 import generators.Generators
 import models.RegistrationType.{Business, Individual}
 import models.{Address, BusinessType, CheckMode, Country, Name, RegistrationType, UniqueTaxpayerReference, UserAnswers}
-import org.mockito.Mockito.when
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import pages._

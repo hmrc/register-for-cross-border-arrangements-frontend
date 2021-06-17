@@ -16,13 +16,13 @@
 
 package models
 
+import base.SpecBase
 import generators.Generators
 import org.scalacheck.Arbitrary.arbitrary
-import org.scalatest.{FreeSpec, MustMatchers}
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import play.api.libs.json.{JsObject, JsSuccess, Json}
 
-class IndividualMatchingSubmissionSpec extends FreeSpec with MustMatchers with ScalaCheckPropertyChecks with Generators {
+class IndividualMatchingSubmissionSpec extends SpecBase with ScalaCheckPropertyChecks with Generators {
 
    "IndividualMatchingSubmission mode" - {
      "must serialise" in {

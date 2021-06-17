@@ -25,7 +25,6 @@ import models.{AddressLookup, NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.{reset, times, verify, when}
 import pages.IndividualUKPostcodePage
 import play.api.data.{Form, FormError}
 import play.api.inject.bind

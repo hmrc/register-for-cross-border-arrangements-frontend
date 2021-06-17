@@ -31,10 +31,7 @@ import uk.gov.hmrc.http.HttpResponse
 
 import scala.concurrent.Future
 
-class EmailServiceSpec extends SpecBase
-
-  with Generators
-  with ScalaCheckPropertyChecks {
+class EmailServiceSpec extends SpecBase with Generators with ScalaCheckPropertyChecks {
 
   override def beforeEach: Unit =
     reset(

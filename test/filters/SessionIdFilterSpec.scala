@@ -19,8 +19,9 @@ package filters
 import java.util.UUID
 
 import akka.stream.Materializer
+import base.SpecBase
 import com.google.inject.Inject
-import org.scalatest.{FreeSpec, MustMatchers, OptionValues}
+import org.scalatest.OptionValues
 import org.scalatestplus.play.components.OneAppPerSuiteWithComponents
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.Json
@@ -44,7 +45,7 @@ object SessionIdFilterSpec {
 
 }
 
-class SessionIdFilterSpec extends FreeSpec with MustMatchers with OptionValues with OneAppPerSuiteWithComponents {
+class SessionIdFilterSpec extends SpecBase with OptionValues with OneAppPerSuiteWithComponents {
 
   override def components: BuiltInComponents = new BuiltInComponentsFromContext(context) with NoHttpFiltersComponents {
 

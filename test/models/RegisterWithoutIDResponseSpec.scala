@@ -16,12 +16,12 @@
 
 package models
 
-import org.scalatest.{FreeSpec, MustMatchers}
+import base.SpecBase
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import helpers.JsonFixtures.{registerWithoutIDResponse, registerWithoutIDResponseJson}
 import play.api.libs.json.Json
 
-class RegisterWithoutIDResponseSpec extends FreeSpec with MustMatchers with ScalaCheckPropertyChecks {
+class RegisterWithoutIDResponseSpec extends SpecBase with ScalaCheckPropertyChecks {
 
   val responseCommon: ResponseCommon = ResponseCommon(status = "OK", statusText = Some("Success"),
     processingDate = "2020-09-01T01:00:00Z", returnParameters = None)

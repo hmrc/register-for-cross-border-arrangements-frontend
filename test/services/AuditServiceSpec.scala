@@ -29,8 +29,7 @@ import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success
 
 import scala.concurrent.Future
 
-class AuditServiceSpec extends SpecBase
-  {
+class AuditServiceSpec extends SpecBase {
 
   val mockAuditConnector = mock[AuditConnector]
   val eventDetail = Json.obj("test-param1" -> "test-value-1")

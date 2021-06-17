@@ -42,7 +42,6 @@ trait SpecBase extends AnyFreeSpec
   with TryValues
   with ScalaFutures
   with IntegrationPatience
-
   with BeforeAndAfterEach {
 
   override def beforeEach {

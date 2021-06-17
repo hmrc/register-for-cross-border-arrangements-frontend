@@ -22,8 +22,6 @@ import generators.Generators
 import matchers.JsonMatchers
 import models.readSubscription._
 import models.{BusinessAddress, BusinessDetails, BusinessType, Name, NormalMode, PayloadRegistrationWithIDResponse, RegisterWithIDResponse, ResponseCommon, UniqueTaxpayerReference, UserAnswers}
-import org.mockito.Matchers._
-import org.mockito.Mockito._
 import pages._
 import play.api.inject._
 import play.api.mvc.AnyContentAsEmpty
@@ -39,11 +37,7 @@ import org.mockito.ArgumentMatchers.any
 import java.time.LocalDate
 import scala.concurrent.Future
 
-class BusinessMatchingControllerSpec extends SpecBase
-
-  with NunjucksSupport
-  with JsonMatchers
-  with Generators {
+class BusinessMatchingControllerSpec extends SpecBase with NunjucksSupport  with JsonMatchers  with Generators {
 
   lazy val individualMatchingRoute: String = routes.BusinessMatchingController.matchIndividual(NormalMode).url
   lazy val businessMatchingRoute: String = routes.BusinessMatchingController.matchBusiness().url
