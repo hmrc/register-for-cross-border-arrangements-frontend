@@ -21,7 +21,7 @@ import connectors.SubscriptionConnector
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction, NotEnrolledForDAC6Action}
 import models.RegistrationType.Individual
 import models.error.RegisterError
-import models.error.RegisterError.DuplicateSubmisisonError
+import models.error.RegisterError.DuplicateSubmissionError
 import models.{PayloadRegistrationWithoutIDResponse, RegistrationType, SubscriptionAudit, SubscriptionForDACRequest, UserAnswers}
 import org.slf4j.LoggerFactory
 import pages._
@@ -215,7 +215,7 @@ class CheckYourAnswersController @Inject()(
           error => {
             logger.warn("Unable to create subscription", error)
             error match {
-              case DuplicateSubmisisonError => Future.successful(Redirect(routes.ThisOrganisationHasAlreadyBeenRegisteredController.onPageLoad()))
+              case DuplicateSubmissionError => Future.successful(Redirect(routes.ThisOrganisationHasAlreadyBeenRegisteredController.onPageLoad()))
               case _                        => Future.successful(Redirect(routes.ProblemWithServiceController.onPageLoad()))
             }
           },
