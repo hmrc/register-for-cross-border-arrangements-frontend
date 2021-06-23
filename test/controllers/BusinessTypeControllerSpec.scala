@@ -65,7 +65,7 @@ class BusinessTypeControllerSpec extends SpecBase with NunjucksSupport with Json
 
       val expectedJson = Json.obj(
         "form"   -> form,
-        "mode"   -> "NormalMode",
+        "mode"   -> NormalMode,
         "radios" -> BusinessType.radios(form)
       )
 
@@ -96,7 +96,7 @@ class BusinessTypeControllerSpec extends SpecBase with NunjucksSupport with Json
 
       val expectedJson = Json.obj(
         "form"   -> filledForm,
-        "mode"   -> "NormalMode",
+        "mode"   -> NormalMode,
         "radios" -> BusinessType.radios(filledForm)
       )
 
@@ -153,7 +153,7 @@ class BusinessTypeControllerSpec extends SpecBase with NunjucksSupport with Json
 
       val expectedJson = Json.obj(
         "form"   -> boundForm,
-        "mode"   -> "NormalMode",
+        "mode"   -> NormalMode,
         "radios" -> BusinessType.radios(boundForm)
       )
 

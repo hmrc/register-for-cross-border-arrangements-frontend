@@ -71,7 +71,7 @@ class ConfirmBusinessControllerSpec extends SpecBase with NunjucksSupport with J
 
       val expectedJson = Json.obj(
         "form"   -> form,
-        "mode"   -> "NormalMode",
+        "mode"   -> NormalMode,
         "radios" -> Radios.yesNo(form("confirm"))
       )
 
@@ -110,7 +110,7 @@ class ConfirmBusinessControllerSpec extends SpecBase with NunjucksSupport with J
 
       val expectedJson = Json.obj(
         "form"   -> filledForm,
-        "mode"   -> "NormalMode",
+        "mode"   -> NormalMode,
         "radios" -> Radios.yesNo(filledForm("confirm"))
       )
 
@@ -178,7 +178,7 @@ class ConfirmBusinessControllerSpec extends SpecBase with NunjucksSupport with J
         "businessName" -> "My Business",
         "address" -> Json.toJson(address),
         "form"   -> boundForm,
-        "mode"   -> "NormalMode",
+        "mode"   -> NormalMode,
         "radios" -> Radios.yesNo(boundForm("confirm"))
       )
 

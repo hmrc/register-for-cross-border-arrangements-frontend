@@ -71,7 +71,7 @@ class SelfAssessmentUTRControllerSpec extends SpecBase with NunjucksSupport with
 
       val expectedJson = Json.obj(
         "form" -> form,
-        "mode" -> "NormalMode"
+        "mode" -> NormalMode
       )
 
       templateCaptor.getValue mustEqual "selfAssessmentUTR.njk"
@@ -104,7 +104,7 @@ class SelfAssessmentUTRControllerSpec extends SpecBase with NunjucksSupport with
 
       val expectedJson = Json.obj(
         "form" -> filledForm,
-        "mode" -> "NormalMode"
+        "mode" -> NormalMode
       )
 
       templateCaptor.getValue mustEqual "selfAssessmentUTR.njk"
@@ -161,7 +161,7 @@ class SelfAssessmentUTRControllerSpec extends SpecBase with NunjucksSupport with
 
       val expectedJson = Json.obj(
         "form"   -> boundForm,
-        "mode"   -> "NormalMode"
+        "mode"   -> NormalMode
       )
 
       templateCaptor.getValue mustEqual "selfAssessmentUTR.njk"

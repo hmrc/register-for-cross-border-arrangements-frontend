@@ -65,7 +65,7 @@ class SecondaryContactTelephoneNumberControllerSpec extends SpecBase with Nunjuc
 
       val expectedJson = Json.obj(
         "form" -> form,
-        "mode" -> "NormalMode"
+        "mode" -> NormalMode
       )
 
       templateCaptor.getValue mustEqual "secondaryContactTelephoneNumber.njk"
@@ -95,7 +95,7 @@ class SecondaryContactTelephoneNumberControllerSpec extends SpecBase with Nunjuc
 
       val expectedJson = Json.obj(
         "form" -> filledForm,
-        "mode" -> "NormalMode"
+        "mode" -> NormalMode
       )
 
       templateCaptor.getValue mustEqual "secondaryContactTelephoneNumber.njk"
@@ -151,7 +151,7 @@ class SecondaryContactTelephoneNumberControllerSpec extends SpecBase with Nunjuc
 
       val expectedJson = Json.obj(
         "form" -> boundForm,
-        "mode" -> "NormalMode"
+        "mode" -> NormalMode
       )
 
       templateCaptor.getValue mustEqual "secondaryContactTelephoneNumber.njk"

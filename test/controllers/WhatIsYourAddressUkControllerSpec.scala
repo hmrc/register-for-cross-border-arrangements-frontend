@@ -74,7 +74,7 @@ class WhatIsYourAddressUkControllerSpec extends SpecBase with NunjucksSupport wi
 
       val expectedJson = Json.obj(
         "form" -> form,
-        "mode" -> "NormalMode"
+        "mode" -> NormalMode
       )
 
       templateCaptor.getValue mustEqual "whatIsYourAddressUk.njk"
@@ -116,7 +116,7 @@ class WhatIsYourAddressUkControllerSpec extends SpecBase with NunjucksSupport wi
 
       val expectedJson = Json.obj(
         "form" -> filledForm,
-        "mode" -> "NormalMode"
+        "mode" -> NormalMode
       )
 
       templateCaptor.getValue mustEqual "whatIsYourAddressUk.njk"
@@ -151,7 +151,7 @@ class WhatIsYourAddressUkControllerSpec extends SpecBase with NunjucksSupport wi
 
       val expectedJson = Json.obj(
         "form" -> filledForm,
-        "mode" -> "NormalMode"
+        "mode" -> NormalMode
       )
 
       templateCaptor.getValue mustEqual "whatIsYourAddressUk.njk"
@@ -207,7 +207,7 @@ class WhatIsYourAddressUkControllerSpec extends SpecBase with NunjucksSupport wi
 
       val expectedJson = Json.obj(
         "form" -> boundForm,
-        "mode" -> "NormalMode"
+        "mode" -> NormalMode
       )
 
       templateCaptor.getValue mustEqual "whatIsYourAddressUk.njk"

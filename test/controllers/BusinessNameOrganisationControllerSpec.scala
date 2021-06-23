@@ -67,7 +67,7 @@ class BusinessNameOrganisationControllerSpec extends SpecBase with NunjucksSuppo
 
       val expectedJson = Json.obj(
         "form" -> form,
-        "mode" -> "NormalMode"
+        "mode" -> NormalMode
       )
 
       templateCaptor.getValue mustEqual "businessNameOrganisation.njk"
@@ -99,7 +99,7 @@ class BusinessNameOrganisationControllerSpec extends SpecBase with NunjucksSuppo
 
       val expectedJson = Json.obj(
         "form" -> filledForm,
-        "mode" -> "NormalMode"
+        "mode" -> NormalMode
       )
 
       templateCaptor.getValue mustEqual "businessNameOrganisation.njk"
@@ -154,7 +154,7 @@ class BusinessNameOrganisationControllerSpec extends SpecBase with NunjucksSuppo
 
       val expectedJson = Json.obj(
         "form" -> boundForm,
-        "mode" -> "NormalMode"
+        "mode" -> NormalMode
       )
 
       templateCaptor.getValue mustEqual "businessNameOrganisation.njk"

@@ -65,7 +65,7 @@ class SecondaryContactTelephoneQuestionControllerSpec extends SpecBase with Nunj
 
       val expectedJson = Json.obj(
         "form"   -> form,
-        "mode"   -> "NormalMode",
+        "mode"   -> NormalMode,
         "radios" -> Radios.yesNo(form("value"))
       )
 
@@ -96,7 +96,7 @@ class SecondaryContactTelephoneQuestionControllerSpec extends SpecBase with Nunj
 
       val expectedJson = Json.obj(
         "form"   -> filledForm,
-        "mode"   -> "NormalMode",
+        "mode"   -> NormalMode,
         "radios" -> Radios.yesNo(filledForm("value"))
       )
 
@@ -154,7 +154,7 @@ class SecondaryContactTelephoneQuestionControllerSpec extends SpecBase with Nunj
 
       val expectedJson = Json.obj(
         "form"   -> boundForm,
-        "mode"   -> "NormalMode",
+        "mode"   -> NormalMode,
         "radios" -> Radios.yesNo(boundForm("value"))
       )
 

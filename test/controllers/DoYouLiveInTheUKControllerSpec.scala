@@ -68,7 +68,7 @@ class DoYouLiveInTheUKControllerSpec extends SpecBase with NunjucksSupport with 
 
       val expectedJson = Json.obj(
         "form"   -> form,
-        "mode"   -> "NormalMode",
+        "mode"   -> NormalMode,
         "radios" -> Radios.yesNo(form("confirm"))
       )
 
@@ -99,7 +99,7 @@ class DoYouLiveInTheUKControllerSpec extends SpecBase with NunjucksSupport with 
 
       val expectedJson = Json.obj(
         "form"   -> filledForm,
-        "mode"   -> "NormalMode",
+        "mode"   -> NormalMode,
         "radios" -> Radios.yesNo(filledForm("confirm"))
       )
 
@@ -153,7 +153,7 @@ class DoYouLiveInTheUKControllerSpec extends SpecBase with NunjucksSupport with 
 
       val expectedJson = Json.obj(
         "form"   -> boundForm,
-        "mode"   -> "NormalMode",
+        "mode"   -> NormalMode,
         "radios" -> Radios.yesNo(boundForm("confirm"))
       )
 

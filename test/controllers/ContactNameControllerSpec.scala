@@ -69,7 +69,7 @@ class ContactNameControllerSpec extends SpecBase with NunjucksSupport with JsonM
 
       val expectedJson = Json.obj(
         "form" -> form,
-        "mode" -> "NormalMode"
+        "mode" -> NormalMode
       )
 
       templateCaptor.getValue mustEqual "contactName.njk"
@@ -103,7 +103,7 @@ class ContactNameControllerSpec extends SpecBase with NunjucksSupport with JsonM
 
       val expectedJson = Json.obj(
         "form" -> filledForm,
-        "mode" -> "NormalMode"
+        "mode" -> NormalMode
       )
 
       templateCaptor.getValue mustEqual "contactName.njk"
@@ -155,7 +155,7 @@ class ContactNameControllerSpec extends SpecBase with NunjucksSupport with JsonM
 
       val expectedJson = Json.obj(
         "form" -> boundForm,
-        "mode" -> "NormalMode"
+        "mode" -> NormalMode
       )
 
       templateCaptor.getValue mustEqual "contactName.njk"

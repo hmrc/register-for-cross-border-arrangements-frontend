@@ -85,7 +85,7 @@ class DateOfBirthControllerSpec extends SpecBase with NunjucksSupport with JsonM
 
       val expectedJson = Json.obj(
         "form" -> form,
-        "mode" -> "NormalMode",
+        "mode" -> NormalMode,
         "date" -> viewModel
       )
 
@@ -123,7 +123,7 @@ class DateOfBirthControllerSpec extends SpecBase with NunjucksSupport with JsonM
 
       val expectedJson = Json.obj(
         "form" -> filledForm,
-        "mode" -> "NormalMode",
+        "mode" -> NormalMode,
         "date" -> viewModel
       )
 
@@ -175,7 +175,7 @@ class DateOfBirthControllerSpec extends SpecBase with NunjucksSupport with JsonM
 
       val expectedJson = Json.obj(
         "form" -> boundForm,
-        "mode" -> "NormalMode",
+        "mode" -> NormalMode,
         "date" -> viewModel
       )
 

@@ -68,7 +68,7 @@ class RegistrationTypeControllerSpec extends SpecBase with NunjucksSupport with 
 
       val expectedJson = Json.obj(
         "form"   -> form,
-        "mode"   -> "NormalMode",
+        "mode"   -> NormalMode,
         "radios" -> RegistrationType.radios(form)
       )
 
@@ -99,7 +99,7 @@ class RegistrationTypeControllerSpec extends SpecBase with NunjucksSupport with 
 
       val expectedJson = Json.obj(
         "form"   -> filledForm,
-        "mode"   -> "NormalMode",
+        "mode"   -> NormalMode,
         "radios" -> RegistrationType.radios(filledForm)
       )
 
@@ -154,7 +154,7 @@ class RegistrationTypeControllerSpec extends SpecBase with NunjucksSupport with 
 
       val expectedJson = Json.obj(
         "form"   -> boundForm,
-        "mode"   -> "NormalMode",
+        "mode"   -> NormalMode,
         "radios" -> RegistrationType.radios(boundForm)
       )
 

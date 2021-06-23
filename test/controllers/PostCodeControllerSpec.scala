@@ -65,7 +65,7 @@ class PostCodeControllerSpec extends SpecBase with NunjucksSupport with JsonMatc
 
       val expectedJson = Json.obj(
         "form" -> form,
-        "mode" -> "NormalMode"
+        "mode" -> NormalMode
       )
 
       templateCaptor.getValue mustEqual "postCode.njk"
@@ -95,7 +95,7 @@ class PostCodeControllerSpec extends SpecBase with NunjucksSupport with JsonMatc
 
       val expectedJson = Json.obj(
         "form" -> filledForm,
-        "mode" -> "NormalMode"
+        "mode" -> NormalMode
       )
 
       templateCaptor.getValue mustEqual "postCode.njk"
@@ -150,7 +150,7 @@ class PostCodeControllerSpec extends SpecBase with NunjucksSupport with JsonMatc
 
       val expectedJson = Json.obj(
         "form" -> boundForm,
-        "mode" -> "NormalMode"
+        "mode" -> NormalMode
       )
 
       templateCaptor.getValue mustEqual "postCode.njk"

@@ -77,7 +77,7 @@ class BusinessAddressControllerSpec extends SpecBase with NunjucksSupport with J
 
       val expectedJson = Json.obj(
         "form" -> form,
-        "mode" -> "NormalMode"
+        "mode" -> NormalMode
       )
 
       templateCaptor.getValue mustEqual "businessAddress.njk"
@@ -119,7 +119,7 @@ class BusinessAddressControllerSpec extends SpecBase with NunjucksSupport with J
 
       val expectedJson = Json.obj(
         "form" -> filledForm,
-        "mode" -> "NormalMode"
+        "mode" -> NormalMode
       )
 
       templateCaptor.getValue mustEqual "businessAddress.njk"
@@ -174,7 +174,7 @@ class BusinessAddressControllerSpec extends SpecBase with NunjucksSupport with J
 
       val expectedJson = Json.obj(
         "form"   -> boundForm,
-        "mode"   -> "NormalMode"
+        "mode"   -> NormalMode
       )
 
       templateCaptor.getValue mustEqual "businessAddress.njk"
