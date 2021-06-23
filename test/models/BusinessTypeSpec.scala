@@ -16,13 +16,14 @@
 
 package models
 
+import base.SpecBase
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Gen
-import org.scalatest.{FreeSpec, MustMatchers, OptionValues}
+import org.scalatest.OptionValues
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import play.api.libs.json.{JsError, JsString, Json}
 
-class BusinessTypeSpec extends FreeSpec with MustMatchers with ScalaCheckPropertyChecks with OptionValues {
+class BusinessTypeSpec extends SpecBase with ScalaCheckPropertyChecks with OptionValues {
 
   "BusinessType" - {
 

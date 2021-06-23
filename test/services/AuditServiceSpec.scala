@@ -17,9 +17,7 @@
 package services
 
 import base.SpecBase
-import org.mockito.Matchers.any
-import org.mockito.Mockito.{times, verify, when}
-import org.scalatestplus.mockito.MockitoSugar
+import org.mockito.ArgumentMatchers.any
 import play.api.Application
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
@@ -31,8 +29,7 @@ import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success
 
 import scala.concurrent.Future
 
-class AuditServiceSpec extends SpecBase
-  with MockitoSugar {
+class AuditServiceSpec extends SpecBase {
 
   val mockAuditConnector = mock[AuditConnector]
   val eventDetail = Json.obj("test-param1" -> "test-value-1")

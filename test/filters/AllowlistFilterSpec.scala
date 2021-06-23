@@ -17,17 +17,16 @@
 package filters
 
 import akka.stream.Materializer
+import base.SpecBase
 import com.typesafe.config.ConfigException
 import generators.Generators
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Gen
-import org.scalatest.{FreeSpec, MustMatchers}
-import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import play.api.Configuration
 import play.api.mvc.Call
 
-class AllowlistFilterSpec extends FreeSpec with MustMatchers with ScalaCheckPropertyChecks with MockitoSugar with Generators {
+class AllowlistFilterSpec extends SpecBase with ScalaCheckPropertyChecks with Generators {
 
   val mockMaterializer = mock[Materializer]
 

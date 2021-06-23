@@ -16,12 +16,12 @@
 
 package models
 
+import base.SpecBase
 import generators.Generators
-import org.scalatest.{FreeSpec, MustMatchers}
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import play.api.libs.json.Json
 
-class BusinessMatchingSubmissionSpec extends FreeSpec with MustMatchers with ScalaCheckPropertyChecks with Generators {
+class BusinessMatchingSubmissionSpec extends SpecBase with ScalaCheckPropertyChecks with Generators {
   "BusinessMatchingSubmission" - {
     "must serialise" in {
       val businessMatchingSubmission = BusinessMatchingSubmission(

@@ -16,10 +16,10 @@
 
 package models
 
-import org.scalatest.{FreeSpec, MustMatchers}
+import base.SpecBase
 import play.api.libs.json.{JsResultException, JsString, Json}
 
-class OrganisationTypeSpec extends FreeSpec with MustMatchers {
+class OrganisationTypeSpec extends SpecBase {
 
   "OrganisationType reads correct BusinessType" - {
     "when a BusinessType is provided" in {
@@ -48,11 +48,11 @@ class OrganisationTypeSpec extends FreeSpec with MustMatchers {
   "OrganisationType.formats.writes" - {
     "must generate a single string JSON representation from the scala enum" - {
       "for each possible value" in {
-        Json.toJson(Partnership) mustBe JsString("Partnership")
-        Json.toJson(LLP) mustBe JsString("LLP")
-        Json.toJson(CorporateBody) mustBe JsString("Corporate Body")
-        Json.toJson(UnincorporatedBody) mustBe JsString("Unincorporated Body")
-        Json.toJson(NotSpecified) mustBe JsString("Not Specified")
+        Json.toJson("Partnership") mustBe JsString("Partnership")
+        Json.toJson("LLP") mustBe JsString("LLP")
+        Json.toJson("Corporate Body") mustBe JsString("Corporate Body")
+        Json.toJson("Unincorporated Body") mustBe JsString("Unincorporated Body")
+        Json.toJson("Not Specified") mustBe JsString("Not Specified")
       }
     }
   }

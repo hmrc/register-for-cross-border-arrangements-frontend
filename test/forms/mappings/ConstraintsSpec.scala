@@ -18,13 +18,13 @@ package forms.mappings
 
 import java.time.LocalDate
 
+import base.SpecBase
 import generators.Generators
 import org.scalacheck.Gen
-import org.scalatest.{FreeSpec, MustMatchers}
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import play.api.data.validation.{Invalid, Valid}
 
-class ConstraintsSpec extends FreeSpec with MustMatchers with ScalaCheckPropertyChecks with Generators  with Constraints {
+class ConstraintsSpec extends SpecBase with ScalaCheckPropertyChecks with Generators  with Constraints {
 
 
   "firstError" - {

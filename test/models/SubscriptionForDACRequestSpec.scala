@@ -20,7 +20,7 @@ import base.SpecBase
 import generators.Generators
 import helpers.JsonFixtures._
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
-import pages.{BusinessAddressPage, ContactEmailAddressPage, ContactNamePage, DoYouHaveANationalInsuranceNumberPage, DoYouHaveUTRPage, DoYouLiveInTheUKPage, NamePage, NonUkNamePage, RegistrationTypePage, SafeIDPage, WhatIsYourAddressPage}
+import pages._
 import play.api.libs.json.{JsString, Json}
 
 import scala.util.matching.Regex

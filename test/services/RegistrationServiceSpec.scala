@@ -21,11 +21,9 @@ import connectors.RegistrationConnector
 import generators.Generators
 import models.RegistrationType.Individual
 import models.{Address, Country, Name, UserAnswers}
-import org.mockito.Matchers._
-import org.mockito.Mockito._
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalatest.BeforeAndAfterEach
-import org.scalatestplus.mockito.MockitoSugar
+import org.mockito.ArgumentMatchers.any
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import pages._
 import play.api.Application
@@ -38,10 +36,7 @@ import java.time.LocalDate
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class RegistrationServiceSpec extends SpecBase
-  with MockitoSugar
-  with Generators
-  with ScalaCheckPropertyChecks with BeforeAndAfterEach {
+class RegistrationServiceSpec extends SpecBase with Generators with ScalaCheckPropertyChecks with BeforeAndAfterEach {
 
   val mockRegistrationConnector: RegistrationConnector = mock[RegistrationConnector]
   val registrationService: RegistrationService = app.injector.instanceOf[RegistrationService]

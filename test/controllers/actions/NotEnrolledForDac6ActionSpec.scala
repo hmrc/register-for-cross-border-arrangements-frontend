@@ -16,10 +16,9 @@
 
 package controllers.actions
 
+import base.SpecBase
 import config.FrontendAppConfig
 import models.requests.{IdentifierRequest, UserRequest}
-import org.scalatest.{FreeSpec, MustMatchers}
-import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.mvc.Results.Ok
 import play.api.mvc.{AnyContent, MessagesControllerComponents, Result}
@@ -29,7 +28,7 @@ import uk.gov.hmrc.auth.core.{Enrolment, Enrolments}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class NotEnrolledForDac6ActionSpec extends FreeSpec with MustMatchers with MockitoSugar with GuiceOneAppPerSuite {
+class NotEnrolledForDac6ActionSpec extends SpecBase with GuiceOneAppPerSuite {
 
   val mockFrontendAppConfig = mock[FrontendAppConfig]
   val mockDac6Enrolment = mock[Enrolment]

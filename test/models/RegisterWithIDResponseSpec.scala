@@ -16,11 +16,11 @@
 
 package models
 
+import base.SpecBase
 import helpers.JsonFixtures._
-import org.scalatest.{FreeSpec, MustMatchers}
 import play.api.libs.json.Json
 
-class RegisterWithIDResponseSpec extends FreeSpec with MustMatchers {
+class RegisterWithIDResponseSpec extends SpecBase {
 
   "RegisterWithIDResponse" - {
     "must marshall from json" in {

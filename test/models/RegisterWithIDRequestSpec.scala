@@ -16,13 +16,13 @@
 
 package models
 
+import base.SpecBase
 import helpers.JsonFixtures._
-import org.scalatest.{FreeSpec, MustMatchers}
 import play.api.libs.json.Json
 
 import scala.util.matching.Regex
 
-class RegisterWithIDRequestSpec extends FreeSpec with MustMatchers {
+class RegisterWithIDRequestSpec extends SpecBase {
 
   "RegisterWithIDRequest" - {
     "marshal from Json Registration with ID" in {

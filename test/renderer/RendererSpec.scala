@@ -16,12 +16,11 @@
 
 package renderer
 
-import org.mockito.Matchers.any
-import org.mockito.Mockito.{times, verify, when}
+import base.SpecBase
+import org.mockito.ArgumentMatchers.any
 import org.mockito.{ArgumentCaptor, Mockito}
+import org.scalatest.BeforeAndAfterEach
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.{BeforeAndAfterEach, FreeSpec, MustMatchers}
-import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
@@ -32,7 +31,7 @@ import uk.gov.hmrc.nunjucks.NunjucksRenderer
 
 import scala.concurrent.Future
 
-class RendererSpec extends FreeSpec with MustMatchers with GuiceOneAppPerSuite with MockitoSugar
+class RendererSpec extends SpecBase with GuiceOneAppPerSuite
   with ScalaFutures with BeforeAndAfterEach {
 
   val mockNunjucksRenderer: NunjucksRenderer = mock[NunjucksRenderer]

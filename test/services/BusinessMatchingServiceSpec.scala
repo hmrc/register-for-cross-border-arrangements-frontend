@@ -22,10 +22,8 @@ import generators.Generators
 import models.BusinessType._
 import models.readSubscription._
 import models.{AddressResponse, BusinessAddress, BusinessDetails, BusinessType, ContactDetails, IndividualResponse, Name, OrganisationResponse, PayloadRegistrationWithIDResponse, RegisterWithIDResponse, ResponseCommon, ResponseDetail, UniqueTaxpayerReference, UserAnswers}
-import org.mockito.Matchers._
-import org.mockito.Mockito.{reset, _}
 import org.scalacheck.Arbitrary.arbitrary
-import org.scalatestplus.mockito.MockitoSugar
+import org.mockito.ArgumentMatchers.any
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import pages._
 import play.api.Application
@@ -39,10 +37,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.util.Random
 
-class BusinessMatchingServiceSpec extends SpecBase
-  with MockitoSugar
-  with Generators
-  with ScalaCheckPropertyChecks {
+class BusinessMatchingServiceSpec extends SpecBase with Generators with ScalaCheckPropertyChecks {
 
   val mockRegistrationConnector: RegistrationConnector = mock[RegistrationConnector]
   val mockSubscriptionConnector: SubscriptionConnector = mock[SubscriptionConnector]

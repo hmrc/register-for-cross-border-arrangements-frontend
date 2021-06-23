@@ -25,9 +25,7 @@ import matchers.JsonMatchers
 import models.{CheckMode, NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentCaptor
-import org.mockito.Matchers.any
-import org.mockito.Mockito.{times, verify, when}
-import org.scalatestplus.mockito.MockitoSugar
+import org.mockito.ArgumentMatchers.any
 import pages.{DateOfBirthPage, DoYouHaveANationalInsuranceNumberPage}
 import play.api.inject.bind
 import play.api.libs.json.{JsObject, Json}
@@ -40,7 +38,7 @@ import uk.gov.hmrc.viewmodels.{DateInput, NunjucksSupport}
 
 import scala.concurrent.Future
 
-class DateOfBirthControllerSpec extends SpecBase with MockitoSugar with NunjucksSupport with JsonMatchers {
+class DateOfBirthControllerSpec extends SpecBase with NunjucksSupport with JsonMatchers {
 
   val formProvider = new DateOfBirthFormProvider()
   private def form = formProvider()

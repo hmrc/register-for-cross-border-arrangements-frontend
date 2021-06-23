@@ -16,11 +16,11 @@
 
 package models
 
-import org.scalatest.{FreeSpec, MustMatchers}
+import base.SpecBase
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import play.api.libs.json.Json
 
-class SubscriptionForDACResponseSpec extends FreeSpec with MustMatchers with ScalaCheckPropertyChecks {
+class SubscriptionForDACResponseSpec extends SpecBase with ScalaCheckPropertyChecks {
 
   val returnParameters: ReturnParameters = ReturnParameters("Name", "Value")
   val responseCommon: ResponseCommon = ResponseCommon(status = "OK", statusText = None, processingDate = "2020-09-01T01:00:00Z", returnParameters = None)

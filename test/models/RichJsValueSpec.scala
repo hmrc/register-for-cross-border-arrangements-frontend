@@ -16,14 +16,14 @@
 
 package models
 
+import base.SpecBase
 import generators.Generators
 import org.scalacheck.Gen
-import org.scalatest.{FreeSpec, MustMatchers, OptionValues}
+import org.scalatest.OptionValues
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import play.api.libs.json._
 
-class RichJsValueSpec extends FreeSpec
-  with MustMatchers
+class RichJsValueSpec extends SpecBase
   with ScalaCheckPropertyChecks
   with OptionValues
   with Generators {

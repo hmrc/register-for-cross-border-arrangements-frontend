@@ -17,11 +17,11 @@
 package models
 
 import java.time.{LocalDate, LocalDateTime}
-
-import org.scalatest.{FreeSpec, MustMatchers, OptionValues}
+import base.SpecBase
+import org.scalatest.OptionValues
 import play.api.libs.json.Json
 
-class MongoDateTimeFormatsSpec extends FreeSpec with MustMatchers with OptionValues with MongoDateTimeFormats {
+class MongoDateTimeFormatsSpec extends SpecBase with OptionValues with MongoDateTimeFormats {
 
   "a LocalDateTime" - {
 
