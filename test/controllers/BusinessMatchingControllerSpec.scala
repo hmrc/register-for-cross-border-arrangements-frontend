@@ -43,6 +43,7 @@ class BusinessMatchingControllerSpec extends SpecBase with NunjucksSupport  with
   lazy val businessMatchingRoute: String = routes.BusinessMatchingController.matchBusiness().url
   lazy val businessMatchNotFoundRoute: String = routes.BusinessNotConfirmedController.onPageLoad().url
   lazy val problemWithServiceRoute: String = routes.ProblemWithServiceController.onPageLoad().url
+  lazy val alreadyRegisteredRoute: String = routes.ThisOrganisationHasAlreadyBeenRegisteredController.onPageLoad().url
 
   def getRequest(route: String): FakeRequest[AnyContentAsEmpty.type] =
     FakeRequest(GET, route)
@@ -308,6 +309,7 @@ class BusinessMatchingControllerSpec extends SpecBase with NunjucksSupport  with
         }
       }
     }
+
     "when a correct submission can be created and returns no individual match" - {
 
       "must redirect the user to the cant find identity page" in {
@@ -363,6 +365,7 @@ class BusinessMatchingControllerSpec extends SpecBase with NunjucksSupport  with
             redirectLocation(result) mustBe Some("/register-for-cross-border-arrangements/register/confirm-business")
         }
       }
+
       "must create the enrolment redirect the user to registration confirmation when user already subscribed" in {
         forAll(validSubscriptionID, validSafeID, validUtr) {
           (existingSubscriptionID, safeId, utr) =>
@@ -480,6 +483,44 @@ class BusinessMatchingControllerSpec extends SpecBase with NunjucksSupport  with
             redirectLocation(result) mustBe Some("/register-for-cross-border-arrangements/register/problem-with-service")
         }
       }
+
+      "must redirect to technical difficulties page if call to create the enrolment fails when user already enrolled" in {
+        forAll(validSubscriptionID, validSafeID, validUtr) {
+          (existingSubscriptionID, safeId, utr) =>
+
+            val application = applicationBuilder(userAnswers = Some(createBusinessUserAnswers(utr)))
+              .overrides(
+                bind[BusinessMatchingService].toInstance(mockBusinessMatchingService),
+                bind[SubscriptionConnector].toInstance(mockSubscriptionConnector),
+                bind[EmailService].toInstance(mockEmailService),
+                bind[SessionRepository].toInstance(mockSessionRepository)
+              ).build()
+
+            val businessDetails = BusinessDetails(
+              name = "My Company",
+              address = BusinessAddress("1 Address Street", None, None, None, "NE11 1BB", "GB"))
+
+            val responseDetailRead: ResponseDetailForReadSubscription = createResponseDetail(existingSubscriptionID)
+
+            val displaySubscriptionForDACResponse: DisplaySubscriptionForDACResponse =
+              DisplaySubscriptionForDACResponse(
+                ReadSubscriptionForDACResponse(responseCommon = responseCommon, responseDetail = responseDetailRead)
+              )
+
+            when(mockBusinessMatchingService.sendBusinessMatchingInformation(any())(any(), any()))
+              .thenReturn(Future.successful((Some(businessDetails), Some(safeId), Some(displaySubscriptionForDACResponse))))
+
+
+            when(mockSubscriptionConnector.createEnrolment(any())(any(), any())).thenReturn(Future.successful(
+              HttpResponse(BAD_REQUEST, """{"code":"MULTIPLE_ENROLMENTS_INVALID","message":"Multiple Enrolments are not valid for this service"}""")))
+
+            val result = route(application, getRequest(businessMatchingRoute)).value
+
+            status(result) mustEqual SEE_OTHER
+            redirectLocation(result) mustBe Some("/register-for-cross-border-arrangements/register/org-already-registered")
+        }
+      }
+
       "must redirect the user to /confirm-business page if business is not unincorporated or corporate" in {
         forAll(validSafeID, validUtr) {
           (safeId, utr) =>
@@ -536,6 +577,7 @@ class BusinessMatchingControllerSpec extends SpecBase with NunjucksSupport  with
         }
       }
     }
+
     "when a correct submission can be created and returns a business match" - {
 
       "must redirect to the error page if validation fails" in {
@@ -557,6 +599,7 @@ class BusinessMatchingControllerSpec extends SpecBase with NunjucksSupport  with
         }
       }
     }
+
     "when a correct submission can't be created due to missing data required to business match" - {
 
       "must redirect the user to the utr page if it's missing" in {

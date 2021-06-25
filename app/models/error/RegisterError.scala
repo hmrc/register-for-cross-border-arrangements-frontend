@@ -29,8 +29,8 @@ object RegisterError {
     case ErrorDetail(_, _, "503", _, _, SourceDetail(detail)) if detail.contains("001 - Request could not be processed") =>
       RequestCouldNotBeProcessedError
     case ErrorDetail(_, _, "409", "Duplicate submission", _, _) =>
-      DuplicateSubmisisonError
-    case _ => DuplicateSubmisisonError //UnableToParseError
+      DuplicateSubmissionError
+    case _ => DuplicateSubmissionError //UnableToParseError
   }
 
   case object BadRequestError extends RegisterError {
@@ -43,7 +43,7 @@ object RegisterError {
     val errorMessage: String = "Record not Found"
   }
 
-  case object DuplicateSubmisisonError extends RegisterError {
+  case object DuplicateSubmissionError extends RegisterError {
     val errorCode: String = "409"
     val errorMessage: String = "Duplicate submission"
   }

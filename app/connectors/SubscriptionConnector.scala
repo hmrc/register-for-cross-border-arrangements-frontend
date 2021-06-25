@@ -18,7 +18,7 @@ package connectors
 
 import config.FrontendAppConfig
 import models.error.RegisterError
-import models.error.RegisterError.{DuplicateSubmisisonError, UnableToCreateEMTPSubscriptionError}
+import models.error.RegisterError.{DuplicateSubmissionError, UnableToCreateEMTPSubscriptionError}
 import models.readSubscription.{DisplaySubscriptionDetails, DisplaySubscriptionForDACRequest, DisplaySubscriptionForDACResponse}
 import models.{CacheCreateSubscriptionForDACRequest, CreateSubscriptionForDACRequest, CreateSubscriptionForDACResponse, SubscriptionForDACRequest, SubscriptionInfo, UserAnswers}
 import org.slf4j.LoggerFactory
@@ -60,7 +60,7 @@ class SubscriptionConnector @Inject()(val config: FrontendAppConfig, val http: H
           }
         }
         case response if response.status equals CONFLICT =>
-          Future.successful(Left(DuplicateSubmisisonError))
+          Future.successful(Left(DuplicateSubmissionError))
         case response =>
           logger.warn(s"Unable to create a subscription to ETMP. ${response.status} response status")
           Future.successful(Left(UnableToCreateEMTPSubscriptionError))

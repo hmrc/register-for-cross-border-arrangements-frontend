@@ -18,7 +18,6 @@ package controllers
 
 import connectors.SubscriptionConnector
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction, NotEnrolledForDAC6Action}
-import javax.inject.Inject
 import models.{BusinessDetails, Mode, NormalMode, UserAnswers}
 import navigation.Navigator
 import org.slf4j.LoggerFactory
@@ -32,6 +31,7 @@ import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.viewmodels.NunjucksSupport
 
+import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class BusinessMatchingController @Inject()(
@@ -59,7 +59,9 @@ class BusinessMatchingController @Inject()(
           updateIndividualAnswers(request.userAnswers, id).flatMap(updatedUserAnswers =>
               if(existingSubscriptionDetails.isDefined) {
                 createEnrolment(updatedUserAnswers, existingSubscriptionDetails.get.displaySubscriptionForDACResponse.responseDetail.subscriptionID)
-              } else Future(Redirect(routes.IdentityConfirmedController.onPageLoad()))
+              } else {
+                Future(Redirect(routes.IdentityConfirmedController.onPageLoad()))
+              }
           )
         case Right(_) => Future.successful(Redirect(routes.IndividualNotConfirmedController.onPageLoad()))
         //we are missing a name or a date of birth take them back to fill it in
@@ -74,7 +76,6 @@ class BusinessMatchingController @Inject()(
     } yield {
       updatedAnswersWithSafeID
     }
-
   }
 
   def matchBusiness(mode: Mode): Action[AnyContent] =
@@ -84,21 +85,20 @@ class BusinessMatchingController @Inject()(
       /*Note: Needs business type, name and utr to business match
       * Checking UTR page only because /registered-business-name uses the business type before calling this method
       */
-      val utrExist = (request.userAnswers.get(SelfAssessmentUTRPage), request.userAnswers.get(CorporationTaxUTRPage)) match {
+      val utrExist: Boolean = (request.userAnswers.get(SelfAssessmentUTRPage), request.userAnswers.get(CorporationTaxUTRPage)) match {
         case (Some(_), _) | (_, Some(_)) => true
         case _ => false
       }
 
       if (utrExist) {
         businessMatchingService.sendBusinessMatchingInformation(request.userAnswers) flatMap {
-
           case (Some(details), Some(id), existingSubscriptionInfo) =>
             updateUserAnswers(request.userAnswers, details, id).flatMap { updatedUserAnswers =>
               if (existingSubscriptionInfo.isDefined) {
                 createEnrolment(updatedUserAnswers, existingSubscriptionInfo.get.displaySubscriptionForDACResponse.responseDetail.subscriptionID)
-              } else
+              } else {
                 Future.successful(Redirect(routes.ConfirmBusinessController.onPageLoad(NormalMode)))
-
+              }
             }
           case _ => Future.successful(Redirect(routes.BusinessNotConfirmedController.onPageLoad()))
         } recover {
@@ -120,23 +120,29 @@ class BusinessMatchingController @Inject()(
   }
 
   def createEnrolment(userAnswers: UserAnswers, subscriptionID: String)(implicit hc: HeaderCarrier): Future[Result] = {
-    addEnrolmentIdToUserAnswers(userAnswers, subscriptionID).flatMap {updatedUserAnswers =>
-    subscriptionConnector.createEnrolment(updatedUserAnswers).flatMap {
-      enrolmentResponse =>
-          if (enrolmentResponse.status.equals(NO_CONTENT)) {
-            emailService.sendEmail(updatedUserAnswers).map {
-              emailResponse =>
-                logEmailResponse(emailResponse)
-                Redirect(routes.RegistrationSuccessfulController.onPageLoad())
-            }.recover {
-              case e: Exception => Redirect(routes.RegistrationSuccessfulController.onPageLoad())
-            }
-          } else {
-            Future(Redirect(routes.ProblemWithServiceController.onPageLoad()))
+    addEnrolmentIdToUserAnswers(userAnswers, subscriptionID).flatMap { updatedUserAnswers =>
+      subscriptionConnector.createEnrolment(updatedUserAnswers).flatMap {
+        enrolmentResponse: HttpResponse =>
+          enrolmentResponse.status match {
+            case NO_CONTENT =>
+              emailService.sendEmail(updatedUserAnswers).map {
+                emailResponse =>
+                  logEmailResponse(emailResponse)
+                  Redirect(routes.RegistrationSuccessfulController.onPageLoad())
+              }.recover {
+                case e: Exception =>
+                  logger.warn("email service failed - redirect to registration successful without email")
+                  Redirect(routes.RegistrationSuccessfulController.onPageLoad())
+              }
+            case _ if enrolmentResponse.body.contains("MULTIPLE_ENROLMENTS_INVALID") =>
+              Future(Redirect(routes.ThisOrganisationHasAlreadyBeenRegisteredController.onPageLoad()))
+
+            case _ => Future(Redirect(routes.ProblemWithServiceController.onPageLoad()))
           }
-        }
+      }
     }
   }
+
   private def addEnrolmentIdToUserAnswers(userAnswers: UserAnswers, subscriptionID: String): Future[UserAnswers] = {
 
     for {
@@ -144,6 +150,7 @@ class BusinessMatchingController @Inject()(
       _ <- sessionRepository.set(updatedAnswersWithSafeID)
     } yield updatedAnswersWithSafeID
   }
+
   private def logEmailResponse(emailResponse: Option[HttpResponse]): Unit = {
     emailResponse match {
       case Some(HttpResponse(NOT_FOUND, _, _)) => logger.warn("The template cannot be found within the email service")
