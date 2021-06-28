@@ -28,7 +28,7 @@
           }) }}
         {% endif %}
 
-        <form action="{{ routes.controllers.SecondaryContactEmailAddressController.onSubmit(mode).url }}" method="post">
+        <form action="{{ routes.controllers.SecondaryContactEmailAddressController.onSubmit(mode).url }}" method="post" novalidate>
 
           {{ csrf() | safe }}
 
@@ -43,6 +43,7 @@
             },
             id: "email",
             name: "email",
+            type: "email",
             value: form.email.value,
             autocomplete: "email",
             errorMessage: form.email.error
