@@ -64,7 +64,8 @@ class WhatIsYourAddressControllerSpec extends SpecBase with NunjucksSupport with
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).overrides(
         bind[CountryListFactory].toInstance(mockCountryFactory)).build()
 
-      when(mockCountryFactory.getCountryList).thenReturn(Some(Seq(Country("valid","GB","United Kingdom"))))
+      when(mockCountryFactory.getCountryList).thenReturn(Some(Seq(Country("valid","FR","France"))))
+      when(mockCountryFactory.uk).thenReturn(Country("valid","GB","United Kingdom"))
       val request = FakeRequest(GET, whatIsYourAddressRoute)
       val templateCaptor = ArgumentCaptor.forClass(classOf[String])
       val jsonCaptor = ArgumentCaptor.forClass(classOf[JsObject])
@@ -90,8 +91,6 @@ class WhatIsYourAddressControllerSpec extends SpecBase with NunjucksSupport with
 
       when(mockRenderer.render(any(), any())(any()))
         .thenReturn(Future.successful(Html("")))
-
-      when(mockCountryFactory.getCountryList).thenReturn(Some(Seq(Country("valid","GB","United Kingdom"),Country("valid","ES","Spain"))))
 
       val userAnswers = UserAnswers(userAnswersId).set(WhatIsYourAddressPage, address).success.value
 
