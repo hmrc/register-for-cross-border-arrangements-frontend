@@ -64,7 +64,7 @@ class WhatIsYourAddressController @Inject()(
       val json = Json.obj(
         "form"   -> preparedForm,
         "mode"   -> mode,
-        "countries" -> countryJsonList(preparedForm.data, countries)
+        "countries" -> countryJsonList(preparedForm.data, countries.filter(_ != countryListFactory.uk))
       )
 
       renderer.render("whatIsYourAddress.njk", json).map(Ok(_))
