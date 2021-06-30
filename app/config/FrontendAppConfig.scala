@@ -60,12 +60,4 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   //Toggles
   lazy val addressLookupToggle: Boolean = configuration.get[String]("addressLookupToggle").toBoolean
   lazy val recruitmentBannerToggle: Boolean = configuration.get[Boolean]("recruitmentBannerToggle")
-
-  def languageMap: Map[String, Lang] = Map(
-    "english" -> Lang("en"),
-    "cymraeg" -> Lang("cy")
-  )
-
-  def routeToSwitchLanguage: String => Call =
-    (lang: String) => routes.LanguageSwitchController.switchToLanguage(lang)
 }
