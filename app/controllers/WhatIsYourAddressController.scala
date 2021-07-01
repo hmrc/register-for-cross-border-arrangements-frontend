@@ -64,7 +64,7 @@ class WhatIsYourAddressController @Inject()(
       val json = Json.obj(
         "form"   -> preparedForm,
         "mode"   -> mode,
-        "countries" -> countryJsonList(preparedForm.data, countries)
+        "countries" -> countryJsonList(preparedForm.data, countries.filter(_ != countryListFactory.uk))
       )
 
       renderer.render("whatIsYourAddress.njk", json).map(Ok(_))
@@ -97,7 +97,7 @@ class WhatIsYourAddressController @Inject()(
           val json = Json.obj(
             "form"   -> formWithErrors,
             "mode"   -> mode,
-            "countries" -> countryJsonList(formWithErrors.data, countries)
+            "countries" -> countryJsonList(formWithErrors.data, countries.filter(_ != countryListFactory.uk))
           )
 
           renderer.render("whatIsYourAddress.njk", json).map(BadRequest(_))
