@@ -26,16 +26,16 @@ import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class RegistrationConnector @Inject()(val config: FrontendAppConfig, val http: HttpClient) {
+class RegistrationConnector @Inject() (val config: FrontendAppConfig, val http: HttpClient) {
 
-    def sendWithoutIDInformation(registration: Register)
-                                          (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] = {
-      val submissionUrl = s"${config.businessMatchingUrl}/registration/02.00.00/noId"
-      http.POST[Register, HttpResponse](submissionUrl, registration)
-    }
+  def sendWithoutIDInformation(registration: Register)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] = {
+    val submissionUrl = s"${config.businessMatchingUrl}/registration/02.00.00/noId"
+    http.POST[Register, HttpResponse](submissionUrl, registration)
+  }
 
-  def registerWithID(registration: PayloadRegisterWithID)
-                    (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[PayloadRegistrationWithIDResponse]] = {
+  def registerWithID(
+    registration: PayloadRegisterWithID
+  )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[PayloadRegistrationWithIDResponse]] = {
     val submissionUrl = s"${config.businessMatchingUrl}/registration/02.00.00/withId"
 
     http.POST[PayloadRegisterWithID, HttpResponse](submissionUrl, registration) map {
@@ -47,8 +47,10 @@ class RegistrationConnector @Inject()(val config: FrontendAppConfig, val http: H
         responseMessage.json.validate[RegisterWithIDErrorResponse] match {
           case JsSuccess(response, _) =>
             val errorDetail = response.errorDetail
-            if (errorDetail.sourceFaultDetail.detail.contains("001 - Request could not be processed")
-                && errorDetail.errorCode == "503") {
+            if (
+              errorDetail.sourceFaultDetail.detail.contains("001 - Request could not be processed")
+              && errorDetail.errorCode == "503"
+            ) {
               None
             } else {
               throw new Exception("There has been an error during individual and business matching")

@@ -41,7 +41,7 @@ class ContactEmailAddressControllerSpec extends SpecBase with NunjucksSupport wi
   def onwardRoute = Call("GET", "/foo")
 
   val formProvider = new ContactEmailAddressFormProvider()
-  val form = formProvider()
+  val form         = formProvider()
 
   lazy val ContactEmailAddressRoute = routes.ContactEmailAddressController.onPageLoad(NormalMode).url
 
@@ -52,10 +52,10 @@ class ContactEmailAddressControllerSpec extends SpecBase with NunjucksSupport wi
       when(mockRenderer.render(any(), any())(any()))
         .thenReturn(Future.successful(Html("")))
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
-      val request = FakeRequest(GET, ContactEmailAddressRoute)
+      val application    = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val request        = FakeRequest(GET, ContactEmailAddressRoute)
       val templateCaptor = ArgumentCaptor.forClass(classOf[String])
-      val jsonCaptor = ArgumentCaptor.forClass(classOf[JsObject])
+      val jsonCaptor     = ArgumentCaptor.forClass(classOf[JsObject])
 
       val result = route(application, request).value
 
@@ -79,11 +79,11 @@ class ContactEmailAddressControllerSpec extends SpecBase with NunjucksSupport wi
       when(mockRenderer.render(any(), any())(any()))
         .thenReturn(Future.successful(Html("")))
 
-      val userAnswers = UserAnswers(userAnswersId).set(ContactEmailAddressPage, "test@email.com").success.value
-      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
-      val request = FakeRequest(GET, ContactEmailAddressRoute)
+      val userAnswers    = UserAnswers(userAnswersId).set(ContactEmailAddressPage, "test@email.com").success.value
+      val application    = applicationBuilder(userAnswers = Some(userAnswers)).build()
+      val request        = FakeRequest(GET, ContactEmailAddressRoute)
       val templateCaptor = ArgumentCaptor.forClass(classOf[String])
-      val jsonCaptor = ArgumentCaptor.forClass(classOf[JsObject])
+      val jsonCaptor     = ArgumentCaptor.forClass(classOf[JsObject])
 
       val result = route(application, request).value
 
@@ -91,9 +91,11 @@ class ContactEmailAddressControllerSpec extends SpecBase with NunjucksSupport wi
 
       verify(mockRenderer, times(1)).render(templateCaptor.capture(), jsonCaptor.capture())(any())
 
-      val filledForm = form.bind(Map(
-        "email" -> "test@email.com"
-      ))
+      val filledForm = form.bind(
+        Map(
+          "email" -> "test@email.com"
+        )
+      )
 
       val expectedJson = Json.obj(
         "form" -> filledForm,
@@ -138,11 +140,11 @@ class ContactEmailAddressControllerSpec extends SpecBase with NunjucksSupport wi
       when(mockRenderer.render(any(), any())(any()))
         .thenReturn(Future.successful(Html("")))
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
-      val request = FakeRequest(POST, ContactEmailAddressRoute).withFormUrlEncodedBody(("value", ""))
-      val boundForm = form.bind(Map("value" -> ""))
+      val application    = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val request        = FakeRequest(POST, ContactEmailAddressRoute).withFormUrlEncodedBody(("value", ""))
+      val boundForm      = form.bind(Map("value" -> ""))
       val templateCaptor = ArgumentCaptor.forClass(classOf[String])
-      val jsonCaptor = ArgumentCaptor.forClass(classOf[JsObject])
+      val jsonCaptor     = ArgumentCaptor.forClass(classOf[JsObject])
 
       val result = route(application, request).value
 

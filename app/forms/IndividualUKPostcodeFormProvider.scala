@@ -22,9 +22,9 @@ import play.api.data.Form
 import utils.RegexConstants
 
 class IndividualUKPostcodeFormProvider @Inject() extends Mappings with RegexConstants {
+
   def apply(): Form[String] =
     Form(
-      "postCode" -> requiredRegexOnlyText("individualUKPostcode.error.required",
-        "individualUKPostcode.error.invalid",regexPostcode)
+      "postCode" -> requiredRegexOnlyText("individualUKPostcode.error.required", "individualUKPostcode.error.invalid", regexPostcode)
     )
 }

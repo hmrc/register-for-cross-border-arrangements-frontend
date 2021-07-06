@@ -21,16 +21,15 @@ import play.api.data.FormError
 
 class NonUkNameFormProviderSpec extends StringFieldBehaviours {
 
-  val form = new NonUkNameFormProvider()()
+  val form      = new NonUkNameFormProvider()()
   val maxLength = 35
 
   ".firstName" - {
 
-    val fieldName = "firstName"
+    val fieldName   = "firstName"
     val requiredKey = "nonUkName.error.firstName.required"
-    val invalidKey = "nonUkName.error.firstName.invalid"
-    val lengthKey = "nonUkName.error.firstName.length"
-
+    val invalidKey  = "nonUkName.error.firstName.invalid"
+    val lengthKey   = "nonUkName.error.firstName.length"
 
     behave like fieldThatBindsValidData(
       form,
@@ -61,10 +60,10 @@ class NonUkNameFormProviderSpec extends StringFieldBehaviours {
 
   ".secondName" - {
 
-    val fieldName = "secondName"
+    val fieldName   = "secondName"
     val requiredKey = "nonUkName.error.secondName.required"
-    val invalidKey = "nonUkName.error.secondName.invalid"
-    val lengthKey = "nonUkName.error.secondName.length"
+    val invalidKey  = "nonUkName.error.secondName.invalid"
+    val lengthKey   = "nonUkName.error.secondName.length"
 
     behave like fieldThatBindsValidData(
       form,

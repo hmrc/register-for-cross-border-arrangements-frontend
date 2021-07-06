@@ -45,12 +45,11 @@ class BusinessAddressControllerSpec extends SpecBase with NunjucksSupport with J
 
   val mockSessionRepository: SessionRepository = mock[SessionRepository]
   val mockFrontendAppConfig: FrontendAppConfig = mock[FrontendAppConfig]
-  val mockCountryFactory: CountryListFactory = mock[CountryListFactory]
+  val mockCountryFactory: CountryListFactory   = mock[CountryListFactory]
 
-  val formProvider = new BusinessAddressFormProvider()
-  val form: Form[Address] = formProvider(Seq(Country("valid","GB","United Kingdom")))
-  val address: Address = Address("value 1", Some("value 2"), "value 3", Some("value 4"), Some("XX9 9XX"),
-    Country("valid","GB","United Kingdom"))
+  val formProvider        = new BusinessAddressFormProvider()
+  val form: Form[Address] = formProvider(Seq(Country("valid", "GB", "United Kingdom")))
+  val address: Address    = Address("value 1", Some("value 2"), "value 3", Some("value 4"), Some("XX9 9XX"), Country("valid", "GB", "United Kingdom"))
 
   lazy val businessAddressRoute: String = routes.BusinessAddressController.onPageLoad(NormalMode).url
 
@@ -61,13 +60,12 @@ class BusinessAddressControllerSpec extends SpecBase with NunjucksSupport with J
       when(mockRenderer.render(any(), any())(any()))
         .thenReturn(Future.successful(Html("")))
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).overrides(
-        bind[CountryListFactory].toInstance(mockCountryFactory)).build()
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).overrides(bind[CountryListFactory].toInstance(mockCountryFactory)).build()
 
-      when(mockCountryFactory.getCountryList).thenReturn(Some(Seq(Country("valid","GB","United Kingdom"))))
-      val request = FakeRequest(GET, businessAddressRoute)
+      when(mockCountryFactory.getCountryList).thenReturn(Some(Seq(Country("valid", "GB", "United Kingdom"))))
+      val request        = FakeRequest(GET, businessAddressRoute)
       val templateCaptor = ArgumentCaptor.forClass(classOf[String])
-      val jsonCaptor = ArgumentCaptor.forClass(classOf[JsObject])
+      val jsonCaptor     = ArgumentCaptor.forClass(classOf[JsObject])
 
       val result = route(application, request).value
 
@@ -91,14 +89,14 @@ class BusinessAddressControllerSpec extends SpecBase with NunjucksSupport with J
       when(mockRenderer.render(any(), any())(any()))
         .thenReturn(Future.successful(Html("")))
 
-      when(mockCountryFactory.getCountryList).thenReturn(Some(Seq(Country("valid","GB","United Kingdom"),Country("valid","ES","Spain"))))
+      when(mockCountryFactory.getCountryList).thenReturn(Some(Seq(Country("valid", "GB", "United Kingdom"), Country("valid", "ES", "Spain"))))
 
       val userAnswers = UserAnswers(userAnswersId).set(BusinessAddressPage, address).success.value
 
-      val application = applicationBuilder(userAnswers = Some(userAnswers)).overrides(bind[CountryListFactory].toInstance(mockCountryFactory)).build()
-      val request = FakeRequest(GET, businessAddressRoute)
+      val application    = applicationBuilder(userAnswers = Some(userAnswers)).overrides(bind[CountryListFactory].toInstance(mockCountryFactory)).build()
+      val request        = FakeRequest(GET, businessAddressRoute)
       val templateCaptor = ArgumentCaptor.forClass(classOf[String])
-      val jsonCaptor = ArgumentCaptor.forClass(classOf[JsObject])
+      val jsonCaptor     = ArgumentCaptor.forClass(classOf[JsObject])
 
       val result = route(application, request).value
 
@@ -112,8 +110,8 @@ class BusinessAddressControllerSpec extends SpecBase with NunjucksSupport with J
           "addressLine2" -> "value 2",
           "addressLine3" -> "value 3",
           "addressLine4" -> "value 4",
-          "postCode" -> "XX9 9XX",
-          "country" -> "GB"
+          "postCode"     -> "XX9 9XX",
+          "country"      -> "GB"
         )
       )
 
@@ -140,11 +138,15 @@ class BusinessAddressControllerSpec extends SpecBase with NunjucksSupport with J
           )
           .build()
 
-
       val request =
         FakeRequest(POST, businessAddressRoute)
-          .withFormUrlEncodedBody(("addressLine1", "value 1"), ("addressLine2", "value 2"),("addressLine3", "value 3"), ("addressLine4", "value 4"),
-            ("postcode", "XX9 9XX"),("country", "GB"))
+          .withFormUrlEncodedBody(("addressLine1", "value 1"),
+                                  ("addressLine2", "value 2"),
+                                  ("addressLine3", "value 3"),
+                                  ("addressLine4", "value 4"),
+                                  ("postcode", "XX9 9XX"),
+                                  ("country", "GB")
+          )
 
       val result = route(application, request).value
 
@@ -160,11 +162,11 @@ class BusinessAddressControllerSpec extends SpecBase with NunjucksSupport with J
       when(mockRenderer.render(any(), any())(any()))
         .thenReturn(Future.successful(Html("")))
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
-      val request = FakeRequest(POST, businessAddressRoute).withFormUrlEncodedBody(("value", "invalid value"))
-      val boundForm = form.bind(Map("value" -> "invalid value"))
+      val application    = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val request        = FakeRequest(POST, businessAddressRoute).withFormUrlEncodedBody(("value", "invalid value"))
+      val boundForm      = form.bind(Map("value" -> "invalid value"))
       val templateCaptor = ArgumentCaptor.forClass(classOf[String])
-      val jsonCaptor = ArgumentCaptor.forClass(classOf[JsObject])
+      val jsonCaptor     = ArgumentCaptor.forClass(classOf[JsObject])
 
       val result = route(application, request).value
 
@@ -173,8 +175,8 @@ class BusinessAddressControllerSpec extends SpecBase with NunjucksSupport with J
       verify(mockRenderer, times(1)).render(templateCaptor.capture(), jsonCaptor.capture())(any())
 
       val expectedJson = Json.obj(
-        "form"   -> boundForm,
-        "mode"   -> NormalMode
+        "form" -> boundForm,
+        "mode" -> NormalMode
       )
 
       templateCaptor.getValue mustEqual "businessAddress.njk"
@@ -186,7 +188,7 @@ class BusinessAddressControllerSpec extends SpecBase with NunjucksSupport with J
     "must redirect to the Check your answers page when user doesn't change their answer" in {
 
       val businessAddressRoute: String = routes.BusinessAddressController.onPageLoad(CheckMode).url
-      val userAnswers = UserAnswers(userAnswersId).set(BusinessAddressPage, address).success.value
+      val userAnswers                  = UserAnswers(userAnswersId).set(BusinessAddressPage, address).success.value
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
@@ -197,7 +199,6 @@ class BusinessAddressControllerSpec extends SpecBase with NunjucksSupport with J
             bind[SessionRepository].toInstance(mockSessionRepository)
           )
           .build()
-
 
       val request =
         FakeRequest(POST, businessAddressRoute)

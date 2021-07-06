@@ -30,8 +30,13 @@ class NamePageFormProvider @Inject() extends Mappings with RegexConstants {
   def apply(): Form[Name] =
     Form(
       mapping(
-      "firstName" -> validatedText("name.error.firstName.required", "name.error.firstName.invalid", "name.error.firstName.length", apiNameRegex, maxLength),
-      "secondName" -> validatedText("name.error.secondName.required", "name.error.secondName.invalid", "name.error.secondName.length", apiNameRegex, maxLength)
+        "firstName" -> validatedText("name.error.firstName.required", "name.error.firstName.invalid", "name.error.firstName.length", apiNameRegex, maxLength),
+        "secondName" -> validatedText("name.error.secondName.required",
+                                      "name.error.secondName.invalid",
+                                      "name.error.secondName.length",
+                                      apiNameRegex,
+                                      maxLength
+        )
       )(Name.apply)(Name.unapply)
     )
 }

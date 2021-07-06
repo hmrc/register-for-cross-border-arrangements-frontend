@@ -41,8 +41,8 @@ class DoYouLiveInTheUKControllerSpec extends SpecBase with NunjucksSupport with 
 
   def onwardRoute: Call = Call("GET", "/foo")
 
-  val formProvider = new DoYouLiveInTheUKFormProvider()
-  val form: Form[Boolean] = formProvider()
+  val formProvider                             = new DoYouLiveInTheUKFormProvider()
+  val form: Form[Boolean]                      = formProvider()
   val mockSessionRepository: SessionRepository = mock[SessionRepository]
   val mockFrontendAppConfig: FrontendAppConfig = mock[FrontendAppConfig]
 
@@ -55,10 +55,10 @@ class DoYouLiveInTheUKControllerSpec extends SpecBase with NunjucksSupport with 
       when(mockRenderer.render(any(), any())(any()))
         .thenReturn(Future.successful(Html("")))
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
-      val request = FakeRequest(GET, doYouLiveInTheUKRoute)
+      val application    = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val request        = FakeRequest(GET, doYouLiveInTheUKRoute)
       val templateCaptor = ArgumentCaptor.forClass(classOf[String])
-      val jsonCaptor = ArgumentCaptor.forClass(classOf[JsObject])
+      val jsonCaptor     = ArgumentCaptor.forClass(classOf[JsObject])
 
       val result = route(application, request).value
 
@@ -83,11 +83,11 @@ class DoYouLiveInTheUKControllerSpec extends SpecBase with NunjucksSupport with 
       when(mockRenderer.render(any(), any())(any()))
         .thenReturn(Future.successful(Html("")))
 
-      val userAnswers = UserAnswers(userAnswersId).set(DoYouLiveInTheUKPage, true).success.value
-      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
-      val request = FakeRequest(GET, doYouLiveInTheUKRoute)
+      val userAnswers    = UserAnswers(userAnswersId).set(DoYouLiveInTheUKPage, true).success.value
+      val application    = applicationBuilder(userAnswers = Some(userAnswers)).build()
+      val request        = FakeRequest(GET, doYouLiveInTheUKRoute)
       val templateCaptor = ArgumentCaptor.forClass(classOf[String])
-      val jsonCaptor = ArgumentCaptor.forClass(classOf[JsObject])
+      val jsonCaptor     = ArgumentCaptor.forClass(classOf[JsObject])
 
       val result = route(application, request).value
 
@@ -139,11 +139,11 @@ class DoYouLiveInTheUKControllerSpec extends SpecBase with NunjucksSupport with 
       when(mockRenderer.render(any(), any())(any()))
         .thenReturn(Future.successful(Html("")))
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
-      val request = FakeRequest(POST, doYouLiveInTheUKRoute).withFormUrlEncodedBody(("confirm", ""))
-      val boundForm = form.bind(Map("confirm" -> ""))
+      val application    = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val request        = FakeRequest(POST, doYouLiveInTheUKRoute).withFormUrlEncodedBody(("confirm", ""))
+      val boundForm      = form.bind(Map("confirm" -> ""))
       val templateCaptor = ArgumentCaptor.forClass(classOf[String])
-      val jsonCaptor = ArgumentCaptor.forClass(classOf[JsObject])
+      val jsonCaptor     = ArgumentCaptor.forClass(classOf[JsObject])
 
       val result = route(application, request).value
 
@@ -166,7 +166,7 @@ class DoYouLiveInTheUKControllerSpec extends SpecBase with NunjucksSupport with 
     "must redirect to the Check your answers page when user doesn't change their answer" in {
 
       val doYouLiveInTheUKRoute = routes.DoYouLiveInTheUKController.onPageLoad(CheckMode).url
-      val userAnswers = UserAnswers(userAnswersId).set(DoYouLiveInTheUKPage, true).success.value
+      val userAnswers           = UserAnswers(userAnswersId).set(DoYouLiveInTheUKPage, true).success.value
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 

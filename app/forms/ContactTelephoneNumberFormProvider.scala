@@ -30,6 +30,9 @@ class ContactTelephoneNumberFormProvider @Inject() extends Mappings with RegexCo
       "telephoneNumber" -> validatedText(
         "contactTelephoneNumber.error.required",
         "contactTelephoneNumber.error.invalid",
-        "contactTelephoneNumber.error.invalid", digitsAndWhiteSpaceOnly, maxlength)
+        "contactTelephoneNumber.error.invalid",
+        digitsAndWhiteSpaceOnly,
+        maxlength
+      )
     )
 }

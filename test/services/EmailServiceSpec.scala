@@ -39,7 +39,7 @@ class EmailServiceSpec extends SpecBase with Generators with ScalaCheckPropertyC
     )
 
   val mockEmailConnector: EmailConnector = mock[EmailConnector]
-  val emailService: EmailService = injector.instanceOf[EmailService]
+  val emailService: EmailService         = injector.instanceOf[EmailService]
 
   override lazy val app: Application = new GuiceApplicationBuilder()
     .overrides(
@@ -67,10 +67,11 @@ class EmailServiceSpec extends SpecBase with Generators with ScalaCheckPropertyC
 
       val result = emailService.sendEmail(userAnswers)
 
-      whenReady(result) { result =>
-        result.map(_.status) mustBe Some(OK)
+      whenReady(result) {
+        result =>
+          result.map(_.status) mustBe Some(OK)
 
-        verify(mockEmailConnector, times(1)).sendEmail(any())(any())
+          verify(mockEmailConnector, times(1)).sendEmail(any())(any())
       }
     }
 
@@ -93,10 +94,11 @@ class EmailServiceSpec extends SpecBase with Generators with ScalaCheckPropertyC
 
       val result = emailService.sendEmail(userAnswers)
 
-      whenReady(result) { result =>
-        result.map(_.status) mustBe Some(OK)
+      whenReady(result) {
+        result =>
+          result.map(_.status) mustBe Some(OK)
 
-        verify(mockEmailConnector, times(1)).sendEmail(any())(any())
+          verify(mockEmailConnector, times(1)).sendEmail(any())(any())
       }
     }
 
@@ -119,10 +121,11 @@ class EmailServiceSpec extends SpecBase with Generators with ScalaCheckPropertyC
 
       val result = emailService.sendEmail(userAnswers)
 
-      whenReady(result) { result =>
-        result.map(_.status) mustBe Some(OK)
+      whenReady(result) {
+        result =>
+          result.map(_.status) mustBe Some(OK)
 
-        verify(mockEmailConnector, times(1)).sendEmail(any())(any())
+          verify(mockEmailConnector, times(1)).sendEmail(any())(any())
       }
     }
 
@@ -151,10 +154,11 @@ class EmailServiceSpec extends SpecBase with Generators with ScalaCheckPropertyC
 
       val result = emailService.sendEmail(userAnswers)
 
-      whenReady(result) { result =>
-        result.map(_.status) mustBe Some(OK)
+      whenReady(result) {
+        result =>
+          result.map(_.status) mustBe Some(OK)
 
-        verify(mockEmailConnector, times(2)).sendEmail(any())(any())
+          verify(mockEmailConnector, times(2)).sendEmail(any())(any())
       }
     }
 
@@ -177,8 +181,9 @@ class EmailServiceSpec extends SpecBase with Generators with ScalaCheckPropertyC
 
       val result = emailService.sendEmail(userAnswers)
 
-      whenReady(result) { result =>
-        result.map(_.status) mustBe None
+      whenReady(result) {
+        result =>
+          result.map(_.status) mustBe None
       }
     }
 

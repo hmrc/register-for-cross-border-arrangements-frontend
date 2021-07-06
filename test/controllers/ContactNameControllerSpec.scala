@@ -39,13 +39,13 @@ import scala.concurrent.Future
 
 class ContactNameControllerSpec extends SpecBase with NunjucksSupport with JsonMatchers {
 
-  def onwardRoute: Call = Call("GET", "/foo")
+  def onwardRoute: Call                        = Call("GET", "/foo")
   val mockSessionRepository: SessionRepository = mock[SessionRepository]
   val mockFrontendAppConfig: FrontendAppConfig = mock[FrontendAppConfig]
 
-  val formProvider = new ContactNameFormProvider()
+  val formProvider       = new ContactNameFormProvider()
   val form: Form[String] = formProvider()
-  val name: String = "Name Name Jnr"
+  val name: String       = "Name Name Jnr"
 
   lazy val contactNameRoute: String = routes.ContactNameController.onPageLoad(NormalMode).url
 
@@ -56,10 +56,10 @@ class ContactNameControllerSpec extends SpecBase with NunjucksSupport with JsonM
       when(mockRenderer.render(any(), any())(any()))
         .thenReturn(Future.successful(Html("")))
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
-      val request = FakeRequest(GET, contactNameRoute)
+      val application    = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val request        = FakeRequest(GET, contactNameRoute)
       val templateCaptor = ArgumentCaptor.forClass(classOf[String])
-      val jsonCaptor = ArgumentCaptor.forClass(classOf[JsObject])
+      val jsonCaptor     = ArgumentCaptor.forClass(classOf[JsObject])
 
       val result = route(application, request).value
 
@@ -83,11 +83,11 @@ class ContactNameControllerSpec extends SpecBase with NunjucksSupport with JsonM
       when(mockRenderer.render(any(), any())(any()))
         .thenReturn(Future.successful(Html("")))
 
-      val userAnswers = UserAnswers(userAnswersId).set(ContactNamePage, name).success.value
-      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
-      val request = FakeRequest(GET, contactNameRoute)
+      val userAnswers    = UserAnswers(userAnswersId).set(ContactNamePage, name).success.value
+      val application    = applicationBuilder(userAnswers = Some(userAnswers)).build()
+      val request        = FakeRequest(GET, contactNameRoute)
       val templateCaptor = ArgumentCaptor.forClass(classOf[String])
-      val jsonCaptor = ArgumentCaptor.forClass(classOf[JsObject])
+      val jsonCaptor     = ArgumentCaptor.forClass(classOf[JsObject])
 
       val result = route(application, request).value
 
@@ -141,11 +141,11 @@ class ContactNameControllerSpec extends SpecBase with NunjucksSupport with JsonM
       when(mockRenderer.render(any(), any())(any()))
         .thenReturn(Future.successful(Html("")))
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
-      val request = FakeRequest(POST, contactNameRoute).withFormUrlEncodedBody("contactName" -> "")
-      val boundForm = form.bind(Map("contactName" -> ""))
+      val application    = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val request        = FakeRequest(POST, contactNameRoute).withFormUrlEncodedBody("contactName" -> "")
+      val boundForm      = form.bind(Map("contactName" -> ""))
       val templateCaptor = ArgumentCaptor.forClass(classOf[String])
-      val jsonCaptor = ArgumentCaptor.forClass(classOf[JsObject])
+      val jsonCaptor     = ArgumentCaptor.forClass(classOf[JsObject])
 
       val result = route(application, request).value
 
@@ -167,7 +167,7 @@ class ContactNameControllerSpec extends SpecBase with NunjucksSupport with JsonM
     "must redirect to the Check your answers page when user doesn't change their answer" in {
 
       val contactNameRoute: String = routes.ContactNameController.onPageLoad(CheckMode).url
-      val userAnswers = UserAnswers(userAnswersId).set(ContactNamePage, name).success.value
+      val userAnswers              = UserAnswers(userAnswersId).set(ContactNamePage, name).success.value
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 

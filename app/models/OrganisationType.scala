@@ -23,41 +23,46 @@ sealed trait OrganisationType {
 }
 
 object OrganisationType {
+
   implicit val formats: Format[OrganisationType] = new Format[OrganisationType] {
-    override def reads(json: JsValue): JsResult[OrganisationType] = {
+
+    override def reads(json: JsValue): JsResult[OrganisationType] =
       json.asOpt[String] match {
-        case Some("Partnership") => JsSuccess(Partnership)
-        case Some("LLP") => JsSuccess(LLP)
-        case Some("Corporate Body") => JsSuccess(CorporateBody)
+        case Some("Partnership")         => JsSuccess(Partnership)
+        case Some("LLP")                 => JsSuccess(LLP)
+        case Some("Corporate Body")      => JsSuccess(CorporateBody)
         case Some("Unincorporated Body") => JsSuccess(UnincorporatedBody)
-        case Some("Not Specified") => JsSuccess(NotSpecified)
-        case _ => JsError("Invalid OrganisationType value")
+        case Some("Not Specified")       => JsSuccess(NotSpecified)
+        case _                           => JsError("Invalid OrganisationType value")
       }
-    }
     override def writes(businessType: OrganisationType): JsValue = JsString(businessType.value)
   }
 
   def apply(businessType: BusinessType): OrganisationType = businessType match {
-    case BusinessType.CorporateBody => CorporateBody
-    case BusinessType.LimitedLiability => LLP
-    case BusinessType.Partnership => Partnership
+    case BusinessType.CorporateBody      => CorporateBody
+    case BusinessType.LimitedLiability   => LLP
+    case BusinessType.Partnership        => Partnership
     case BusinessType.UnIncorporatedBody => UnincorporatedBody
-    case BusinessType.NotSpecified => NotSpecified
+    case BusinessType.NotSpecified       => NotSpecified
   }
 }
 
 case object CorporateBody extends OrganisationType {
   def value = "Corporate Body"
 }
+
 case object LLP extends OrganisationType {
   def value = "LLP"
 }
+
 case object Partnership extends OrganisationType {
   def value = "Partnership"
 }
+
 case object UnincorporatedBody extends OrganisationType {
   def value = "Unincorporated Body"
 }
+
 case object NotSpecified extends OrganisationType {
   def value = "Not Specified"
 }

@@ -21,7 +21,18 @@ import connectors.SubscriptionConnector
 import generators.Generators
 import matchers.JsonMatchers
 import models.readSubscription._
-import models.{BusinessAddress, BusinessDetails, BusinessType, Name, NormalMode, PayloadRegistrationWithIDResponse, RegisterWithIDResponse, ResponseCommon, UniqueTaxpayerReference, UserAnswers}
+import models.{
+  BusinessAddress,
+  BusinessDetails,
+  BusinessType,
+  Name,
+  NormalMode,
+  PayloadRegistrationWithIDResponse,
+  RegisterWithIDResponse,
+  ResponseCommon,
+  UniqueTaxpayerReference,
+  UserAnswers
+}
 import pages._
 import play.api.inject._
 import play.api.mvc.AnyContentAsEmpty
@@ -37,13 +48,13 @@ import org.mockito.ArgumentMatchers.any
 import java.time.LocalDate
 import scala.concurrent.Future
 
-class BusinessMatchingControllerSpec extends SpecBase with NunjucksSupport  with JsonMatchers  with Generators {
+class BusinessMatchingControllerSpec extends SpecBase with NunjucksSupport with JsonMatchers with Generators {
 
-  lazy val individualMatchingRoute: String = routes.BusinessMatchingController.matchIndividual(NormalMode).url
-  lazy val businessMatchingRoute: String = routes.BusinessMatchingController.matchBusiness().url
+  lazy val individualMatchingRoute: String    = routes.BusinessMatchingController.matchIndividual(NormalMode).url
+  lazy val businessMatchingRoute: String      = routes.BusinessMatchingController.matchBusiness().url
   lazy val businessMatchNotFoundRoute: String = routes.BusinessNotConfirmedController.onPageLoad().url
-  lazy val problemWithServiceRoute: String = routes.ProblemWithServiceController.onPageLoad().url
-  lazy val alreadyRegisteredRoute: String = routes.ThisOrganisationHasAlreadyBeenRegisteredController.onPageLoad().url
+  lazy val problemWithServiceRoute: String    = routes.ProblemWithServiceController.onPageLoad().url
+  lazy val alreadyRegisteredRoute: String     = routes.ThisOrganisationHasAlreadyBeenRegisteredController.onPageLoad().url
 
   def getRequest(route: String): FakeRequest[AnyContentAsEmpty.type] =
     FakeRequest(GET, route)
@@ -67,31 +78,35 @@ class BusinessMatchingControllerSpec extends SpecBase with NunjucksSupport  with
     .success
     .value
 
+  val primaryContact: PrimaryContact = PrimaryContact(
+    Seq(
+      ContactInformationForIndividual(
+        individual = IndividualDetails(firstName = "FirstName", lastName = "LastName", middleName = None),
+        email = "email@email.com",
+        phone = Some("07111222333"),
+        mobile = Some("07111222333")
+      )
+    )
+  )
 
-  val primaryContact: PrimaryContact = PrimaryContact(Seq(
-    ContactInformationForIndividual(
-      individual = IndividualDetails(firstName = "FirstName", lastName = "LastName", middleName = None),
-      email = "email@email.com", phone = Some("07111222333"), mobile = Some("07111222333"))
-  ))
-  val secondaryContact: SecondaryContact = SecondaryContact(Seq(
-    ContactInformationForOrganisation(
-      organisation = OrganisationDetails(organisationName = "Organisation Name"),
-      email = "email@email.com", phone = None, mobile = None)
-  ))
+  val secondaryContact: SecondaryContact = SecondaryContact(
+    Seq(
+      ContactInformationForOrganisation(organisation = OrganisationDetails(organisationName = "Organisation Name"),
+                                        email = "email@email.com",
+                                        phone = None,
+                                        mobile = None
+      )
+    )
+  )
 
+  def createResponseDetail(id: String): ResponseDetailForReadSubscription = ResponseDetailForReadSubscription(subscriptionID = id,
+                                                                                                              tradingName = Some("Trading Name"),
+                                                                                                              isGBUser = true,
+                                                                                                              primaryContact = primaryContact,
+                                                                                                              secondaryContact = Some(secondaryContact)
+  )
 
-  def createResponseDetail(id: String): ResponseDetailForReadSubscription = ResponseDetailForReadSubscription(
-    subscriptionID = id,
-    tradingName = Some("Trading Name"),
-    isGBUser = true,
-    primaryContact = primaryContact,
-    secondaryContact = Some(secondaryContact))
-
-  val responseCommon: ResponseCommon = ResponseCommon(
-    status = "OK",
-    statusText = None,
-    processingDate = "2020-08-09T11:23:45Z",
-    returnParameters = None)
+  val responseCommon: ResponseCommon = ResponseCommon(status = "OK", statusText = None, processingDate = "2020-08-09T11:23:45Z", returnParameters = None)
 
   when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
@@ -117,19 +132,26 @@ class BusinessMatchingControllerSpec extends SpecBase with NunjucksSupport  with
               .overrides(
                 bind[BusinessMatchingService].toInstance(mockBusinessMatchingService),
                 bind[SessionRepository].toInstance(mockSessionRepository)
-              ).build()
+              )
+              .build()
 
             when(mockBusinessMatchingService.sendIndividualMatchingInformation(any())(any(), any()))
               .thenReturn(
-                Future.successful(Right((Some(
-                  PayloadRegistrationWithIDResponse(
-                    RegisterWithIDResponse(
-                      ResponseCommon("OK", None, "", None),
-                      None
+                Future.successful(
+                  Right(
+                    (Some(
+                       PayloadRegistrationWithIDResponse(
+                         RegisterWithIDResponse(
+                           ResponseCommon("OK", None, "", None),
+                           None
+                         )
+                       )
+                     ),
+                     Some(safeId),
+                     None
                     )
                   )
-                ), Some(safeId), None)
-                ))
+                )
               )
 
             val result = route(application, getRequest(individualMatchingRoute)).value
@@ -143,7 +165,6 @@ class BusinessMatchingControllerSpec extends SpecBase with NunjucksSupport  with
 
         forAll(validSubscriptionID, validSafeID) {
           (existingSubscriptionID, safeId) =>
-
             val userAnswers = UserAnswers(userAnswersId)
               .set(DateOfBirthPage, LocalDate.now())
               .success
@@ -161,7 +182,8 @@ class BusinessMatchingControllerSpec extends SpecBase with NunjucksSupport  with
                 bind[SubscriptionConnector].toInstance(mockSubscriptionConnector),
                 bind[EmailService].toInstance(mockEmailService),
                 bind[SessionRepository].toInstance(mockSessionRepository)
-              ).build()
+              )
+              .build()
 
             val responseDetailRead: ResponseDetailForReadSubscription = createResponseDetail(existingSubscriptionID)
 
@@ -172,15 +194,21 @@ class BusinessMatchingControllerSpec extends SpecBase with NunjucksSupport  with
 
             when(mockBusinessMatchingService.sendIndividualMatchingInformation(any())(any(), any()))
               .thenReturn(
-                Future.successful(Right((Some(
-                  PayloadRegistrationWithIDResponse(
-                    RegisterWithIDResponse(
-                      ResponseCommon("OK", None, "", None),
-                      None
+                Future.successful(
+                  Right(
+                    (Some(
+                       PayloadRegistrationWithIDResponse(
+                         RegisterWithIDResponse(
+                           ResponseCommon("OK", None, "", None),
+                           None
+                         )
+                       )
+                     ),
+                     Some(safeId),
+                     Some(displaySubscriptionForDACResponse)
                     )
                   )
-                ), Some(safeId), Some(displaySubscriptionForDACResponse))
-                ))
+                )
               )
 
             when(mockSubscriptionConnector.createEnrolment(any())(any(), any()))
@@ -196,12 +224,10 @@ class BusinessMatchingControllerSpec extends SpecBase with NunjucksSupport  with
         }
       }
 
-
       "must redirect the user to registration confirmation page if user is already subscribed even if email call fails" in {
 
         forAll(validSubscriptionID, validSafeID) {
           (existingSubscriptionID, safeId) =>
-
             val userAnswers = UserAnswers(userAnswersId)
               .set(DateOfBirthPage, LocalDate.now())
               .success
@@ -219,7 +245,8 @@ class BusinessMatchingControllerSpec extends SpecBase with NunjucksSupport  with
                 bind[SubscriptionConnector].toInstance(mockSubscriptionConnector),
                 bind[EmailService].toInstance(mockEmailService),
                 bind[SessionRepository].toInstance(mockSessionRepository)
-              ).build()
+              )
+              .build()
 
             val responseDetailRead: ResponseDetailForReadSubscription = createResponseDetail(existingSubscriptionID)
 
@@ -230,15 +257,21 @@ class BusinessMatchingControllerSpec extends SpecBase with NunjucksSupport  with
 
             when(mockBusinessMatchingService.sendIndividualMatchingInformation(any())(any(), any()))
               .thenReturn(
-                Future.successful(Right((Some(
-                  PayloadRegistrationWithIDResponse(
-                    RegisterWithIDResponse(
-                      ResponseCommon("OK", None, "", None),
-                      None
+                Future.successful(
+                  Right(
+                    (Some(
+                       PayloadRegistrationWithIDResponse(
+                         RegisterWithIDResponse(
+                           ResponseCommon("OK", None, "", None),
+                           None
+                         )
+                       )
+                     ),
+                     Some(safeId),
+                     Some(displaySubscriptionForDACResponse)
                     )
                   )
-                ), Some(safeId), Some(displaySubscriptionForDACResponse))
-                ))
+                )
               )
 
             when(mockSubscriptionConnector.createEnrolment(any())(any(), any()))
@@ -258,7 +291,6 @@ class BusinessMatchingControllerSpec extends SpecBase with NunjucksSupport  with
 
         forAll(validSubscriptionID, validSafeID) {
           (existingSubscriptionID, safeId) =>
-
             val userAnswers = UserAnswers(userAnswersId)
               .set(DateOfBirthPage, LocalDate.now())
               .success
@@ -276,7 +308,8 @@ class BusinessMatchingControllerSpec extends SpecBase with NunjucksSupport  with
                 bind[SubscriptionConnector].toInstance(mockSubscriptionConnector),
                 bind[EmailService].toInstance(mockEmailService),
                 bind[SessionRepository].toInstance(mockSessionRepository)
-              ).build()
+              )
+              .build()
 
             val responseDetailRead: ResponseDetailForReadSubscription = createResponseDetail(existingSubscriptionID)
 
@@ -287,20 +320,25 @@ class BusinessMatchingControllerSpec extends SpecBase with NunjucksSupport  with
 
             when(mockBusinessMatchingService.sendIndividualMatchingInformation(any())(any(), any()))
               .thenReturn(
-                Future.successful(Right((Some(
-                  PayloadRegistrationWithIDResponse(
-                    RegisterWithIDResponse(
-                      ResponseCommon("OK", None, "", None),
-                      None
+                Future.successful(
+                  Right(
+                    (Some(
+                       PayloadRegistrationWithIDResponse(
+                         RegisterWithIDResponse(
+                           ResponseCommon("OK", None, "", None),
+                           None
+                         )
+                       )
+                     ),
+                     Some(safeId),
+                     Some(displaySubscriptionForDACResponse)
                     )
                   )
-                ), Some(safeId), Some(displaySubscriptionForDACResponse))
-                ))
+                )
               )
 
             when(mockSubscriptionConnector.createEnrolment(any())(any(), any()))
               .thenReturn(Future.successful(HttpResponse(BAD_REQUEST, "")))
-
 
             val result = route(application, getRequest(individualMatchingRoute)).value
 
@@ -329,7 +367,8 @@ class BusinessMatchingControllerSpec extends SpecBase with NunjucksSupport  with
           .overrides(
             bind[BusinessMatchingService].toInstance(mockBusinessMatchingService),
             bind[SessionRepository].toInstance(mockSessionRepository)
-          ).build()
+          )
+          .build()
 
         when(mockBusinessMatchingService.sendIndividualMatchingInformation(any())(any(), any()))
           .thenReturn(Future.successful(Right((None, None, None))))
@@ -350,11 +389,10 @@ class BusinessMatchingControllerSpec extends SpecBase with NunjucksSupport  with
               .overrides(
                 bind[BusinessMatchingService].toInstance(mockBusinessMatchingService),
                 bind[SessionRepository].toInstance(mockSessionRepository)
-              ).build()
+              )
+              .build()
 
-            val businessDetails = BusinessDetails(
-              name = "My Company",
-              address = BusinessAddress("1 Address Street", None, None, None, "NE11 1BB", "GB"))
+            val businessDetails = BusinessDetails(name = "My Company", address = BusinessAddress("1 Address Street", None, None, None, "NE11 1BB", "GB"))
 
             when(mockBusinessMatchingService.sendBusinessMatchingInformation(any())(any(), any()))
               .thenReturn(Future.successful((Some(businessDetails), Some(safeId), None)))
@@ -369,18 +407,16 @@ class BusinessMatchingControllerSpec extends SpecBase with NunjucksSupport  with
       "must create the enrolment redirect the user to registration confirmation when user already subscribed" in {
         forAll(validSubscriptionID, validSafeID, validUtr) {
           (existingSubscriptionID, safeId, utr) =>
-
             val application = applicationBuilder(userAnswers = Some(createBusinessUserAnswers(utr)))
               .overrides(
                 bind[BusinessMatchingService].toInstance(mockBusinessMatchingService),
                 bind[SubscriptionConnector].toInstance(mockSubscriptionConnector),
                 bind[EmailService].toInstance(mockEmailService),
                 bind[SessionRepository].toInstance(mockSessionRepository)
-              ).build()
+              )
+              .build()
 
-            val businessDetails = BusinessDetails(
-              name = "My Company",
-              address = BusinessAddress("1 Address Street", None, None, None, "NE11 1BB", "GB"))
+            val businessDetails = BusinessDetails(name = "My Company", address = BusinessAddress("1 Address Street", None, None, None, "NE11 1BB", "GB"))
 
             val responseDetailRead: ResponseDetailForReadSubscription = createResponseDetail(existingSubscriptionID)
 
@@ -391,7 +427,6 @@ class BusinessMatchingControllerSpec extends SpecBase with NunjucksSupport  with
 
             when(mockBusinessMatchingService.sendBusinessMatchingInformation(any())(any(), any()))
               .thenReturn(Future.successful((Some(businessDetails), Some(safeId), Some(displaySubscriptionForDACResponse))))
-
 
             when(mockSubscriptionConnector.createEnrolment(any())(any(), any()))
               .thenReturn(Future.successful(HttpResponse(NO_CONTENT, "")))
@@ -406,22 +441,19 @@ class BusinessMatchingControllerSpec extends SpecBase with NunjucksSupport  with
         }
       }
 
-
       "must create the enrolment redirect the user to registration confirmation when user already subscribed even if call to email service fails" in {
         forAll(validSubscriptionID, validSafeID, validUtr) {
           (existingSubscriptionID, safeId, utr) =>
-
             val application = applicationBuilder(userAnswers = Some(createBusinessUserAnswers(utr)))
               .overrides(
                 bind[BusinessMatchingService].toInstance(mockBusinessMatchingService),
                 bind[SubscriptionConnector].toInstance(mockSubscriptionConnector),
                 bind[EmailService].toInstance(mockEmailService),
                 bind[SessionRepository].toInstance(mockSessionRepository)
-              ).build()
+              )
+              .build()
 
-            val businessDetails = BusinessDetails(
-              name = "My Company",
-              address = BusinessAddress("1 Address Street", None, None, None, "NE11 1BB", "GB"))
+            val businessDetails = BusinessDetails(name = "My Company", address = BusinessAddress("1 Address Street", None, None, None, "NE11 1BB", "GB"))
 
             val responseDetailRead: ResponseDetailForReadSubscription = createResponseDetail(existingSubscriptionID)
 
@@ -432,7 +464,6 @@ class BusinessMatchingControllerSpec extends SpecBase with NunjucksSupport  with
 
             when(mockBusinessMatchingService.sendBusinessMatchingInformation(any())(any(), any()))
               .thenReturn(Future.successful((Some(businessDetails), Some(safeId), Some(displaySubscriptionForDACResponse))))
-
 
             when(mockSubscriptionConnector.createEnrolment(any())(any(), any()))
               .thenReturn(Future.successful(HttpResponse(NO_CONTENT, "")))
@@ -450,18 +481,16 @@ class BusinessMatchingControllerSpec extends SpecBase with NunjucksSupport  with
       "must redirect to technical difficulties page if call to create the enrolment fails when user already subscribed" in {
         forAll(validSubscriptionID, validSafeID, validUtr) {
           (existingSubscriptionID, safeId, utr) =>
-
             val application = applicationBuilder(userAnswers = Some(createBusinessUserAnswers(utr)))
               .overrides(
                 bind[BusinessMatchingService].toInstance(mockBusinessMatchingService),
                 bind[SubscriptionConnector].toInstance(mockSubscriptionConnector),
                 bind[EmailService].toInstance(mockEmailService),
                 bind[SessionRepository].toInstance(mockSessionRepository)
-              ).build()
+              )
+              .build()
 
-            val businessDetails = BusinessDetails(
-              name = "My Company",
-              address = BusinessAddress("1 Address Street", None, None, None, "NE11 1BB", "GB"))
+            val businessDetails = BusinessDetails(name = "My Company", address = BusinessAddress("1 Address Street", None, None, None, "NE11 1BB", "GB"))
 
             val responseDetailRead: ResponseDetailForReadSubscription = createResponseDetail(existingSubscriptionID)
 
@@ -472,7 +501,6 @@ class BusinessMatchingControllerSpec extends SpecBase with NunjucksSupport  with
 
             when(mockBusinessMatchingService.sendBusinessMatchingInformation(any())(any(), any()))
               .thenReturn(Future.successful((Some(businessDetails), Some(safeId), Some(displaySubscriptionForDACResponse))))
-
 
             when(mockSubscriptionConnector.createEnrolment(any())(any(), any()))
               .thenReturn(Future.successful(HttpResponse(BAD_REQUEST, "")))
@@ -487,18 +515,16 @@ class BusinessMatchingControllerSpec extends SpecBase with NunjucksSupport  with
       "must redirect to technical difficulties page if call to create the enrolment fails when user already enrolled" in {
         forAll(validSubscriptionID, validSafeID, validUtr) {
           (existingSubscriptionID, safeId, utr) =>
-
             val application = applicationBuilder(userAnswers = Some(createBusinessUserAnswers(utr)))
               .overrides(
                 bind[BusinessMatchingService].toInstance(mockBusinessMatchingService),
                 bind[SubscriptionConnector].toInstance(mockSubscriptionConnector),
                 bind[EmailService].toInstance(mockEmailService),
                 bind[SessionRepository].toInstance(mockSessionRepository)
-              ).build()
+              )
+              .build()
 
-            val businessDetails = BusinessDetails(
-              name = "My Company",
-              address = BusinessAddress("1 Address Street", None, None, None, "NE11 1BB", "GB"))
+            val businessDetails = BusinessDetails(name = "My Company", address = BusinessAddress("1 Address Street", None, None, None, "NE11 1BB", "GB"))
 
             val responseDetailRead: ResponseDetailForReadSubscription = createResponseDetail(existingSubscriptionID)
 
@@ -510,9 +536,11 @@ class BusinessMatchingControllerSpec extends SpecBase with NunjucksSupport  with
             when(mockBusinessMatchingService.sendBusinessMatchingInformation(any())(any(), any()))
               .thenReturn(Future.successful((Some(businessDetails), Some(safeId), Some(displaySubscriptionForDACResponse))))
 
-
-            when(mockSubscriptionConnector.createEnrolment(any())(any(), any())).thenReturn(Future.successful(
-              HttpResponse(BAD_REQUEST, """{"code":"MULTIPLE_ENROLMENTS_INVALID","message":"Multiple Enrolments are not valid for this service"}""")))
+            when(mockSubscriptionConnector.createEnrolment(any())(any(), any())).thenReturn(
+              Future.successful(
+                HttpResponse(BAD_REQUEST, """{"code":"MULTIPLE_ENROLMENTS_INVALID","message":"Multiple Enrolments are not valid for this service"}""")
+              )
+            )
 
             val result = route(application, getRequest(businessMatchingRoute)).value
 
@@ -539,11 +567,10 @@ class BusinessMatchingControllerSpec extends SpecBase with NunjucksSupport  with
               .overrides(
                 bind[BusinessMatchingService].toInstance(mockBusinessMatchingService),
                 bind[SessionRepository].toInstance(mockSessionRepository)
-              ).build()
+              )
+              .build()
 
-            val businessDetails = BusinessDetails(
-              name = "My Company",
-              address = BusinessAddress("1 Address Street", None, None, None, "NE11 1BB", "GB"))
+            val businessDetails = BusinessDetails(name = "My Company", address = BusinessAddress("1 Address Street", None, None, None, "NE11 1BB", "GB"))
 
             when(mockBusinessMatchingService.sendBusinessMatchingInformation(any())(any(), any()))
               .thenReturn(Future.successful((Some(businessDetails), Some(safeId), None)))
@@ -565,7 +592,8 @@ class BusinessMatchingControllerSpec extends SpecBase with NunjucksSupport  with
               .overrides(
                 bind[BusinessMatchingService].toInstance(mockBusinessMatchingService),
                 bind[SessionRepository].toInstance(mockSessionRepository)
-              ).build()
+              )
+              .build()
 
             when(mockBusinessMatchingService.sendBusinessMatchingInformation(any())(any(), any()))
               .thenReturn(Future.successful((None, None, None)))
@@ -587,7 +615,8 @@ class BusinessMatchingControllerSpec extends SpecBase with NunjucksSupport  with
               .overrides(
                 bind[BusinessMatchingService].toInstance(mockBusinessMatchingService),
                 bind[SessionRepository].toInstance(mockSessionRepository)
-              ).build()
+              )
+              .build()
 
             when(mockBusinessMatchingService.sendBusinessMatchingInformation(any())(any(), any()))
               .thenReturn(Future.failed(new Exception))
@@ -616,7 +645,8 @@ class BusinessMatchingControllerSpec extends SpecBase with NunjucksSupport  with
           .overrides(
             bind[BusinessMatchingService].toInstance(mockBusinessMatchingService),
             bind[SessionRepository].toInstance(mockSessionRepository)
-          ).build()
+          )
+          .build()
 
         when(mockBusinessMatchingService.sendBusinessMatchingInformation(any())(any(), any()))
           .thenReturn(Future.successful((None, None, None)))

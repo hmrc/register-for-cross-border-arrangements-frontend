@@ -39,13 +39,12 @@ import scala.concurrent.Future
 
 class HaveSecondContactControllerSpec extends SpecBase with NunjucksSupport with JsonMatchers {
 
-  def onwardRoute: Call = Call("GET", "/foo")
+  def onwardRoute: Call                        = Call("GET", "/foo")
   val mockSessionRepository: SessionRepository = mock[SessionRepository]
   val mockFrontendAppConfig: FrontendAppConfig = mock[FrontendAppConfig]
 
-  val formProvider = new HaveSecondContactFormProvider()
+  val formProvider        = new HaveSecondContactFormProvider()
   val form: Form[Boolean] = formProvider()
-
 
   lazy val haveSecondContactRoute: String = routes.HaveSecondContactController.onPageLoad(NormalMode).url
 
@@ -58,11 +57,11 @@ class HaveSecondContactControllerSpec extends SpecBase with NunjucksSupport with
       when(mockRenderer.render(any(), any())(any()))
         .thenReturn(Future.successful(Html("")))
 
-      val userAnswers = UserAnswers(userAnswersId).set(ContactNamePage, name).success.value
-      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
-      val request = FakeRequest(GET, haveSecondContactRoute)
+      val userAnswers    = UserAnswers(userAnswersId).set(ContactNamePage, name).success.value
+      val application    = applicationBuilder(userAnswers = Some(userAnswers)).build()
+      val request        = FakeRequest(GET, haveSecondContactRoute)
       val templateCaptor = ArgumentCaptor.forClass(classOf[String])
-      val jsonCaptor = ArgumentCaptor.forClass(classOf[JsObject])
+      val jsonCaptor     = ArgumentCaptor.forClass(classOf[JsObject])
 
       val result = route(application, request).value
 
@@ -89,13 +88,15 @@ class HaveSecondContactControllerSpec extends SpecBase with NunjucksSupport with
 
       val userAnswers = UserAnswers(userAnswersId)
         .set(ContactNamePage, name)
-        .success.value
+        .success
+        .value
         .set(HaveSecondContactPage, true)
-        .success.value
-      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
-      val request = FakeRequest(GET, haveSecondContactRoute)
+        .success
+        .value
+      val application    = applicationBuilder(userAnswers = Some(userAnswers)).build()
+      val request        = FakeRequest(GET, haveSecondContactRoute)
       val templateCaptor = ArgumentCaptor.forClass(classOf[String])
-      val jsonCaptor = ArgumentCaptor.forClass(classOf[JsObject])
+      val jsonCaptor     = ArgumentCaptor.forClass(classOf[JsObject])
 
       val result = route(application, request).value
 
@@ -133,7 +134,7 @@ class HaveSecondContactControllerSpec extends SpecBase with NunjucksSupport with
           .build()
 
       val request =
-       FakeRequest(GET, haveSecondContactRoute)
+        FakeRequest(GET, haveSecondContactRoute)
 
       val result = route(application, request).value
 
@@ -177,11 +178,11 @@ class HaveSecondContactControllerSpec extends SpecBase with NunjucksSupport with
 
       val userAnswers = UserAnswers(userAnswersId).set(ContactNamePage, name).success.value
 
-      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
-      val request = FakeRequest(POST, haveSecondContactRoute).withFormUrlEncodedBody(("confirm", ""))
-      val boundForm = form.bind(Map("confirm" -> ""))
+      val application    = applicationBuilder(userAnswers = Some(userAnswers)).build()
+      val request        = FakeRequest(POST, haveSecondContactRoute).withFormUrlEncodedBody(("confirm", ""))
+      val boundForm      = form.bind(Map("confirm" -> ""))
       val templateCaptor = ArgumentCaptor.forClass(classOf[String])
-      val jsonCaptor = ArgumentCaptor.forClass(classOf[JsObject])
+      val jsonCaptor     = ArgumentCaptor.forClass(classOf[JsObject])
 
       val result = route(application, request).value
 

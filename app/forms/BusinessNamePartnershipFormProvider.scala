@@ -23,11 +23,9 @@ import utils.RegexConstants
 
 class BusinessNamePartnershipFormProvider @Inject() extends Mappings with RegexConstants {
   private val length = 105
+
   def apply(): Form[String] =
     Form(
-      "value" ->  maxLengthText(
-        "businessName.partnership.error.required",
-          "businessName.partnership.error.length",
-                    length)
+      "value" -> maxLengthText("businessName.partnership.error.required", "businessName.partnership.error.length", length)
     )
 }

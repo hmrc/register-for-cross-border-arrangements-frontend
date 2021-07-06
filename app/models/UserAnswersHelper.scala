@@ -22,10 +22,13 @@ import play.api.libs.json.{Reads, Writes}
 import scala.concurrent.Future
 
 object UserAnswersHelper {
-   def updateUserAnswersIfValueChanged[A](userAnswers: UserAnswers, page: QuestionPage[A], value: A)
-                                         (implicit rds: Reads[A], wrs: Writes[A]): Future[UserAnswers] =
+
+  def updateUserAnswersIfValueChanged[A](userAnswers: UserAnswers, page: QuestionPage[A], value: A)(implicit
+    rds: Reads[A],
+    wrs: Writes[A]
+  ): Future[UserAnswers] =
     userAnswers.get(page) match {
-      case Some(oldValue)  if oldValue == value => Future.successful(userAnswers)
-      case _ =>  Future.fromTry(userAnswers.set(page, value))
+      case Some(oldValue) if oldValue == value => Future.successful(userAnswers)
+      case _                                   => Future.fromTry(userAnswers.set(page, value))
     }
 }

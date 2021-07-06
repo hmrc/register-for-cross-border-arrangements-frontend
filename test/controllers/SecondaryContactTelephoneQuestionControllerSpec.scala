@@ -41,7 +41,7 @@ class SecondaryContactTelephoneQuestionControllerSpec extends SpecBase with Nunj
   def onwardRoute = Call("GET", "/foo")
 
   val formProvider = new SecondaryContactTelephoneQuestionFormProvider()
-  val form = formProvider()
+  val form         = formProvider()
 
   lazy val secondaryContactTelephoneQuestionRoute = routes.SecondaryContactTelephoneQuestionController.onPageLoad(NormalMode).url
 
@@ -52,10 +52,10 @@ class SecondaryContactTelephoneQuestionControllerSpec extends SpecBase with Nunj
       when(mockRenderer.render(any(), any())(any()))
         .thenReturn(Future.successful(Html("")))
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
-      val request = FakeRequest(GET, secondaryContactTelephoneQuestionRoute)
+      val application    = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val request        = FakeRequest(GET, secondaryContactTelephoneQuestionRoute)
       val templateCaptor = ArgumentCaptor.forClass(classOf[String])
-      val jsonCaptor = ArgumentCaptor.forClass(classOf[JsObject])
+      val jsonCaptor     = ArgumentCaptor.forClass(classOf[JsObject])
 
       val result = route(application, request).value
 
@@ -80,11 +80,11 @@ class SecondaryContactTelephoneQuestionControllerSpec extends SpecBase with Nunj
       when(mockRenderer.render(any(), any())(any()))
         .thenReturn(Future.successful(Html("")))
 
-      val userAnswers = UserAnswers(userAnswersId).set(SecondaryContactTelephoneQuestionPage, true).success.value
-      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
-      val request = FakeRequest(GET, secondaryContactTelephoneQuestionRoute)
+      val userAnswers    = UserAnswers(userAnswersId).set(SecondaryContactTelephoneQuestionPage, true).success.value
+      val application    = applicationBuilder(userAnswers = Some(userAnswers)).build()
+      val request        = FakeRequest(GET, secondaryContactTelephoneQuestionRoute)
       val templateCaptor = ArgumentCaptor.forClass(classOf[String])
-      val jsonCaptor = ArgumentCaptor.forClass(classOf[JsObject])
+      val jsonCaptor     = ArgumentCaptor.forClass(classOf[JsObject])
 
       val result = route(application, request).value
 
@@ -113,7 +113,6 @@ class SecondaryContactTelephoneQuestionControllerSpec extends SpecBase with Nunj
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
       val mockFrontendAppConfig = mock[FrontendAppConfig]
 
-
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers))
           .overrides(
@@ -140,11 +139,11 @@ class SecondaryContactTelephoneQuestionControllerSpec extends SpecBase with Nunj
       when(mockRenderer.render(any(), any())(any()))
         .thenReturn(Future.successful(Html("")))
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
-      val request = FakeRequest(POST, secondaryContactTelephoneQuestionRoute).withFormUrlEncodedBody(("value", ""))
-      val boundForm = form.bind(Map("value" -> ""))
+      val application    = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val request        = FakeRequest(POST, secondaryContactTelephoneQuestionRoute).withFormUrlEncodedBody(("value", ""))
+      val boundForm      = form.bind(Map("value" -> ""))
       val templateCaptor = ArgumentCaptor.forClass(classOf[String])
-      val jsonCaptor = ArgumentCaptor.forClass(classOf[JsObject])
+      val jsonCaptor     = ArgumentCaptor.forClass(classOf[JsObject])
 
       val result = route(application, request).value
 

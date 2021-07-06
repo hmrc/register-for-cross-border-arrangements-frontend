@@ -25,19 +25,20 @@ object SourceDetail {
 }
 
 case class ErrorDetail(
-                        timestamp: String,
-                        correlationId: String,
-                        errorCode: String,
-                        errorMessage: String,
-                        source: String,
-                        sourceFaultDetail: SourceDetail
-                      )
+  timestamp: String,
+  correlationId: String,
+  errorCode: String,
+  errorMessage: String,
+  source: String,
+  sourceFaultDetail: SourceDetail
+)
 
 object ErrorDetail {
   implicit val format: OFormat[ErrorDetail] = Json.format[ErrorDetail]
 }
 
 case class RegisterWithIDErrorResponse(errorDetail: ErrorDetail)
+
 object RegisterWithIDErrorResponse {
   implicit val format: OFormat[RegisterWithIDErrorResponse] = Json.format[RegisterWithIDErrorResponse]
 }

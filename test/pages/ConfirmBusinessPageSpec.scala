@@ -29,4 +29,3 @@ class ConfirmBusinessPageSpec extends PageBehaviours {
     beRemovable[Boolean](ConfirmBusinessPage)
   }
 }
-

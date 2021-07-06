@@ -23,9 +23,9 @@ import utils.RegexConstants
 class ContactTelephoneNumberFormProviderSpec extends StringFieldBehaviours with RegexConstants {
 
   val requiredKey = "contactTelephoneNumber.error.required"
-  val lengthKey = "contactTelephoneNumber.error.invalid"
-  val invalidKey = "contactTelephoneNumber.error.invalid"
-  val maxLength = 50
+  val lengthKey   = "contactTelephoneNumber.error.invalid"
+  val invalidKey  = "contactTelephoneNumber.error.invalid"
+  val maxLength   = 50
 
   val form = new ContactTelephoneNumberFormProvider()()
 

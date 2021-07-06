@@ -23,15 +23,15 @@ import play.api.data.FormError
 class WhatIsYourAddressFormProviderSpec extends StringFieldBehaviours {
 
   val countries = Seq(Country("valid", "AD", "Andorra"))
-  val form = new WhatIsYourAddressFormProvider()(countries)
+  val form      = new WhatIsYourAddressFormProvider()(countries)
   val maxLength = 35
 
   ".addressLine1" - {
 
-    val fieldName = "addressLine1"
+    val fieldName   = "addressLine1"
     val requiredKey = "whatIsYourAddress.error.addressLine1.required"
-    val invalidKey = "whatIsYourAddress.error.addressLine1.invalid"
-    val lengthKey = "whatIsYourAddress.error.addressLine1.length"
+    val invalidKey  = "whatIsYourAddress.error.addressLine1.invalid"
+    val lengthKey   = "whatIsYourAddress.error.addressLine1.length"
 
     behave like fieldThatBindsValidData(
       form,
@@ -68,9 +68,9 @@ class WhatIsYourAddressFormProviderSpec extends StringFieldBehaviours {
 
   ".addressLine2" - {
 
-    val fieldName = "addressLine2"
+    val fieldName  = "addressLine2"
     val invalidKey = "whatIsYourAddress.error.addressLine2.invalid"
-    val lengthKey = "whatIsYourAddress.error.addressLine2.length"
+    val lengthKey  = "whatIsYourAddress.error.addressLine2.length"
 
     behave like fieldThatBindsValidData(
       form,
@@ -95,10 +95,10 @@ class WhatIsYourAddressFormProviderSpec extends StringFieldBehaviours {
 
   ".addressLine3" - {
 
-    val fieldName = "addressLine3"
+    val fieldName   = "addressLine3"
     val requiredKey = "whatIsYourAddress.error.addressLine3.required"
-    val invalidKey = "whatIsYourAddress.error.addressLine3.invalid"
-    val lengthKey = "whatIsYourAddress.error.addressLine3.length"
+    val invalidKey  = "whatIsYourAddress.error.addressLine3.invalid"
+    val lengthKey   = "whatIsYourAddress.error.addressLine3.length"
 
     behave like fieldThatBindsValidData(
       form,
@@ -135,9 +135,9 @@ class WhatIsYourAddressFormProviderSpec extends StringFieldBehaviours {
 
   ".addressLine4" - {
 
-    val fieldName = "addressLine4"
+    val fieldName  = "addressLine4"
     val invalidKey = "whatIsYourAddress.error.addressLine4.invalid"
-    val lengthKey = "whatIsYourAddress.error.addressLine4.length"
+    val lengthKey  = "whatIsYourAddress.error.addressLine4.length"
 
     behave like fieldThatBindsValidData(
       form,
@@ -162,9 +162,9 @@ class WhatIsYourAddressFormProviderSpec extends StringFieldBehaviours {
 
   ".postCode" - {
 
-    val fieldName = "postCode"
-    val requiredKey = "whatIsYourAddress.error.postcode.required"
-    val lengthKey = "whatIsYourAddress.error.postcode.length"
+    val fieldName         = "postCode"
+    val requiredKey       = "whatIsYourAddress.error.postcode.required"
+    val lengthKey         = "whatIsYourAddress.error.postcode.length"
     val postCodeMaxLength = 10
 
     behave like fieldThatBindsValidData(

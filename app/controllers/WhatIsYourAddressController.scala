@@ -34,36 +34,36 @@ import utils.CountryListFactory
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class WhatIsYourAddressController @Inject()(
-    override val messagesApi: MessagesApi,
-    countryListFactory: CountryListFactory,
-    sessionRepository: SessionRepository,
-    navigator: Navigator,
-    identify: IdentifierAction,
-    notEnrolled: NotEnrolledForDAC6Action,
-    getData: DataRetrievalAction,
-    requireData: DataRequiredAction,
-    formProvider: WhatIsYourAddressFormProvider,
-    val controllerComponents: MessagesControllerComponents,
-    renderer: Renderer
-)(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with NunjucksSupport {
-
-
+class WhatIsYourAddressController @Inject() (
+  override val messagesApi: MessagesApi,
+  countryListFactory: CountryListFactory,
+  sessionRepository: SessionRepository,
+  navigator: Navigator,
+  identify: IdentifierAction,
+  notEnrolled: NotEnrolledForDAC6Action,
+  getData: DataRetrievalAction,
+  requireData: DataRequiredAction,
+  formProvider: WhatIsYourAddressFormProvider,
+  val controllerComponents: MessagesControllerComponents,
+  renderer: Renderer
+)(implicit ec: ExecutionContext)
+    extends FrontendBaseController
+    with I18nSupport
+    with NunjucksSupport {
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen notEnrolled andThen getData andThen requireData).async {
     implicit request =>
-
       val countries = countryListFactory.getCountryList.getOrElse(throw new Exception("Cannot retrieve country list"))
-      val form = formProvider(countries)
+      val form      = formProvider(countries)
 
       val preparedForm = request.userAnswers.get(WhatIsYourAddressPage) match {
-        case None => form
+        case None        => form
         case Some(value) => form.fill(value)
       }
 
       val json = Json.obj(
-        "form"   -> preparedForm,
-        "mode"   -> mode,
+        "form"      -> preparedForm,
+        "mode"      -> mode,
         "countries" -> countryJsonList(preparedForm.data, countries.filter(_ != countryListFactory.uk))
       )
 
@@ -74,7 +74,7 @@ class WhatIsYourAddressController @Inject()(
     def containsCountry(country: Country): Boolean =
       value.get("country") match {
         case Some(countrycode) => countrycode == country.code
-        case _ => false
+        case _                 => false
       }
 
     val countryJsonList = countries.map {
@@ -87,35 +87,35 @@ class WhatIsYourAddressController @Inject()(
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen notEnrolled andThen getData andThen requireData).async {
     implicit request =>
-
       val countries = countryListFactory.getCountryList.getOrElse(throw new Exception("Cannot retrieve country list"))
-      val form = formProvider(countries)
+      val form      = formProvider(countries)
 
-      form.bindFromRequest().fold(
-        formWithErrors => {
+      form
+        .bindFromRequest()
+        .fold(
+          formWithErrors => {
 
-          val json = Json.obj(
-            "form"   -> formWithErrors,
-            "mode"   -> mode,
-            "countries" -> countryJsonList(formWithErrors.data, countries.filter(_ != countryListFactory.uk))
-          )
+            val json = Json.obj(
+              "form"      -> formWithErrors,
+              "mode"      -> mode,
+              "countries" -> countryJsonList(formWithErrors.data, countries.filter(_ != countryListFactory.uk))
+            )
 
-          renderer.render("whatIsYourAddress.njk", json).map(BadRequest(_))
-        },
-        value => {
-          val redirectUsers = redirectToSummary(value, WhatIsYourAddressPage, mode, request.userAnswers)
+            renderer.render("whatIsYourAddress.njk", json).map(BadRequest(_))
+          },
+          value => {
+            val redirectUsers = redirectToSummary(value, WhatIsYourAddressPage, mode, request.userAnswers)
 
-          for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(WhatIsYourAddressPage, value))
-            _              <- sessionRepository.set(updatedAnswers)
-          } yield {
-            if (redirectUsers) {
-              Redirect(routes.CheckYourAnswersController.onPageLoad())
-            } else {
-              Redirect(navigator.nextPage(WhatIsYourAddressPage, mode, updatedAnswers))
-            }
+            for {
+              updatedAnswers <- Future.fromTry(request.userAnswers.set(WhatIsYourAddressPage, value))
+              _              <- sessionRepository.set(updatedAnswers)
+            } yield
+              if (redirectUsers) {
+                Redirect(routes.CheckYourAnswersController.onPageLoad())
+              } else {
+                Redirect(navigator.nextPage(WhatIsYourAddressPage, mode, updatedAnswers))
+              }
           }
-        }
-      )
+        )
   }
 }

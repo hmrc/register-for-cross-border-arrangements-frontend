@@ -25,13 +25,23 @@ import utils.RegexConstants
 
 class NonUkNameFormProvider @Inject() extends Mappings with RegexConstants {
 
- private val maxLength = 35
+  private val maxLength = 35
 
   def apply(): Form[Name] =
-  Form(
-    mapping(
-      "firstName" -> validatedText("nonUkName.error.firstName.required", "nonUkName.error.firstName.invalid", "nonUkName.error.firstName.length", apiNameRegex, maxLength),
-      "secondName" -> validatedText("nonUkName.error.secondName.required", "nonUkName.error.secondName.invalid", "nonUkName.error.secondName.length", apiNameRegex, maxLength)
-    )(Name.apply)(Name.unapply)
-  )
+    Form(
+      mapping(
+        "firstName" -> validatedText("nonUkName.error.firstName.required",
+                                     "nonUkName.error.firstName.invalid",
+                                     "nonUkName.error.firstName.length",
+                                     apiNameRegex,
+                                     maxLength
+        ),
+        "secondName" -> validatedText("nonUkName.error.secondName.required",
+                                      "nonUkName.error.secondName.invalid",
+                                      "nonUkName.error.secondName.length",
+                                      apiNameRegex,
+                                      maxLength
+        )
+      )(Name.apply)(Name.unapply)
+    )
 }

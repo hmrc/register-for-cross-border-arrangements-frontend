@@ -23,9 +23,9 @@ class OrganisationTypeSpec extends SpecBase {
 
   "OrganisationType reads correct BusinessType" - {
     "when a BusinessType is provided" in {
-      OrganisationType(BusinessType.Partnership).value mustBe("Partnership")
-      OrganisationType(BusinessType.CorporateBody).value mustBe("Corporate Body")
-      OrganisationType(BusinessType.UnIncorporatedBody).value mustBe("Unincorporated Body")
+      OrganisationType(BusinessType.Partnership).value mustBe "Partnership"
+      OrganisationType(BusinessType.CorporateBody).value mustBe "Corporate Body"
+      OrganisationType(BusinessType.UnIncorporatedBody).value mustBe "Unincorporated Body"
       OrganisationType(BusinessType.LimitedLiability).value mustBe "LLP"
       OrganisationType(BusinessType.NotSpecified).value mustBe "Not Specified"
     }
@@ -41,7 +41,7 @@ class OrganisationTypeSpec extends SpecBase {
       }
     }
     "must throw an JsResultException in response to an invalid string value" in {
-      val ex = the [JsResultException] thrownBy JsString("April").as[OrganisationType](OrganisationType.formats)
+      val ex = the[JsResultException] thrownBy JsString("April").as[OrganisationType](OrganisationType.formats)
       ex.getMessage must include("Invalid OrganisationType value")
     }
   }

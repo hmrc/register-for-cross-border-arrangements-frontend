@@ -20,7 +20,18 @@ import base.SpecBase
 import connectors.SubscriptionConnector
 import models.RegistrationType.{Business, Individual}
 import models.error.RegisterError.UnableToCreateEMTPSubscriptionError
-import models.{Address, BusinessType, Country, CreateSubscriptionForDACResponse, Name, RegistrationType, ResponseCommon, ResponseDetailForDACSubscription, SubscriptionForDACResponse, UserAnswers}
+import models.{
+  Address,
+  BusinessType,
+  Country,
+  CreateSubscriptionForDACResponse,
+  Name,
+  RegistrationType,
+  ResponseCommon,
+  ResponseDetailForDACSubscription,
+  SubscriptionForDACResponse,
+  UserAnswers
+}
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
 import generators.Generators
@@ -42,22 +53,23 @@ import scala.concurrent.Future
 
 class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach with Generators {
 
-  val address: Address = Address("value 1", Some("value 2"), "value 3", Some("value 4"), Some("XX9 9XX"),
-    Country("valid","GB","United Kingdom"))
-  val nino: Nino = new Generator().nextNino
+  val address: Address   = Address("value 1", Some("value 2"), "value 3", Some("value 4"), Some("XX9 9XX"), Country("valid", "GB", "United Kingdom"))
+  val nino: Nino         = new Generator().nextNino
   val singleName: String = "Name Name-Name"
-  val name: Name = Name("FirstName", "LastName")
-  val email: String = "email@email.com"
-  val dacSubscriptionResponse: CreateSubscriptionForDACResponse = CreateSubscriptionForDACResponse(
-    SubscriptionForDACResponse(
-      responseCommon = ResponseCommon("OK", None, "2020-09-23T16:12:11Z", None),
-      responseDetail = ResponseDetailForDACSubscription("XADAC0000123456")))
+  val name: Name         = Name("FirstName", "LastName")
+  val email: String      = "email@email.com"
 
-  val mockEmailService: EmailService = mock[EmailService]
+  val dacSubscriptionResponse: CreateSubscriptionForDACResponse = CreateSubscriptionForDACResponse(
+    SubscriptionForDACResponse(responseCommon = ResponseCommon("OK", None, "2020-09-23T16:12:11Z", None),
+                               responseDetail = ResponseDetailForDACSubscription("XADAC0000123456")
+    )
+  )
+
+  val mockEmailService: EmailService                   = mock[EmailService]
   val mockSubscriptionConnector: SubscriptionConnector = mock[SubscriptionConnector]
-  val mockRegistrationService: RegistrationService = mock[RegistrationService]
-  val mockSessionRepository: SessionRepository = mock[SessionRepository]
-  val mockAuditService : AuditService = mock[AuditService]
+  val mockRegistrationService: RegistrationService     = mock[RegistrationService]
+  val mockSessionRepository: SessionRepository         = mock[SessionRepository]
+  val mockAuditService: AuditService                   = mock[AuditService]
 
   val safeID = validSafeID.sample.get
 
@@ -96,34 +108,47 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach wi
 
       val userAnswers: UserAnswers = UserAnswers(userAnswersId)
         .set(BusinessTypePage, BusinessType.UnIncorporatedBody)
-        .success.value
+        .success
+        .value
         .set(BusinessAddressPage, address)
-        .success.value
+        .success
+        .value
         .set(RetrievedNamePage, "My Business")
-        .success.value
+        .success
+        .value
         .set(ConfirmBusinessPage, true)
-        .success.value
+        .success
+        .value
         .set(ContactNamePage, singleName)
-        .success.value
+        .success
+        .value
         .set(ContactEmailAddressPage, email)
-        .success.value
+        .success
+        .value
         .set(TelephoneNumberQuestionPage, false)
-        .success.value
+        .success
+        .value
         .set(HaveSecondContactPage, true)
-        .success.value
+        .success
+        .value
         .set(SecondaryContactNamePage, "Secondary Contact")
-        .success.value
+        .success
+        .value
         .set(SecondaryContactEmailAddressPage, email)
-        .success.value
+        .success
+        .value
         .set(SecondaryContactTelephoneQuestionPage, true)
-        .success.value
+        .success
+        .value
         .set(SecondaryContactTelephoneNumberPage, "07888888888")
-        .success.value
+        .success
+        .value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers))
         .overrides(
           bind[SessionRepository].toInstance(mockSessionRepository)
-        ).build()
+        )
+        .build()
 
       val request = FakeRequest(GET, routes.CheckYourAnswersController.onPageLoad().url)
 
@@ -132,14 +157,14 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach wi
       status(result) mustEqual OK
 
       val templateCaptor = ArgumentCaptor.forClass(classOf[String])
-      val jsonCaptor = ArgumentCaptor.forClass(classOf[JsObject])
+      val jsonCaptor     = ArgumentCaptor.forClass(classOf[JsObject])
 
       verify(mockRenderer, times(1)).render(templateCaptor.capture(), jsonCaptor.capture())(any())
 
-      val json = jsonCaptor.getValue
-      val header = (json \ "header").toString
+      val json            = jsonCaptor.getValue
+      val header          = (json \ "header").toString
       val businessDetails = (json \ "businessDetailsList").toString
-      val contactDetails = (json \ "contactDetailsList").toString
+      val contactDetails  = (json \ "contactDetailsList").toString
 
       templateCaptor.getValue mustEqual "check-your-answers.njk"
       header.contains("checkYourAnswers.businessDetails.h2") mustBe true
@@ -163,26 +188,35 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach wi
 
       val userAnswers: UserAnswers = UserAnswers(userAnswersId)
         .set(DoYouHaveUTRPage, false)
-        .success.value
+        .success
+        .value
         .set(RegistrationTypePage, Individual)
-        .success.value
+        .success
+        .value
         .set(DoYouHaveANationalInsuranceNumberPage, true)
-        .success.value
+        .success
+        .value
         .set(NinoPage, nino)
-        .success.value
+        .success
+        .value
         .set(NamePage, name)
-        .success.value
+        .success
+        .value
         .set(DateOfBirthPage, LocalDate.now())
-        .success.value
+        .success
+        .value
         .set(ContactEmailAddressPage, email)
-        .success.value
+        .success
+        .value
         .set(TelephoneNumberQuestionPage, false)
-        .success.value
+        .success
+        .value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers))
         .overrides(
           bind[SessionRepository].toInstance(mockSessionRepository)
-        ).build()
+        )
+        .build()
 
       val request = FakeRequest(GET, routes.CheckYourAnswersController.onPageLoad().url)
 
@@ -191,14 +225,14 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach wi
       status(result) mustEqual OK
 
       val templateCaptor = ArgumentCaptor.forClass(classOf[String])
-      val jsonCaptor = ArgumentCaptor.forClass(classOf[JsObject])
+      val jsonCaptor     = ArgumentCaptor.forClass(classOf[JsObject])
 
       verify(mockRenderer, times(1)).render(templateCaptor.capture(), jsonCaptor.capture())(any())
 
-      val json = jsonCaptor.getValue
-      val header = (json \ "header").toString
+      val json            = jsonCaptor.getValue
+      val header          = (json \ "header").toString
       val businessDetails = (json \ "businessDetailsList").toString
-      val contactDetails = (json \ "contactDetailsList").toString
+      val contactDetails  = (json \ "contactDetailsList").toString
 
       templateCaptor.getValue mustEqual "check-your-answers.njk"
       header.contains("checkYourAnswers.individualDetails.h2") mustBe true
@@ -221,28 +255,38 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach wi
 
       val userAnswers: UserAnswers = UserAnswers(userAnswersId)
         .set(DoYouHaveUTRPage, false)
-        .success.value
+        .success
+        .value
         .set(RegistrationTypePage, RegistrationType.values.head)
-        .success.value
+        .success
+        .value
         .set(BusinessWithoutIDNamePage, "Business name")
-        .success.value
+        .success
+        .value
         .set(BusinessAddressPage, address)
-        .success.value
+        .success
+        .value
         .set(ContactNamePage, singleName)
-        .success.value
+        .success
+        .value
         .set(ContactEmailAddressPage, email)
-        .success.value
+        .success
+        .value
         .set(TelephoneNumberQuestionPage, true)
-        .success.value
+        .success
+        .value
         .set(ContactTelephoneNumberPage, "07111111111")
-        .success.value
+        .success
+        .value
         .set(HaveSecondContactPage, false)
-        .success.value
+        .success
+        .value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers))
         .overrides(
           bind[SessionRepository].toInstance(mockSessionRepository)
-        ).build()
+        )
+        .build()
 
       val request = FakeRequest(GET, routes.CheckYourAnswersController.onPageLoad().url)
 
@@ -251,14 +295,14 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach wi
       status(result) mustEqual OK
 
       val templateCaptor = ArgumentCaptor.forClass(classOf[String])
-      val jsonCaptor = ArgumentCaptor.forClass(classOf[JsObject])
+      val jsonCaptor     = ArgumentCaptor.forClass(classOf[JsObject])
 
       verify(mockRenderer, times(1)).render(templateCaptor.capture(), jsonCaptor.capture())(any())
 
-      val json = jsonCaptor.getValue
-      val header = (json \ "header").toString
+      val json            = jsonCaptor.getValue
+      val header          = (json \ "header").toString
       val businessDetails = (json \ "businessDetailsList").toString
-      val contactDetails = (json \ "contactDetailsList").toString
+      val contactDetails  = (json \ "contactDetailsList").toString
 
       templateCaptor.getValue mustEqual "check-your-answers.njk"
       header.contains("checkYourAnswers.businessDetails.h2") mustBe true
@@ -282,26 +326,35 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach wi
 
       val userAnswers: UserAnswers = UserAnswers(userAnswersId)
         .set(DoYouHaveUTRPage, false)
-        .success.value
+        .success
+        .value
         .set(DoYouHaveANationalInsuranceNumberPage, false)
-        .success.value
+        .success
+        .value
         .set(NonUkNamePage, name)
-        .success.value
+        .success
+        .value
         .set(DateOfBirthPage, LocalDate.now())
-        .success.value
+        .success
+        .value
         .set(DoYouLiveInTheUKPage, true)
-        .success.value
+        .success
+        .value
         .set(WhatIsYourAddressUkPage, address)
-        .success.value
+        .success
+        .value
         .set(ContactEmailAddressPage, email)
-        .success.value
+        .success
+        .value
         .set(TelephoneNumberQuestionPage, false)
-        .success.value
+        .success
+        .value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers))
         .overrides(
           bind[SessionRepository].toInstance(mockSessionRepository)
-        ).build()
+        )
+        .build()
 
       val request = FakeRequest(GET, routes.CheckYourAnswersController.onPageLoad().url)
 
@@ -310,14 +363,14 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach wi
       status(result) mustEqual OK
 
       val templateCaptor = ArgumentCaptor.forClass(classOf[String])
-      val jsonCaptor = ArgumentCaptor.forClass(classOf[JsObject])
+      val jsonCaptor     = ArgumentCaptor.forClass(classOf[JsObject])
 
       verify(mockRenderer, times(1)).render(templateCaptor.capture(), jsonCaptor.capture())(any())
 
-      val json = jsonCaptor.getValue
-      val header = (json \ "header").toString
+      val json            = jsonCaptor.getValue
+      val header          = (json \ "header").toString
       val businessDetails = (json \ "businessDetailsList").toString
-      val contactDetails = (json \ "contactDetailsList").toString
+      val contactDetails  = (json \ "contactDetailsList").toString
 
       templateCaptor.getValue mustEqual "check-your-answers.njk"
       header.contains("checkYourAnswers.individualDetails.h2") mustBe true
@@ -338,7 +391,8 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach wi
       val application = applicationBuilder(userAnswers = None)
         .overrides(
           bind[SessionRepository].toInstance(mockSessionRepository)
-        ).build()
+        )
+        .build()
 
       val request = FakeRequest(GET, routes.CheckYourAnswersController.onPageLoad().url)
 
@@ -357,24 +411,30 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach wi
 
         val userAnswers: UserAnswers = UserAnswers(userAnswersId)
           .set(DoYouHaveUTRPage, false)
-          .success.value
+          .success
+          .value
           .set(RegistrationTypePage, Individual)
-          .success.value
+          .success
+          .value
           .set(DoYouHaveANationalInsuranceNumberPage, true)
-          .success.value
+          .success
+          .value
           .set(SafeIDPage, "")
-          .success.value
+          .success
+          .value
           .set(ContactEmailAddressPage, "")
-          .success.value
+          .success
+          .value
           .set(NamePage, Name("", ""))
-          .success.value
+          .success
+          .value
 
         val application = applicationBuilder(userAnswers = Some(userAnswers))
           .overrides(
             bind[EmailService].toInstance(mockEmailService),
             bind[SubscriptionConnector].toInstance(mockSubscriptionConnector),
-            bind[SessionRepository]toInstance(mockSessionRepository),
-            bind[AuditService]toInstance(mockAuditService)
+            bind[SessionRepository] toInstance mockSessionRepository,
+            bind[AuditService] toInstance mockAuditService
           )
           .build()
 
@@ -390,11 +450,11 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach wi
         when(mockEmailService.sendEmail(any())(any()))
           .thenReturn(Future.successful(Some(HttpResponse(OK, ""))))
 
-        when(mockAuditService.sendAuditEvent(any(),any(),any(),any())(any(),any()))
+        when(mockAuditService.sendAuditEvent(any(), any(), any(), any())(any(), any()))
           .thenReturn(Future.successful(AuditResult.Success))
 
         val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit().url)
-        val result = route(application, request).value
+        val result  = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result) mustBe Some("/register-for-cross-border-arrangements/register/confirm-registration")
@@ -404,62 +464,70 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach wi
       "must send email and redirect to the confirmation page when OK response received for individual (no nino) and " +
         "EIS subscription returned a subscription ID" in {
 
-        val userAnswers: UserAnswers = UserAnswers(userAnswersId)
-          .set(DoYouHaveUTRPage, false)
-          .success.value
-          .set(RegistrationTypePage, Individual)
-          .success.value
-          .set(DoYouHaveANationalInsuranceNumberPage, false)
-          .success.value
-          .set(SafeIDPage, "")
-          .success.value
-          .set(ContactEmailAddressPage, "")
-          .success.value
-          .set(NamePage, Name("", ""))
-          .success.value
+          val userAnswers: UserAnswers = UserAnswers(userAnswersId)
+            .set(DoYouHaveUTRPage, false)
+            .success
+            .value
+            .set(RegistrationTypePage, Individual)
+            .success
+            .value
+            .set(DoYouHaveANationalInsuranceNumberPage, false)
+            .success
+            .value
+            .set(SafeIDPage, "")
+            .success
+            .value
+            .set(ContactEmailAddressPage, "")
+            .success
+            .value
+            .set(NamePage, Name("", ""))
+            .success
+            .value
 
-        val application = applicationBuilder(userAnswers = Some(userAnswers))
-          .overrides(
-            bind[RegistrationService].toInstance(mockRegistrationService),
-            bind[EmailService].toInstance(mockEmailService),
-            bind[SubscriptionConnector].toInstance(mockSubscriptionConnector),
-            bind[SessionRepository].toInstance(mockSessionRepository),
-            bind[AuditService]toInstance(mockAuditService)
-          )
-          .build()
+          val application = applicationBuilder(userAnswers = Some(userAnswers))
+            .overrides(
+              bind[RegistrationService].toInstance(mockRegistrationService),
+              bind[EmailService].toInstance(mockEmailService),
+              bind[SubscriptionConnector].toInstance(mockSubscriptionConnector),
+              bind[SessionRepository].toInstance(mockSessionRepository),
+              bind[AuditService] toInstance mockAuditService
+            )
+            .build()
 
-        when(mockRegistrationService.sendRegistration(any())(any(), any()))
-          .thenReturn(Future.successful(Some(HttpResponse(OK, registerWithoutIDResponse(safeID)))))
+          when(mockRegistrationService.sendRegistration(any())(any(), any()))
+            .thenReturn(Future.successful(Some(HttpResponse(OK, registerWithoutIDResponse(safeID)))))
 
-        when(mockSubscriptionConnector.createSubscription(any())(any(), any()))
-          .thenReturn(Future.successful(Right(safeID)))
+          when(mockSubscriptionConnector.createSubscription(any())(any(), any()))
+            .thenReturn(Future.successful(Right(safeID)))
 
-        when(mockSubscriptionConnector.cacheSubscription(any(), any())(any(), any()))
-          .thenReturn(Future.successful(HttpResponse(OK, "")))
+          when(mockSubscriptionConnector.cacheSubscription(any(), any())(any(), any()))
+            .thenReturn(Future.successful(HttpResponse(OK, "")))
 
-        when(mockEmailService.sendEmail(any())(any()))
-          .thenReturn(Future.successful(Some(HttpResponse(OK, ""))))
+          when(mockEmailService.sendEmail(any())(any()))
+            .thenReturn(Future.successful(Some(HttpResponse(OK, ""))))
 
-        when(mockSubscriptionConnector.createEnrolment(any())(any(), any()))
-          .thenReturn(Future.successful(HttpResponse(NO_CONTENT, "")))
+          when(mockSubscriptionConnector.createEnrolment(any())(any(), any()))
+            .thenReturn(Future.successful(HttpResponse(NO_CONTENT, "")))
 
-        when(mockAuditService.sendAuditEvent(any(),any(),any(),any())(any(),any()))
-          .thenReturn(Future.successful(AuditResult.Success))
+          when(mockAuditService.sendAuditEvent(any(), any(), any(), any())(any(), any()))
+            .thenReturn(Future.successful(AuditResult.Success))
 
-        val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit().url)
-        val result = route(application, request).value
+          val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit().url)
+          val result  = route(application, request).value
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result) mustBe Some("/register-for-cross-border-arrangements/register/confirm-registration")
-        verify(mockEmailService, times(1)).sendEmail(any())(any())
-      }
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result) mustBe Some("/register-for-cross-border-arrangements/register/confirm-registration")
+          verify(mockEmailService, times(1)).sendEmail(any())(any())
+        }
 
       "must redirect to the problem with service page if registration response doesn't have a responseDetail" in {
         val userAnswers: UserAnswers = UserAnswers(userAnswersId)
           .set(DoYouHaveUTRPage, false)
-          .success.value
+          .success
+          .value
           .set(RegistrationTypePage, Business)
-          .success.value
+          .success
+          .value
 
         val application = applicationBuilder(userAnswers = Some(userAnswers))
           .overrides(
@@ -484,7 +552,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach wi
           .thenReturn(Future.successful(Some(HttpResponse(OK, registrationResponse))))
 
         val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit().url)
-        val result = route(application, request).value
+        val result  = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result) mustBe Some("/register-for-cross-border-arrangements/register/problem-with-service")
@@ -493,7 +561,8 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach wi
       "must redirect to the problem with service page if registration response throws a JsError" in {
         val userAnswers: UserAnswers = UserAnswers(userAnswersId)
           .set(DoYouHaveUTRPage, false)
-          .success.value
+          .success
+          .value
 
         val application = applicationBuilder(userAnswers = Some(userAnswers))
           .overrides(
@@ -521,7 +590,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach wi
           .thenReturn(Future.successful(Some(HttpResponse(OK, invalidRegistrationResponse))))
 
         val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit().url)
-        val result = route(application, request).value
+        val result  = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result) mustBe Some("/register-for-cross-border-arrangements/register/problem-with-service")
@@ -530,13 +599,15 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach wi
       "must redirect to the problem with service if EIS subscription throws an error" in {
         val userAnswers: UserAnswers = UserAnswers(userAnswersId)
           .set(DoYouHaveUTRPage, false)
-          .success.value
+          .success
+          .value
 
         val application = applicationBuilder(userAnswers = Some(userAnswers))
           .overrides(
             bind[RegistrationService].toInstance(mockRegistrationService),
             bind[SubscriptionConnector].toInstance(mockSubscriptionConnector),
-            bind[SessionRepository].toInstance(mockSessionRepository))
+            bind[SessionRepository].toInstance(mockSessionRepository)
+          )
           .build()
 
         when(mockRegistrationService.sendRegistration(any())(any(), any()))
@@ -549,7 +620,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach wi
           .thenReturn(Future.successful(HttpResponse(OK, "")))
 
         val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit().url)
-        val result = route(application, request).value
+        val result  = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result) mustBe Some("/register-for-cross-border-arrangements/register/problem-with-service")
@@ -559,10 +630,10 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach wi
 
         val userAnswers: UserAnswers = UserAnswers(userAnswersId)
           .set(DoYouHaveUTRPage, true)
-          .success.value
+          .success
+          .value
 
-        val application = applicationBuilder(userAnswers = Some(userAnswers)
-        )
+        val application = applicationBuilder(userAnswers = Some(userAnswers))
           .overrides(
             bind[EmailService].toInstance(mockEmailService),
             bind[SubscriptionConnector].toInstance(mockSubscriptionConnector),
@@ -577,7 +648,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach wi
           .thenReturn(Future.successful(Left(UnableToCreateEMTPSubscriptionError)))
 
         val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit().url)
-        val result = route(application, request).value
+        val result  = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result) mustBe Some("/register-for-cross-border-arrangements/register/problem-with-service")
@@ -590,20 +661,24 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach wi
 
         val userAnswers: UserAnswers = UserAnswers(userAnswersId)
           .set(DoYouHaveUTRPage, true)
-          .success.value
+          .success
+          .value
           .set(SafeIDPage, "")
-          .success.value
+          .success
+          .value
           .set(ContactEmailAddressPage, "")
-          .success.value
+          .success
+          .value
           .set(ContactNamePage, "")
-          .success.value
+          .success
+          .value
 
         val application = applicationBuilder(userAnswers = Some(userAnswers))
           .overrides(
             bind[EmailService].toInstance(mockEmailService),
             bind[SubscriptionConnector].toInstance(mockSubscriptionConnector),
             bind[SessionRepository].toInstance(mockSessionRepository),
-            bind[AuditService]toInstance(mockAuditService)
+            bind[AuditService] toInstance mockAuditService
           )
           .build()
 
@@ -619,65 +694,70 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach wi
         when(mockSubscriptionConnector.createEnrolment(any())(any(), any()))
           .thenReturn(Future.successful(HttpResponse(NO_CONTENT, "")))
 
-        when(mockAuditService.sendAuditEvent(any(),any(),any(),any())(any(),any()))
+        when(mockAuditService.sendAuditEvent(any(), any(), any(), any())(any(), any()))
           .thenReturn(Future.successful(AuditResult.Success))
 
         val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit().url)
-        val result = route(application, request).value
+        val result  = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result) mustBe Some("/register-for-cross-border-arrangements/register/confirm-registration")
       }
 
-    "must send email and redirect to the confirmation page when OK response received for organisation (no utr) and " +
-      "EIS subscription returned a subscription ID" in {
+      "must send email and redirect to the confirmation page when OK response received for organisation (no utr) and " +
+        "EIS subscription returned a subscription ID" in {
 
-      val userAnswers: UserAnswers = UserAnswers(userAnswersId)
-        .set(DoYouHaveUTRPage, false)
-        .success.value
-        .set(RegistrationTypePage, Business)
-        .success.value
-        .set(SafeIDPage, "")
-        .success.value
-        .set(ContactEmailAddressPage, "")
-        .success.value
-        .set(ContactNamePage, "")
-        .success.value
+          val userAnswers: UserAnswers = UserAnswers(userAnswersId)
+            .set(DoYouHaveUTRPage, false)
+            .success
+            .value
+            .set(RegistrationTypePage, Business)
+            .success
+            .value
+            .set(SafeIDPage, "")
+            .success
+            .value
+            .set(ContactEmailAddressPage, "")
+            .success
+            .value
+            .set(ContactNamePage, "")
+            .success
+            .value
 
-      val application = applicationBuilder(userAnswers = Some(userAnswers))
-        .overrides(
-          bind[RegistrationService].toInstance(mockRegistrationService),
-          bind[EmailService].toInstance(mockEmailService),
-          bind[SubscriptionConnector].toInstance(mockSubscriptionConnector),
-          bind[SessionRepository].toInstance(mockSessionRepository),
-          bind[AuditService]toInstance(mockAuditService)
-        )
-        .build()
+          val application = applicationBuilder(userAnswers = Some(userAnswers))
+            .overrides(
+              bind[RegistrationService].toInstance(mockRegistrationService),
+              bind[EmailService].toInstance(mockEmailService),
+              bind[SubscriptionConnector].toInstance(mockSubscriptionConnector),
+              bind[SessionRepository].toInstance(mockSessionRepository),
+              bind[AuditService] toInstance mockAuditService
+            )
+            .build()
 
-      when(mockSubscriptionConnector.createSubscription(any())(any(), any()))
-        .thenReturn(Future.successful(Right(safeID)))
+          when(mockSubscriptionConnector.createSubscription(any())(any(), any()))
+            .thenReturn(Future.successful(Right(safeID)))
 
-      when(mockSubscriptionConnector.cacheSubscription(any(), any())(any(), any()))
-        .thenReturn(Future.successful(HttpResponse(OK, "")))
+          when(mockSubscriptionConnector.cacheSubscription(any(), any())(any(), any()))
+            .thenReturn(Future.successful(HttpResponse(OK, "")))
 
-      when(mockRegistrationService.sendRegistration(any())(any(), any()))
-        .thenReturn(Future.successful(Some(HttpResponse(OK, registerWithoutIDResponse(safeID)))))
+          when(mockRegistrationService.sendRegistration(any())(any(), any()))
+            .thenReturn(Future.successful(Some(HttpResponse(OK, registerWithoutIDResponse(safeID)))))
 
-      when(mockEmailService.sendEmail(any())(any()))
-        .thenReturn(Future.successful(Some(HttpResponse(OK, ""))))
+          when(mockEmailService.sendEmail(any())(any()))
+            .thenReturn(Future.successful(Some(HttpResponse(OK, ""))))
 
-      when(mockSubscriptionConnector.createEnrolment(any())(any(), any()))
-        .thenReturn(Future.successful(HttpResponse(NO_CONTENT, "")))
+          when(mockSubscriptionConnector.createEnrolment(any())(any(), any()))
+            .thenReturn(Future.successful(HttpResponse(NO_CONTENT, "")))
 
-      when(mockAuditService.sendAuditEvent(any(),any(),any(),any())(any(),any()))
-        .thenReturn(Future.successful(AuditResult.Success))
+          when(mockAuditService.sendAuditEvent(any(), any(), any(), any())(any(), any()))
+            .thenReturn(Future.successful(AuditResult.Success))
 
-      val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit().url)
-      val result = route(application, request).value
+          val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit().url)
+          val result  = route(application, request).value
 
-      status(result) mustEqual SEE_OTHER
-      redirectLocation(result) mustBe Some("/register-for-cross-border-arrangements/register/confirm-registration")
-    }
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result) mustBe Some("/register-for-cross-border-arrangements/register/confirm-registration")
+        }
 
       "must redirect to problem with service when NOT_FOUND response received from registration for organisation" in {
 
@@ -692,7 +772,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach wi
           .thenReturn(Future.successful(Some(HttpResponse(NOT_FOUND, ""))))
 
         val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit().url)
-        val result = route(application, request).value
+        val result  = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result) mustBe Some("/register-for-cross-border-arrangements/register/problem-with-service")
@@ -701,7 +781,6 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach wi
       "must redirect to problem with service when BAD_REQUEST response received from registration for organisation" in {
 
         val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
-
           .overrides(
             bind[SubscriptionConnector].toInstance(mockSubscriptionConnector),
             bind[RegistrationService].toInstance(mockRegistrationService),
@@ -716,7 +795,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach wi
           .thenReturn(Future.successful(HttpResponse(NO_CONTENT, "")))
 
         val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit().url)
-        val result = route(application, request).value
+        val result  = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result) mustBe Some("/register-for-cross-border-arrangements/register/problem-with-service")
@@ -740,12 +819,11 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach wi
           .thenReturn(Future.successful(HttpResponse(NO_CONTENT, "")))
 
         val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit().url)
-        val result = route(application, request).value
+        val result  = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result) mustBe Some("/register-for-cross-border-arrangements/register/problem-with-service")
       }
-
 
       "must redirect the user to the index page when send email call fails" in {
 
@@ -764,7 +842,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach wi
           .thenReturn(Future.successful(HttpResponse(NO_CONTENT, "")))
 
         val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit().url)
-        val result = route(application, request).value
+        val result  = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result) mustBe Some("/register-for-cross-border-arrangements/register/problem-with-service")
@@ -773,16 +851,14 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach wi
       "must redirect to problem with service when NOT_FOUND response received from registration for individual" in {
 
         val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
-          .overrides(
-            bind[RegistrationService].toInstance(mockRegistrationService),
-            bind[SessionRepository].toInstance(mockSessionRepository))
+          .overrides(bind[RegistrationService].toInstance(mockRegistrationService), bind[SessionRepository].toInstance(mockSessionRepository))
           .build()
 
         when(mockRegistrationService.sendRegistration(any())(any(), any()))
           .thenReturn(Future.successful(Some(HttpResponse(NOT_FOUND, ""))))
 
         val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit().url)
-        val result = route(application, request).value
+        val result  = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result) mustBe Some("/register-for-cross-border-arrangements/register/problem-with-service")
@@ -801,7 +877,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach wi
           .thenReturn(Future.successful(Some(HttpResponse(BAD_REQUEST, ""))))
 
         val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit().url)
-        val result = route(application, request).value
+        val result  = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result) mustBe Some("/register-for-cross-border-arrangements/register/problem-with-service")
@@ -820,7 +896,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach wi
           .thenReturn(Future.successful(None))
 
         val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit().url)
-        val result = route(application, request).value
+        val result  = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result) mustBe Some("/register-for-cross-border-arrangements/register/problem-with-service")
@@ -828,4 +904,3 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach wi
     }
   }
 }
-

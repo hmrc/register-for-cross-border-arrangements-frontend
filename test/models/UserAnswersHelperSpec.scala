@@ -21,7 +21,7 @@ import org.scalacheck.Arbitrary.arbitrary
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import pages.{ContactNamePage, DoYouHaveUTRPage}
 
-class UserAnswersHelperSpec extends SpecBase  with ScalaCheckPropertyChecks {
+class UserAnswersHelperSpec extends SpecBase with ScalaCheckPropertyChecks {
 
   "updateUserAnswersIfValueChanged" - {
 
@@ -33,8 +33,12 @@ class UserAnswersHelperSpec extends SpecBase  with ScalaCheckPropertyChecks {
       forAll(gen1, gen2) {
         (nameString, boolVal) =>
           val userAnswers = UserAnswers(userAnswersId)
-            .set(DoYouHaveUTRPage, boolVal).success.value
-            .set(ContactNamePage, nameString).success.value
+            .set(DoYouHaveUTRPage, boolVal)
+            .success
+            .value
+            .set(ContactNamePage, nameString)
+            .success
+            .value
 
           val result = UserAnswersHelper.updateUserAnswersIfValueChanged(userAnswers, DoYouHaveUTRPage, boolVal)
 
@@ -47,14 +51,18 @@ class UserAnswersHelperSpec extends SpecBase  with ScalaCheckPropertyChecks {
 
     "must run an implemented cleanup if the value is changed" in {
 
-      val gen = arbitrary[String]
+      val gen  = arbitrary[String]
       val gen2 = arbitrary[Boolean]
 
       forAll(gen, gen2) {
-        (nameString,boolVal) =>
+        (nameString, boolVal) =>
           val userAnswers = UserAnswers(userAnswersId)
-            .set(DoYouHaveUTRPage, boolVal).success.value
-            .set(ContactNamePage, nameString).success.value
+            .set(DoYouHaveUTRPage, boolVal)
+            .success
+            .value
+            .set(ContactNamePage, nameString)
+            .success
+            .value
 
           val result = UserAnswersHelper.updateUserAnswersIfValueChanged(userAnswers, DoYouHaveUTRPage, !boolVal)
 

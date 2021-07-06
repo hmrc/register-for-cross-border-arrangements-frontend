@@ -29,7 +29,7 @@ trait ModelGenerators {
 
   val regime = "DACSIX"
 
-  implicit lazy val arbitraryCountry: Arbitrary[Country] = {
+  implicit lazy val arbitraryCountry: Arbitrary[Country] =
     Arbitrary {
       for {
         state <- Gen.oneOf(Seq("Valid", "Invalid"))
@@ -37,31 +37,28 @@ trait ModelGenerators {
         name  <- arbitrary[String]
       } yield Country(state, code.mkString, name)
     }
-  }
 
   implicit lazy val arbitraryWhatIsYourAddress: Arbitrary[Address] =
-      Arbitrary {
+    Arbitrary {
       for {
         addressLine1 <- arbitrary[String]
         addressLine2 <- arbitrary[Option[String]]
         addressLine3 <- arbitrary[String]
         addressLine4 <- arbitrary[Option[String]]
-        postCode <- arbitrary[Option[String]]
-        country <- arbitrary[Country]
+        postCode     <- arbitrary[Option[String]]
+        country      <- arbitrary[Country]
       } yield Address(addressLine1, addressLine2, addressLine3, addressLine4, postCode, country)
     }
-
 
   //TODO: Pull out length
   implicit val arbitraryName: Arbitrary[Name] = Arbitrary {
     for {
-      firstName <- stringsWithMaxLength(50)
+      firstName  <- stringsWithMaxLength(50)
       secondName <- stringsWithMaxLength(50)
     } yield Name(firstName, secondName)
   }
 
-
-  implicit val arbitraryNino: Arbitrary[Nino] = Arbitrary{
+  implicit val arbitraryNino: Arbitrary[Nino] = Arbitrary {
     for {
       prefix <- Gen.oneOf(Nino.validPrefixes)
       number <- Gen.choose(0, 999999)
@@ -72,29 +69,21 @@ trait ModelGenerators {
   implicit val arbitraryIndividualMatchingSubmission: Arbitrary[IndividualMatchingSubmission] = Arbitrary {
     for {
       name <- arbitrary[Name]
-      dob <- arbitrary[LocalDate]
-    } yield
-      IndividualMatchingSubmission(regime,
-        requiresNameMatch = true,
-        isAnAgent = false,
-        Individual(name, dob))
+      dob  <- arbitrary[LocalDate]
+    } yield IndividualMatchingSubmission(regime, requiresNameMatch = true, isAnAgent = false, Individual(name, dob))
   }
 
   implicit val arbitraryBusinessMatchingSubmission: Arbitrary[BusinessMatchingSubmission] = Arbitrary {
     for {
       businessName <- arbitrary[String]
       businessType <- arbitraryBusinessType.arbitrary
-    } yield
-      BusinessMatchingSubmission(regime,
-        requiresNameMatch = true,
-        isAnAgent = false,
-        Organisation(businessName, businessType))
+    } yield BusinessMatchingSubmission(regime, requiresNameMatch = true, isAnAgent = false, Organisation(businessName, businessType))
   }
 
   implicit val arbitraryEmailRequest: Arbitrary[EmailRequest] = Arbitrary {
     for {
-      to <- arbitrary[List[String]]
-      id <- arbitrary[String]
+      to          <- arbitrary[List[String]]
+      id          <- arbitrary[String]
       contactName <- arbitrary[Map[String, String]]
 
     } yield EmailRequest(to, id, contactName)
@@ -112,23 +101,24 @@ trait ModelGenerators {
       Gen.oneOf(BusinessType.values.toSeq)
     }
 
-  implicit val arbitraryRequestCommon: Arbitrary[RequestCommon] = Arbitrary {for {
-    receiptDate <- arbitrary[String]
-    acknowledgementReference <- stringsWithMaxLength(32)
+  implicit val arbitraryRequestCommon: Arbitrary[RequestCommon] = Arbitrary {
+    for {
+      receiptDate              <- arbitrary[String]
+      acknowledgementReference <- stringsWithMaxLength(32)
 
-  } yield RequestCommon(
-    receiptDate,
-    regime = "DAC",
-    acknowledgementReference,
-    None
-  )
+    } yield RequestCommon(
+      receiptDate,
+      regime = "DAC",
+      acknowledgementReference,
+      None
+    )
   }
 
   implicit val arbitraryWithIDIndividual: Arbitrary[WithIDIndividual] = Arbitrary {
     for {
-      firstName <- alphaStr
-      middleName <- Gen.option(alphaStr)
-      lastName <- alphaStr
+      firstName   <- alphaStr
+      middleName  <- Gen.option(alphaStr)
+      lastName    <- alphaStr
       dateOfBirth <- alphaStr
     } yield WithIDIndividual(firstName, middleName, lastName, dateOfBirth)
   }
@@ -142,67 +132,61 @@ trait ModelGenerators {
 
   implicit val arbitraryRequestWithIDDetails: Arbitrary[RequestWithIDDetails] = Arbitrary {
     for {
-      idType <- alphaStr
-      idNumber <- alphaStr
+      idType            <- alphaStr
+      idNumber          <- alphaStr
       requiresNameMatch <- arbitrary[Boolean]
-      isAnAgent <- arbitrary[Boolean]
-      partnerDetails <- Gen.oneOf(arbitrary[WithIDIndividual], arbitrary[WithIDOrganisation])
+      isAnAgent         <- arbitrary[Boolean]
+      partnerDetails    <- Gen.oneOf(arbitrary[WithIDIndividual], arbitrary[WithIDOrganisation])
     } yield RequestWithIDDetails(idType, idNumber, requiresNameMatch, isAnAgent, partnerDetails)
   }
 
   implicit val arbitraryPayloadRegisterWithID: Arbitrary[PayloadRegisterWithID] = Arbitrary {
     for {
-      requestCommon <- arbitrary[RequestCommon]
+      requestCommon        <- arbitrary[RequestCommon]
       requestWithIDDetails <- arbitrary[RequestWithIDDetails]
     } yield PayloadRegisterWithID(RegisterWithIDRequest(requestCommon, requestWithIDDetails))
   }
 
-  implicit val arbitraryRegistration: Arbitrary[Register] = Arbitrary {for {
-    requestCommon <- arbitrary[RequestCommon]
-    name <- arbitrary[String]
-    address <- arbitrary[AddressNoId]
-    contactDetails <- arbitrary[ContactDetails]
-    identification <- Gen.option(arbitrary[Identification])
-  } yield
-    Register(
+  implicit val arbitraryRegistration: Arbitrary[Register] = Arbitrary {
+    for {
+      requestCommon  <- arbitrary[RequestCommon]
+      name           <- arbitrary[String]
+      address        <- arbitrary[AddressNoId]
+      contactDetails <- arbitrary[ContactDetails]
+      identification <- Gen.option(arbitrary[Identification])
+    } yield Register(
       RegisterWithoutIDRequest(
         requestCommon,
-        RequestDetails(
-
-          Some(NoIdOrganisation(name)),
-          None,
-          address = address,
-          contactDetails = contactDetails,
-          identification = identification)
+        RequestDetails(Some(NoIdOrganisation(name)), None, address = address, contactDetails = contactDetails, identification = identification)
       )
     )
   }
 
-  implicit val arbitraryAddressNoId: Arbitrary[AddressNoId] = Arbitrary {for {
-    addressLine1 <- arbitrary[String]
-    addressLine2 <- Gen.option(arbitrary[String])
-    addressLine3 <- arbitrary[String]
-    addressLine4 <- Gen.option(arbitrary[String])
-    postalCode <- Gen.option(arbitrary[String])
-    countryCode <- arbitrary[String]
-  } yield
-    AddressNoId(
+  implicit val arbitraryAddressNoId: Arbitrary[AddressNoId] = Arbitrary {
+    for {
+      addressLine1 <- arbitrary[String]
+      addressLine2 <- Gen.option(arbitrary[String])
+      addressLine3 <- arbitrary[String]
+      addressLine4 <- Gen.option(arbitrary[String])
+      postalCode   <- Gen.option(arbitrary[String])
+      countryCode  <- arbitrary[String]
+    } yield AddressNoId(
       addressLine1 = addressLine1,
       addressLine2 = addressLine2,
       addressLine3 = addressLine3,
       addressLine4 = addressLine4,
       postalCode = postalCode,
-      countryCode = countryCode,
+      countryCode = countryCode
     )
   }
 
-  implicit val arbitraryContactDetails: Arbitrary[ContactDetails] = Arbitrary {for {
-    phoneNumber <- Gen.option(arbitrary[String])
-    mobileNumber <- Gen.option(arbitrary[String])
-    faxNumber <- Gen.option(arbitrary[String])
-    emailAddress <- Gen.option(arbitrary[String])
-  } yield
-    ContactDetails(
+  implicit val arbitraryContactDetails: Arbitrary[ContactDetails] = Arbitrary {
+    for {
+      phoneNumber  <- Gen.option(arbitrary[String])
+      mobileNumber <- Gen.option(arbitrary[String])
+      faxNumber    <- Gen.option(arbitrary[String])
+      emailAddress <- Gen.option(arbitrary[String])
+    } yield ContactDetails(
       phoneNumber = phoneNumber,
       mobileNumber = mobileNumber,
       faxNumber = faxNumber,
@@ -210,12 +194,12 @@ trait ModelGenerators {
     )
   }
 
-  implicit val arbitraryIdentification: Arbitrary[Identification] = Arbitrary {for {
-    idNumber <- arbitrary[String]
-    issuingInstitution <- arbitrary[String]
-    issuingCountryCode <- arbitrary[String]
-  } yield
-    Identification(
+  implicit val arbitraryIdentification: Arbitrary[Identification] = Arbitrary {
+    for {
+      idNumber           <- arbitrary[String]
+      issuingInstitution <- arbitrary[String]
+      issuingCountryCode <- arbitrary[String]
+    } yield Identification(
       idNumber = idNumber,
       issuingInstitution = issuingInstitution,
       issuingCountryCode = issuingCountryCode
@@ -230,47 +214,46 @@ trait ModelGenerators {
 
   implicit val arbitraryRegistrationWithIDResponse: Arbitrary[RegisterWithIDResponse] = Arbitrary {
     for {
-      responseCommon <- arbitrary[ResponseCommon]
+      responseCommon  <- arbitrary[ResponseCommon]
       responseDetails <- Gen.option(arbitrary[ResponseDetail])
     } yield RegisterWithIDResponse(responseCommon, responseDetails)
   }
 
   implicit val arbitraryResponseCommon: Arbitrary[ResponseCommon] = Arbitrary {
     for {
-      status <- Gen.oneOf("OK", "NOT_OK")
-      statusText <- Gen.option(arbitrary[String])
-      processingDate <- arbitrary[String]
+      status           <- Gen.oneOf("OK", "NOT_OK")
+      statusText       <- Gen.option(arbitrary[String])
+      processingDate   <- arbitrary[String]
       returnParameters <- Gen.option(Gen.listOf(arbitrary[ReturnParameters]))
     } yield ResponseCommon(status, statusText, processingDate, returnParameters)
   }
 
   implicit val arbitraryReturnParameters: Arbitrary[ReturnParameters] = Arbitrary {
     for {
-      paramName <- arbitrary[String]
+      paramName  <- arbitrary[String]
       paramValue <- arbitrary[String]
     } yield ReturnParameters(paramName, paramValue)
   }
 
   implicit val arbitraryResponseDetails: Arbitrary[ResponseDetail] = Arbitrary {
     for {
-      safeid <- arbitrary[String]
-      arn <- Gen.option(arbitrary[String])
-      isEditable <- arbitrary[Boolean]
-      isAnAgent <- arbitrary[Boolean]
-      isAnASAgent <- Gen.option(arbitrary[Boolean])
+      safeid         <- arbitrary[String]
+      arn            <- Gen.option(arbitrary[String])
+      isEditable     <- arbitrary[Boolean]
+      isAnAgent      <- arbitrary[Boolean]
+      isAnASAgent    <- Gen.option(arbitrary[Boolean])
       isAnIndividual <- arbitrary[Boolean]
       partnerDetails <- Gen.oneOf(arbitrary[IndividualResponse], arbitrary[OrganisationResponse])
-      address <- arbitrary[AddressResponse]
+      address        <- arbitrary[AddressResponse]
       contactDetails <- arbitrary[ContactDetails]
-    } yield ResponseDetail(safeid, arn, isEditable, isAnAgent, isAnASAgent,
-      isAnIndividual, partnerDetails, address, contactDetails)
+    } yield ResponseDetail(safeid, arn, isEditable, isAnAgent, isAnASAgent, isAnIndividual, partnerDetails, address, contactDetails)
   }
 
   implicit val arbitraryIndividualResponse: Arbitrary[IndividualResponse] = Arbitrary {
     for {
-      firstName <- arbitrary[String]
-      middleName <- Gen.option(arbitrary[String])
-      lastName <- arbitrary[String]
+      firstName   <- arbitrary[String]
+      middleName  <- Gen.option(arbitrary[String])
+      lastName    <- arbitrary[String]
       dateOfBirth <- Gen.option(arbitrary[String])
     } yield IndividualResponse(firstName, middleName, lastName, dateOfBirth)
   }
@@ -278,9 +261,9 @@ trait ModelGenerators {
   implicit val arbitraryOrganisationResponse: Arbitrary[OrganisationResponse] = Arbitrary {
     for {
       organisationName <- arbitrary[String]
-      isAGroup <- arbitrary[Boolean]
+      isAGroup         <- arbitrary[Boolean]
       organisationType <- Gen.option(arbitrary[String])
-      code <- Gen.option(arbitrary[String])
+      code             <- Gen.option(arbitrary[String])
     } yield OrganisationResponse(organisationName, isAGroup, organisationType, code)
   }
 
@@ -290,8 +273,8 @@ trait ModelGenerators {
       addressLine2 <- Gen.option(arbitrary[String])
       addressLine3 <- Gen.option(arbitrary[String])
       addressLine4 <- Gen.option(arbitrary[String])
-      postalCode <- Gen.option(arbitrary[String])
-      countryCode <- arbitrary[String]
+      postalCode   <- Gen.option(arbitrary[String])
+      countryCode  <- arbitrary[String]
     } yield AddressResponse(addressLine1, addressLine2, addressLine3, addressLine4, postalCode, countryCode)
   }
 }

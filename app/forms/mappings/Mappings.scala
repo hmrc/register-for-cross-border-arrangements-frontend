@@ -35,50 +35,44 @@ trait Mappings extends Formatters with Constraints {
 
   protected def int(requiredKey: String = "error.required",
                     wholeNumberKey: String = "error.wholeNumber",
-                    nonNumericKey: String = "error.nonNumeric"): FieldMapping[Int] =
+                    nonNumericKey: String = "error.nonNumeric"
+  ): FieldMapping[Int] =
     of(intFormatter(requiredKey, wholeNumberKey, nonNumericKey))
 
-  protected def boolean(requiredKey: String = "error.required",
-                        invalidKey: String = "error.boolean"): FieldMapping[Boolean] =
+  protected def boolean(requiredKey: String = "error.required", invalidKey: String = "error.boolean"): FieldMapping[Boolean] =
     of(booleanFormatter(requiredKey, invalidKey))
 
-
-  protected def enumerable[A](requiredKey: String = "error.required",
-                              invalidKey: String = "error.invalid")(implicit ev: Enumerable[A]): FieldMapping[A] =
+  protected def enumerable[A](requiredKey: String = "error.required", invalidKey: String = "error.invalid")(implicit ev: Enumerable[A]): FieldMapping[A] =
     of(enumerableFormatter[A](requiredKey, invalidKey))
 
-  protected def localDate(
-                           invalidKey: String,
-                           allRequiredKey: String,
-                           twoRequiredKey: String,
-                           requiredKey: String,
-                           args: Seq[String] = Seq.empty): FieldMapping[LocalDate] =
+  protected def localDate(invalidKey: String,
+                          allRequiredKey: String,
+                          twoRequiredKey: String,
+                          requiredKey: String,
+                          args: Seq[String] = Seq.empty
+  ): FieldMapping[LocalDate] =
     of(new LocalDateFormatter(invalidKey, allRequiredKey, twoRequiredKey, requiredKey, args))
 
-  protected def addressPostcode(invalidKey: String = "error.invalid", regex: String,
-                                requiredKey: String = "postCode.error.required"): FieldMapping[Option[String]] = {
+  protected def addressPostcode(invalidKey: String = "error.invalid",
+                                regex: String,
+                                requiredKey: String = "postCode.error.required"
+  ): FieldMapping[Option[String]] =
     of(addressPostcodeFormatter(invalidKey, regex, requiredKey))
-  }
 
-  protected def maxLengthText(requiredKey: String, lengthKey: String, maxLength: Int): FieldMapping[String] = {
-    of(maxLengthTextFormatter(requiredKey,lengthKey, maxLength))
-  }
+  protected def maxLengthText(requiredKey: String, lengthKey: String, maxLength: Int): FieldMapping[String] =
+    of(maxLengthTextFormatter(requiredKey, lengthKey, maxLength))
 
-  protected def validatedText(requiredKey: String, invalidKey: String, lengthKey: String, regex: String, maxLength: Int): FieldMapping[String] = {
+  protected def validatedText(requiredKey: String, invalidKey: String, lengthKey: String, regex: String, maxLength: Int): FieldMapping[String] =
     of(validatedTextFormatter(requiredKey, invalidKey, lengthKey, regex, maxLength))
-  }
 
-  protected def validatedFixedLengthText(requiredKey: String, invalidKey: String, lengthKey: String, regex: String, length: Int): FieldMapping[String] = {
+  protected def validatedFixedLengthText(requiredKey: String, invalidKey: String, lengthKey: String, regex: String, length: Int): FieldMapping[String] =
     of(validatedFixedLengthTextFormatter(requiredKey, invalidKey, lengthKey, regex, length))
-  }
 
-  protected def validatedOptionalText(invalidKey: String, lengthKey: String, regex: String, length: Int): FieldMapping[Option[String]] = {
+  protected def validatedOptionalText(invalidKey: String, lengthKey: String, regex: String, length: Int): FieldMapping[Option[String]] =
     of(validatedOptionalTextFormatter(invalidKey, lengthKey, regex, length))
-  }
 
-  protected def requiredRegexOnlyText(requiredKey: String, invalidKey: String, regex: String): FieldMapping[String] = {
+  protected def requiredRegexOnlyText(requiredKey: String, invalidKey: String, regex: String): FieldMapping[String] =
     of(requiredRegexOnly(requiredKey, invalidKey, regex))
-  }
 
   protected def optionalPostcode(requiredKey: String, lengthKey: String, countryFieldName: String): FieldMapping[Option[String]] =
     of(optionalPostcodeFormatter(requiredKey, lengthKey, countryFieldName))

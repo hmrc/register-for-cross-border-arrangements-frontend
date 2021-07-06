@@ -31,12 +31,14 @@ case object DoYouHaveANationalInsuranceNumberPage extends QuestionPage[Boolean] 
     //Not clearing DateOfBirthPage because it's used in both journeys
     value match {
       case Some(true) =>
-        userAnswers.remove(NonUkNamePage)
+        userAnswers
+          .remove(NonUkNamePage)
           .flatMap(_.remove(DoYouLiveInTheUKPage))
           .flatMap(_.remove(IndividualUKPostcodePage))
           .flatMap(_.remove(SelectAddressPage))
       case Some(false) =>
-        userAnswers.remove(NinoPage)
+        userAnswers
+          .remove(NinoPage)
           .flatMap(_.remove(NamePage))
       case None => super.cleanup(value, userAnswers)
     }

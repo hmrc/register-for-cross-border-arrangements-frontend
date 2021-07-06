@@ -25,8 +25,6 @@ class PostCodeFormProvider @Inject() extends Mappings with RegexConstants {
 
   def apply(): Form[String] =
     Form(
-      "value" -> requiredRegexOnlyText("postCode.error.required",
-        "postCode.error.invalid",
-         regexPostcode)
+      "value" -> requiredRegexOnlyText("postCode.error.required", "postCode.error.invalid", regexPostcode)
     )
 }

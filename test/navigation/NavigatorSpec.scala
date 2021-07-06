@@ -31,7 +31,7 @@ import pages._
 class NavigatorSpec extends SpecBase with ScalaCheckPropertyChecks with Generators {
 
   val mockFrontendConfig: FrontendAppConfig = mock[FrontendAppConfig]
-  val navigator: Navigator = new Navigator(mockFrontendConfig)
+  val navigator: Navigator                  = new Navigator(mockFrontendConfig)
 
   "Navigator" - {
 
@@ -43,8 +43,8 @@ class NavigatorSpec extends SpecBase with ScalaCheckPropertyChecks with Generato
 
         forAll(arbitrary[UserAnswers]) {
           answers =>
-
-            navigator.nextPage(UnknownPage, NormalMode, answers)
+            navigator
+              .nextPage(UnknownPage, NormalMode, answers)
               .mustBe(routes.IndexController.onPageLoad())
         }
       }
@@ -112,7 +112,6 @@ class NavigatorSpec extends SpecBase with ScalaCheckPropertyChecks with Generato
       "must go from Nino page to Name page" in {
         forAll(arbitrary[UserAnswers]) {
           answers =>
-
             navigator
               .nextPage(NinoPage, NormalMode, answers)
               .mustBe(routes.NameController.onPageLoad(NormalMode))
@@ -341,7 +340,6 @@ class NavigatorSpec extends SpecBase with ScalaCheckPropertyChecks with Generato
       "must go from business name page to making the business match check" in {
         forAll(arbitrary[UserAnswers]) {
           answers =>
-
             navigator
               .nextPage(BusinessNamePage, NormalMode, answers)
               .mustBe(routes.BusinessMatchingController.matchBusiness())
@@ -351,7 +349,6 @@ class NavigatorSpec extends SpecBase with ScalaCheckPropertyChecks with Generato
       "must go from sole proprietor name page to individual match check" in {
         forAll(arbitrary[UserAnswers]) {
           answers =>
-
             navigator
               .nextPage(SoleTraderNamePage, NormalMode, answers)
               .mustBe(routes.DateOfBirthController.onPageLoad(NormalMode))
@@ -376,7 +373,6 @@ class NavigatorSpec extends SpecBase with ScalaCheckPropertyChecks with Generato
       "must go from Non Uk Name page to Date of Birth Page" in {
         forAll(arbitrary[UserAnswers]) {
           answers =>
-
             navigator
               .nextPage(NonUkNamePage, NormalMode, answers)
               .mustBe(routes.DateOfBirthController.onPageLoad(NormalMode))
@@ -389,7 +385,6 @@ class NavigatorSpec extends SpecBase with ScalaCheckPropertyChecks with Generato
 
         forAll(arbitrary[UserAnswers]) {
           answers =>
-
             val updatedAnswers =
               answers
                 .set(DoYouLiveInTheUKPage, true)
@@ -408,7 +403,6 @@ class NavigatorSpec extends SpecBase with ScalaCheckPropertyChecks with Generato
 
         forAll(arbitrary[UserAnswers]) {
           answers =>
-
             val updatedAnswers =
               answers
                 .set(DoYouLiveInTheUKPage, true)
@@ -424,7 +418,6 @@ class NavigatorSpec extends SpecBase with ScalaCheckPropertyChecks with Generato
       "must go from the Do You Live in the UK page for people who do to the What is your address page (non-UK)" in {
         forAll(arbitrary[UserAnswers]) {
           answers =>
-
             val updatedAnswers =
               answers
                 .set(DoYouLiveInTheUKPage, false)
@@ -440,7 +433,6 @@ class NavigatorSpec extends SpecBase with ScalaCheckPropertyChecks with Generato
       "must go from the What is your postcode? page to What is your address? page" in {
         forAll(arbitrary[UserAnswers]) {
           answers =>
-
             val updatedAnswers =
               answers
                 .set(IndividualUKPostcodePage, "AA1 1AA")
@@ -456,7 +448,6 @@ class NavigatorSpec extends SpecBase with ScalaCheckPropertyChecks with Generato
       "must go from the What is your address? page to What is your email address? page" in {
         forAll(arbitrary[UserAnswers]) {
           answers =>
-
             val updatedAnswers =
               answers
                 .set(SelectAddressPage, "Some UK address")
@@ -472,7 +463,6 @@ class NavigatorSpec extends SpecBase with ScalaCheckPropertyChecks with Generato
       "must go from the What is your business name page (without-id) to the What is your business address page" in {
         forAll(arbitrary[UserAnswers]) {
           answers =>
-
             val updatedAnswers =
               answers
                 .set(BusinessWithoutIDNamePage, "Business name")
@@ -485,11 +475,9 @@ class NavigatorSpec extends SpecBase with ScalaCheckPropertyChecks with Generato
         }
       }
 
-
       "must go from what is your address uk page to enter your email page" in {
         forAll(arbitrary[UserAnswers]) {
           answers =>
-
             navigator
               .nextPage(WhatIsYourAddressUkPage, NormalMode, answers)
               .mustBe(routes.ContactEmailAddressController.onPageLoad(NormalMode))
@@ -499,7 +487,6 @@ class NavigatorSpec extends SpecBase with ScalaCheckPropertyChecks with Generato
       "must go from What is your home address (non-UK) page to What is your email address page" in {
         forAll(arbitrary[UserAnswers]) {
           answers =>
-
             navigator
               .nextPage(WhatIsYourAddressPage, NormalMode, answers)
               .mustBe(routes.ContactEmailAddressController.onPageLoad(NormalMode))
@@ -508,25 +495,23 @@ class NavigatorSpec extends SpecBase with ScalaCheckPropertyChecks with Generato
 
       "must go from the Who should we contact if we have any questions about your disclosures page" +
         " to the What is your email address page" in {
-        forAll(arbitrary[UserAnswers]) {
-          answers =>
+          forAll(arbitrary[UserAnswers]) {
+            answers =>
+              val updatedAnswers =
+                answers
+                  .set(ContactNamePage, "name")
+                  .success
+                  .value
 
-            val updatedAnswers =
-              answers
-                .set(ContactNamePage, "name")
-                .success
-                .value
-
-            navigator
-              .nextPage(ContactNamePage, NormalMode, updatedAnswers)
-              .mustBe(routes.ContactEmailAddressController.onPageLoad(NormalMode))
+              navigator
+                .nextPage(ContactNamePage, NormalMode, updatedAnswers)
+                .mustBe(routes.ContactEmailAddressController.onPageLoad(NormalMode))
+          }
         }
-      }
 
       "must go from the What is your email address? page to Do you have a telephone number? page" in {
         forAll(arbitrary[UserAnswers]) {
           answers =>
-
             val updatedAnswers =
               answers
                 .set(ContactEmailAddressPage, "example@test.com")
@@ -585,7 +570,6 @@ class NavigatorSpec extends SpecBase with ScalaCheckPropertyChecks with Generato
       "must go from the Do you have telephone page to the What is the telephone number page when the answer is 'Yes'" in {
         forAll(arbitrary[UserAnswers]) {
           answers =>
-
             val updatedAnswers =
               answers
                 .set(TelephoneNumberQuestionPage, true)
@@ -600,177 +584,169 @@ class NavigatorSpec extends SpecBase with ScalaCheckPropertyChecks with Generato
 
       "must go from the Do you have telephone page to Have second contact page when the answer is 'No' and " +
         "the user is an Organisation" in {
-        forAll(arbitrary[UserAnswers]) {
-          answers =>
+          forAll(arbitrary[UserAnswers]) {
+            answers =>
+              val updatedAnswers =
+                answers
+                  .set(BusinessTypePage, BusinessType.CorporateBody)
+                  .success
+                  .value
+                  .set(TelephoneNumberQuestionPage, false)
+                  .success
+                  .value
 
-            val updatedAnswers =
-              answers
-                .set(BusinessTypePage, BusinessType.CorporateBody)
-                .success
-                .value
-                .set(TelephoneNumberQuestionPage, false)
-                .success
-                .value
-
-            navigator
-              .nextPage(TelephoneNumberQuestionPage, NormalMode, updatedAnswers)
-              .mustBe(routes.HaveSecondContactController.onPageLoad(NormalMode))
+              navigator
+                .nextPage(TelephoneNumberQuestionPage, NormalMode, updatedAnswers)
+                .mustBe(routes.HaveSecondContactController.onPageLoad(NormalMode))
+          }
         }
-      }
 
       "must go from the Do you have telephone page to the Check answers page when the answer is 'No' and " +
         "the business type is Sole proprietor" in {
-        forAll(arbitrary[UserAnswers]) {
-          answers =>
+          forAll(arbitrary[UserAnswers]) {
+            answers =>
+              val updatedAnswers =
+                answers
+                  .set(BusinessTypePage, BusinessType.NotSpecified)
+                  .success
+                  .value
+                  .set(TelephoneNumberQuestionPage, false)
+                  .success
+                  .value
 
-            val updatedAnswers =
-              answers
-                .set(BusinessTypePage, BusinessType.NotSpecified)
-                .success
-                .value
-                .set(TelephoneNumberQuestionPage, false)
-                .success
-                .value
-
-            navigator
-              .nextPage(TelephoneNumberQuestionPage, NormalMode, updatedAnswers)
-              .mustBe(routes.CheckYourAnswersController.onPageLoad())
+              navigator
+                .nextPage(TelephoneNumberQuestionPage, NormalMode, updatedAnswers)
+                .mustBe(routes.CheckYourAnswersController.onPageLoad())
+          }
         }
-      }
 
       "must go from the Do you have telephone page to the Check answers page when the answer is 'No' and " +
         "the user is an Individual" in {
 
-        val userAnswers = UserAnswers(userAnswersId).set(TelephoneNumberQuestionPage, false).success.value
+          val userAnswers = UserAnswers(userAnswersId).set(TelephoneNumberQuestionPage, false).success.value
 
-        navigator
-          .nextPage(TelephoneNumberQuestionPage, NormalMode, userAnswers)
-          .mustBe(routes.CheckYourAnswersController.onPageLoad())
-      }
+          navigator
+            .nextPage(TelephoneNumberQuestionPage, NormalMode, userAnswers)
+            .mustBe(routes.CheckYourAnswersController.onPageLoad())
+        }
 
       "must go from Is there someone else we can contact if *name* is not available??" +
         "to What is the name of the individual or team we should contact? when Yes is selected" in {
-        forAll(arbitrary[UserAnswers]) {
-          answers =>
-            val updatedAnswers =
-              answers
-                .set(HaveSecondContactPage, true)
-                .success
-                .value
+          forAll(arbitrary[UserAnswers]) {
+            answers =>
+              val updatedAnswers =
+                answers
+                  .set(HaveSecondContactPage, true)
+                  .success
+                  .value
 
-            navigator
-              .nextPage(HaveSecondContactPage, NormalMode, updatedAnswers)
-              .mustBe(routes.SecondaryContactNameController.onPageLoad(NormalMode))
+              navigator
+                .nextPage(HaveSecondContactPage, NormalMode, updatedAnswers)
+                .mustBe(routes.SecondaryContactNameController.onPageLoad(NormalMode))
+          }
         }
-      }
 
       "must go from Is there someone else we can contact if *name* is not available??" +
         "to Check your answers? when No is selected" in {
-        forAll(arbitrary[UserAnswers]) {
-          answers =>
-            val updatedAnswers =
-              answers
-                .set(HaveSecondContactPage, false)
-                .success
-                .value
+          forAll(arbitrary[UserAnswers]) {
+            answers =>
+              val updatedAnswers =
+                answers
+                  .set(HaveSecondContactPage, false)
+                  .success
+                  .value
 
-            navigator
-              .nextPage(HaveSecondContactPage, NormalMode, updatedAnswers)
-              .mustBe(routes.CheckYourAnswersController.onPageLoad())
+              navigator
+                .nextPage(HaveSecondContactPage, NormalMode, updatedAnswers)
+                .mustBe(routes.CheckYourAnswersController.onPageLoad())
+          }
         }
-      }
 
       "must go from the What is the name of the individual or team we should contact? page " +
         "to what is the email address for *name*? page" in {
-        forAll(arbitrary[UserAnswers]) {
-          answers =>
+          forAll(arbitrary[UserAnswers]) {
+            answers =>
+              val updatedAnswers =
+                answers
+                  .set(SecondaryContactNamePage, "DAC6 Team")
+                  .success
+                  .value
 
-            val updatedAnswers =
-              answers
-                .set(SecondaryContactNamePage, "DAC6 Team")
-                .success
-                .value
-
-            navigator
-              .nextPage(SecondaryContactNamePage, NormalMode, updatedAnswers)
-              .mustBe(routes.SecondaryContactEmailAddressController.onPageLoad(NormalMode))
+              navigator
+                .nextPage(SecondaryContactNamePage, NormalMode, updatedAnswers)
+                .mustBe(routes.SecondaryContactEmailAddressController.onPageLoad(NormalMode))
+          }
         }
-      }
 
       "must go from the What is the email address for *name*? page " +
         "to does *name*? have a telephone number page" in {
-        forAll(arbitrary[UserAnswers]) {
-          answers =>
+          forAll(arbitrary[UserAnswers]) {
+            answers =>
+              val updatedAnswers =
+                answers
+                  .set(SecondaryContactNamePage, "DAC6 Team")
+                  .success
+                  .value
 
-            val updatedAnswers =
-              answers
-                .set(SecondaryContactNamePage, "DAC6 Team")
-                .success
-                .value
-
-            navigator
-              .nextPage(SecondaryContactEmailAddressPage, NormalMode, updatedAnswers)
-              .mustBe(routes.SecondaryContactTelephoneQuestionController.onPageLoad(NormalMode))
+              navigator
+                .nextPage(SecondaryContactEmailAddressPage, NormalMode, updatedAnswers)
+                .mustBe(routes.SecondaryContactTelephoneQuestionController.onPageLoad(NormalMode))
+          }
         }
-      }
 
       "must go from the does *name*? have a telephone number page " +
         "to what is the telephone number for *name*? page when option 'yes' is selected" in {
-        forAll(arbitrary[UserAnswers]) {
-          answers =>
+          forAll(arbitrary[UserAnswers]) {
+            answers =>
+              val updatedAnswers =
+                answers
+                  .set(SecondaryContactNamePage, "DAC6 Team")
+                  .success
+                  .value
+                  .set(SecondaryContactTelephoneQuestionPage, true)
+                  .success
+                  .value
 
-            val updatedAnswers =
-              answers
-                .set(SecondaryContactNamePage, "DAC6 Team")
-                .success
-                .value
-                .set(SecondaryContactTelephoneQuestionPage, true)
-                .success
-                .value
-
-            navigator
-              .nextPage(SecondaryContactTelephoneQuestionPage, NormalMode, updatedAnswers)
-              .mustBe(routes.SecondaryContactTelephoneNumberController.onPageLoad(NormalMode))
+              navigator
+                .nextPage(SecondaryContactTelephoneQuestionPage, NormalMode, updatedAnswers)
+                .mustBe(routes.SecondaryContactTelephoneNumberController.onPageLoad(NormalMode))
+          }
         }
-      }
 
       "must go from the does *name*? have a telephone number page " +
         "to Check your answers page when option 'no' is selected" in {
-        forAll(arbitrary[UserAnswers]) {
-          answers =>
+          forAll(arbitrary[UserAnswers]) {
+            answers =>
+              val updatedAnswers =
+                answers
+                  .set(SecondaryContactNamePage, "DAC6 Team")
+                  .success
+                  .value
+                  .set(SecondaryContactTelephoneQuestionPage, false)
+                  .success
+                  .value
 
-            val updatedAnswers =
-              answers
-                .set(SecondaryContactNamePage, "DAC6 Team")
-                .success
-                .value
-                .set(SecondaryContactTelephoneQuestionPage, false)
-                .success
-                .value
-
-            navigator
-              .nextPage(SecondaryContactTelephoneQuestionPage, NormalMode, updatedAnswers)
-              .mustBe(routes.CheckYourAnswersController.onPageLoad())
+              navigator
+                .nextPage(SecondaryContactTelephoneQuestionPage, NormalMode, updatedAnswers)
+                .mustBe(routes.CheckYourAnswersController.onPageLoad())
+          }
         }
-      }
 
       "must go from the What is the telephone number for *name* contact page " +
         "to Check your answers page" in {
-        forAll(arbitrary[UserAnswers]) {
-          answers =>
+          forAll(arbitrary[UserAnswers]) {
+            answers =>
+              val updatedAnswers =
+                answers
+                  .set(SecondaryContactTelephoneNumberPage, "07000000000")
+                  .success
+                  .value
 
-            val updatedAnswers =
-              answers
-                .set(SecondaryContactTelephoneNumberPage, "07000000000")
-                .success
-                .value
-
-            navigator
-              .nextPage(SecondaryContactTelephoneNumberPage, NormalMode, updatedAnswers)
-              .mustBe(routes.CheckYourAnswersController.onPageLoad())
+              navigator
+                .nextPage(SecondaryContactTelephoneNumberPage, NormalMode, updatedAnswers)
+                .mustBe(routes.CheckYourAnswersController.onPageLoad())
+          }
         }
-      }
-
 
       "must got from Is this your business? page to" - {
         "Contact email address page when answer is 'Yes' is business type not specified" in {
@@ -827,4 +803,3 @@ class NavigatorSpec extends SpecBase with ScalaCheckPropertyChecks with Generato
     }
   }
 }
-

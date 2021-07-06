@@ -33,7 +33,6 @@ class RegistrationTypeSpec extends SpecBase with ScalaCheckPropertyChecks with O
 
       forAll(gen) {
         registrationType =>
-
           JsString(registrationType.toString).validate[RegistrationType].asOpt.value mustEqual registrationType
       }
     }
@@ -44,7 +43,6 @@ class RegistrationTypeSpec extends SpecBase with ScalaCheckPropertyChecks with O
 
       forAll(gen) {
         invalidValue =>
-
           JsString(invalidValue).validate[RegistrationType] mustEqual JsError("error.invalid")
       }
     }
@@ -55,7 +53,6 @@ class RegistrationTypeSpec extends SpecBase with ScalaCheckPropertyChecks with O
 
       forAll(gen) {
         registrationType =>
-
           Json.toJson(registrationType) mustEqual JsString(registrationType.toString)
       }
     }

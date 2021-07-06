@@ -41,8 +41,8 @@ class NonUkNameControllerSpec extends SpecBase with NunjucksSupport with JsonMat
 
   def onwardRoute: Call = Call("GET", "/foo")
 
-  val formProvider = new NonUkNameFormProvider()
-  val form: Form[Name] = formProvider()
+  val formProvider                             = new NonUkNameFormProvider()
+  val form: Form[Name]                         = formProvider()
   val mockSessionRepository: SessionRepository = mock[SessionRepository]
   val mockFrontendAppConfig: FrontendAppConfig = mock[FrontendAppConfig]
 
@@ -52,7 +52,7 @@ class NonUkNameControllerSpec extends SpecBase with NunjucksSupport with JsonMat
     userAnswersId,
     Json.obj(
       NonUkNamePage.toString -> Json.obj(
-        "firstName" -> "value one",
+        "firstName"  -> "value one",
         "secondName" -> "value two"
       )
     )
@@ -65,10 +65,10 @@ class NonUkNameControllerSpec extends SpecBase with NunjucksSupport with JsonMat
       when(mockRenderer.render(any(), any())(any()))
         .thenReturn(Future.successful(Html("")))
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
-      val request = FakeRequest(GET, nonUkNameRoute)
+      val application    = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val request        = FakeRequest(GET, nonUkNameRoute)
       val templateCaptor = ArgumentCaptor.forClass(classOf[String])
-      val jsonCaptor = ArgumentCaptor.forClass(classOf[JsObject])
+      val jsonCaptor     = ArgumentCaptor.forClass(classOf[JsObject])
 
       val result = route(application, request).value
 
@@ -92,10 +92,10 @@ class NonUkNameControllerSpec extends SpecBase with NunjucksSupport with JsonMat
       when(mockRenderer.render(any(), any())(any()))
         .thenReturn(Future.successful(Html("")))
 
-      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
-      val request = FakeRequest(GET, nonUkNameRoute)
+      val application    = applicationBuilder(userAnswers = Some(userAnswers)).build()
+      val request        = FakeRequest(GET, nonUkNameRoute)
       val templateCaptor = ArgumentCaptor.forClass(classOf[String])
-      val jsonCaptor = ArgumentCaptor.forClass(classOf[JsObject])
+      val jsonCaptor     = ArgumentCaptor.forClass(classOf[JsObject])
 
       val result = route(application, request).value
 
@@ -105,7 +105,7 @@ class NonUkNameControllerSpec extends SpecBase with NunjucksSupport with JsonMat
 
       val filledForm = form.bind(
         Map(
-          "firstName" -> "value one",
+          "firstName"  -> "value one",
           "secondName" -> "value two"
         )
       )
@@ -133,7 +133,6 @@ class NonUkNameControllerSpec extends SpecBase with NunjucksSupport with JsonMat
           )
           .build()
 
-
       val request =
         FakeRequest(POST, nonUkNameRoute)
           .withFormUrlEncodedBody(("firstName", "value one"), ("secondName", "value two"))
@@ -152,11 +151,11 @@ class NonUkNameControllerSpec extends SpecBase with NunjucksSupport with JsonMat
       when(mockRenderer.render(any(), any())(any()))
         .thenReturn(Future.successful(Html("")))
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
-      val request = FakeRequest(POST, nonUkNameRoute).withFormUrlEncodedBody(("value", "invalid value"))
-      val boundForm = form.bind(Map("value" -> "invalid value"))
+      val application    = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val request        = FakeRequest(POST, nonUkNameRoute).withFormUrlEncodedBody(("value", "invalid value"))
+      val boundForm      = form.bind(Map("value" -> "invalid value"))
       val templateCaptor = ArgumentCaptor.forClass(classOf[String])
-      val jsonCaptor = ArgumentCaptor.forClass(classOf[JsObject])
+      val jsonCaptor     = ArgumentCaptor.forClass(classOf[JsObject])
 
       val result = route(application, request).value
 
@@ -165,14 +164,14 @@ class NonUkNameControllerSpec extends SpecBase with NunjucksSupport with JsonMat
       verify(mockRenderer, times(1)).render(templateCaptor.capture(), jsonCaptor.capture())(any())
 
       val expectedJson = Json.obj(
-        "form"   -> boundForm,
-        "mode"   -> NormalMode
+        "form" -> boundForm,
+        "mode" -> NormalMode
       )
 
       templateCaptor.getValue mustEqual "nonUkName.njk"
       jsonCaptor.getValue must containJson(expectedJson)
 
-       application.stop()
+      application.stop()
     }
 
     "must redirect to the Check your answers page when mode is CheckMode" in {

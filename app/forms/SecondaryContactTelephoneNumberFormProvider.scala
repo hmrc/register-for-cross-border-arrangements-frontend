@@ -27,8 +27,12 @@ class SecondaryContactTelephoneNumberFormProvider @Inject() extends Mappings wit
 
   def apply(): Form[String] =
     Form(
-      "telephoneNumber" -> validatedText("secondaryContactTelephoneNumber.error.required",
+      "telephoneNumber" -> validatedText(
+        "secondaryContactTelephoneNumber.error.required",
         "secondaryContactTelephoneNumber.error.invalid",
-        "secondaryContactTelephoneNumber.error.length", digitsAndWhiteSpaceOnly, maxLength)
+        "secondaryContactTelephoneNumber.error.length",
+        digitsAndWhiteSpaceOnly,
+        maxLength
+      )
     )
 }

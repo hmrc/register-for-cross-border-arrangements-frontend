@@ -23,8 +23,8 @@ import play.api.libs.json.Json
 
 class RegisterWithoutIDResponseSpec extends SpecBase with ScalaCheckPropertyChecks {
 
-  val responseCommon: ResponseCommon = ResponseCommon(status = "OK", statusText = Some("Success"),
-    processingDate = "2020-09-01T01:00:00Z", returnParameters = None)
+  val responseCommon: ResponseCommon =
+    ResponseCommon(status = "OK", statusText = Some("Success"), processingDate = "2020-09-01T01:00:00Z", returnParameters = None)
   val responseDetail: RegisterWithoutIDResponseDetail = RegisterWithoutIDResponseDetail(SAFEID = "XE0000123456789", ARN = None)
 
   val registerWithoutID: PayloadRegistrationWithoutIDResponse = PayloadRegistrationWithoutIDResponse(

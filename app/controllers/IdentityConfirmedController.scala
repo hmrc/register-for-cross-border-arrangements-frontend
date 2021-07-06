@@ -28,23 +28,24 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
 import scala.concurrent.ExecutionContext
 
-class IdentityConfirmedController @Inject()(
-    override val messagesApi: MessagesApi,
-    identify: IdentifierAction,
-    notEnrolled: NotEnrolledForDAC6Action,
-    getData: DataRetrievalAction,
-    requireData: DataRequiredAction,
-    val controllerComponents: MessagesControllerComponents,
-    renderer: Renderer
-)(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+class IdentityConfirmedController @Inject() (
+  override val messagesApi: MessagesApi,
+  identify: IdentifierAction,
+  notEnrolled: NotEnrolledForDAC6Action,
+  getData: DataRetrievalAction,
+  requireData: DataRequiredAction,
+  val controllerComponents: MessagesControllerComponents,
+  renderer: Renderer
+)(implicit ec: ExecutionContext)
+    extends FrontendBaseController
+    with I18nSupport {
 
   def onPageLoad: Action[AnyContent] = (identify andThen notEnrolled andThen getData andThen requireData).async {
     implicit request =>
-
       val nextPage: String = request.userAnswers.get(BusinessTypePage) match {
         case Some(BusinessType.NotSpecified) => routes.ContactEmailAddressController.onPageLoad(NormalMode).url
-        case Some(_) => routes.ContactNameController.onPageLoad(NormalMode).url
-        case None => routes.ContactEmailAddressController.onPageLoad(NormalMode).url
+        case Some(_)                         => routes.ContactNameController.onPageLoad(NormalMode).url
+        case None                            => routes.ContactEmailAddressController.onPageLoad(NormalMode).url
       }
 
       val json = Json.obj(

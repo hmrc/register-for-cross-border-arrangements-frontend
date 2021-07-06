@@ -30,7 +30,7 @@ case object BusinessTypePage extends QuestionPage[BusinessType] {
   override def cleanup(value: Option[BusinessType], userAnswers: UserAnswers): Try[UserAnswers] =
     value match {
       case Some(BusinessType.NotSpecified) => userAnswers.remove(BusinessNamePage)
-      case Some(_) => userAnswers.remove(SoleTraderNamePage)
-      case None => super.cleanup(value, userAnswers)
+      case Some(_)                         => userAnswers.remove(SoleTraderNamePage)
+      case None                            => super.cleanup(value, userAnswers)
     }
 }

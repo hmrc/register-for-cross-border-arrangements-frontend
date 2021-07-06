@@ -19,12 +19,12 @@ package models.readSubscription
 import models.{PrimaryContact, ResponseCommon, SecondaryContact}
 import play.api.libs.json._
 
-
 case class ResponseDetailForReadSubscription(subscriptionID: String,
                                              tradingName: Option[String],
                                              isGBUser: Boolean,
                                              primaryContact: PrimaryContact,
-                                             secondaryContact: Option[SecondaryContact])
+                                             secondaryContact: Option[SecondaryContact]
+)
 
 object ResponseDetailForReadSubscription {
   implicit val format: OFormat[ResponseDetailForReadSubscription] = Json.format[ResponseDetailForReadSubscription]

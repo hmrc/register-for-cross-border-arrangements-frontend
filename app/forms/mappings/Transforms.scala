@@ -17,27 +17,30 @@
 package forms.mappings
 
 trait Transforms {
-  protected def stripSpaces(string: String): String = {
-    string.trim.replaceAll(" ", "")
-  }
 
-  protected def validPostCodeFormat(validPostCode: String): String = {
+  protected def stripSpaces(string: String): String =
+    string.trim.replaceAll(" ", "")
+
+  protected def validPostCodeFormat(validPostCode: String): String =
     if (!validPostCode.contains(" ")) {
       val tail = validPostCode.substring(validPostCode.length - 3)
       val head = validPostCode.substring(0, validPostCode.length - 3)
       s"$head $tail".toUpperCase
-    } else {validPostCode.toUpperCase}
-  }
+    } else { validPostCode.toUpperCase }
 
   protected def minimiseSpace(value: String): String =
     value.replaceAll(" {2,}", " ")
-  private[mappings] def postCodeTransform(value: String): String = {
+
+  private[mappings] def postCodeTransform(value: String): String =
     minimiseSpace(value.trim.toUpperCase)
-  }
-  protected def postCodeDataTransform(value: Option[String]): Option[String] = {
+
+  protected def postCodeDataTransform(value: Option[String]): Option[String] =
     value.map(postCodeTransform).filter(_.nonEmpty)
-  }
-  protected def countryDataTransform(value: Option[String]): Option[String] = {
-    value.map(s => stripSpaces(s).toUpperCase()).filter(_.nonEmpty)
-  }
+
+  protected def countryDataTransform(value: Option[String]): Option[String] =
+    value
+      .map(
+        s => stripSpaces(s).toUpperCase()
+      )
+      .filter(_.nonEmpty)
 }

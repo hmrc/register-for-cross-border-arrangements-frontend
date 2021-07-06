@@ -33,81 +33,79 @@ import uk.gov.hmrc.viewmodels.{NunjucksSupport, Radios}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class HaveSecondContactController @Inject()(
-    override val messagesApi: MessagesApi,
-    sessionRepository: SessionRepository,
-    navigator: Navigator,
-    identify: IdentifierAction,
-    notEnrolled: NotEnrolledForDAC6Action,
-    getData: DataRetrievalAction,
-    requireData: DataRequiredAction,
-    formProvider: HaveSecondContactFormProvider,
-    val controllerComponents: MessagesControllerComponents,
-    renderer: Renderer
-)(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with NunjucksSupport {
+class HaveSecondContactController @Inject() (
+  override val messagesApi: MessagesApi,
+  sessionRepository: SessionRepository,
+  navigator: Navigator,
+  identify: IdentifierAction,
+  notEnrolled: NotEnrolledForDAC6Action,
+  getData: DataRetrievalAction,
+  requireData: DataRequiredAction,
+  formProvider: HaveSecondContactFormProvider,
+  val controllerComponents: MessagesControllerComponents,
+  renderer: Renderer
+)(implicit ec: ExecutionContext)
+    extends FrontendBaseController
+    with I18nSupport
+    with NunjucksSupport {
 
   private val form = formProvider()
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen notEnrolled andThen getData andThen requireData).async {
     implicit request =>
-
-      if (request.userAnswers.get(ContactNamePage).isEmpty){
-        Future(Redirect(routes.ContactNameController.onPageLoad(NormalMode))) }
-
-        else{
+      if (request.userAnswers.get(ContactNamePage).isEmpty) {
+        Future(Redirect(routes.ContactNameController.onPageLoad(NormalMode)))
+      } else {
 
         val contactName = request.userAnswers.get(ContactNamePage).get
 
-          val preparedForm = request.userAnswers.get(HaveSecondContactPage) match {
-            case None => form
-            case Some(confirm) => form.fill(confirm)
-          }
-
-
-
-          val json = Json.obj(
-            "form"   -> preparedForm,
-            "mode"   -> mode,
-            "radios" -> Radios.yesNo(preparedForm("confirm")),
-            "contactName" -> contactName
-          )
-
-          renderer.render("haveSecondContact.njk", json).map(Ok(_))
+        val preparedForm = request.userAnswers.get(HaveSecondContactPage) match {
+          case None          => form
+          case Some(confirm) => form.fill(confirm)
         }
+
+        val json = Json.obj(
+          "form"        -> preparedForm,
+          "mode"        -> mode,
+          "radios"      -> Radios.yesNo(preparedForm("confirm")),
+          "contactName" -> contactName
+        )
+
+        renderer.render("haveSecondContact.njk", json).map(Ok(_))
       }
+  }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen notEnrolled andThen getData andThen requireData).async {
     implicit request =>
-
       val contactName = request.userAnswers.get(ContactNamePage).get
 
-      form.bindFromRequest().fold(
-        formWithErrors => {
+      form
+        .bindFromRequest()
+        .fold(
+          formWithErrors => {
 
+            val json = Json.obj(
+              "form"        -> formWithErrors,
+              "mode"        -> mode,
+              "radios"      -> Radios.yesNo(formWithErrors("confirm")),
+              "contactName" -> contactName
+            )
 
-          val json = Json.obj(
-            "form"   -> formWithErrors,
-            "mode"   -> mode,
-            "radios" -> Radios.yesNo(formWithErrors("confirm")),
-            "contactName" -> contactName
-          )
+            renderer.render("haveSecondContact.njk", json).map(BadRequest(_))
+          },
+          value => {
+            val redirectUsers = redirectToSummary(value, HaveSecondContactPage, mode, request.userAnswers)
 
-          renderer.render("haveSecondContact.njk", json).map(BadRequest(_))
-        },
-        value => {
-          val redirectUsers = redirectToSummary(value, HaveSecondContactPage, mode, request.userAnswers)
-
-          for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(HaveSecondContactPage, value))
-            _              <- sessionRepository.set(updatedAnswers)
-          } yield {
-            if (redirectUsers) {
-              Redirect(routes.CheckYourAnswersController.onPageLoad())
-            } else {
-              Redirect(navigator.nextPage(HaveSecondContactPage, mode, updatedAnswers))
-            }
+            for {
+              updatedAnswers <- Future.fromTry(request.userAnswers.set(HaveSecondContactPage, value))
+              _              <- sessionRepository.set(updatedAnswers)
+            } yield
+              if (redirectUsers) {
+                Redirect(routes.CheckYourAnswersController.onPageLoad())
+              } else {
+                Redirect(navigator.nextPage(HaveSecondContactPage, mode, updatedAnswers))
+              }
           }
-        }
-      )
+        )
   }
 }

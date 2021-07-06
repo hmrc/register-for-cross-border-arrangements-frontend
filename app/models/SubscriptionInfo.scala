@@ -24,65 +24,60 @@ case class SubscriptionInfo(safeID: String,
                             ctUtr: Option[String] = None,
                             nino: Option[String] = None,
                             nonUkPostcode: Option[String] = None,
-                            dac6Id: String)
+                            dac6Id: String
+)
+
 object SubscriptionInfo {
   implicit val format: OFormat[SubscriptionInfo] = Json.format[SubscriptionInfo]
 
-  def createSubscriptionInfo(userAnswers: UserAnswers): SubscriptionInfo = {
-
+  def createSubscriptionInfo(userAnswers: UserAnswers): SubscriptionInfo =
     SubscriptionInfo(
       safeID = getSafeID(userAnswers),
       saUtr = getSaUtrIfProvided(userAnswers),
       ctUtr = getCtUtrIfProvided(userAnswers),
       nino = getNinoIfProvided(userAnswers),
       nonUkPostcode = getNonUkPostCodeIfProvided(userAnswers),
-      dac6Id = getSubscriptionId(userAnswers))
-  }
+      dac6Id = getSubscriptionId(userAnswers)
+    )
 
-    private def getSafeID(userAnswers: UserAnswers): String = {
-      userAnswers.get(SafeIDPage) match {
-        case Some(id) => id
-        case None => throw new Exception("Safe ID can't be retrieved")
-      }
+  private def getSafeID(userAnswers: UserAnswers): String =
+    userAnswers.get(SafeIDPage) match {
+      case Some(id) => id
+      case None     => throw new Exception("Safe ID can't be retrieved")
     }
 
-  private def getSubscriptionId(userAnswers: UserAnswers): String = {
-      userAnswers.get(SubscriptionIDPage) match {
-        case Some(id) => id
-        case None => throw new Exception("Subscription ID can't be retrieved")
-      }
+  private def getSubscriptionId(userAnswers: UserAnswers): String =
+    userAnswers.get(SubscriptionIDPage) match {
+      case Some(id) => id
+      case None     => throw new Exception("Subscription ID can't be retrieved")
     }
 
-    private def getNinoIfProvided(userAnswers: UserAnswers): Option[String] = {
-      userAnswers.get(NinoPage) match {
+  private def getNinoIfProvided(userAnswers: UserAnswers): Option[String] =
+    userAnswers.get(NinoPage) match {
 
-        case Some(nino) => Some(nino.nino)
-        case _ => None
-      }
+      case Some(nino) => Some(nino.nino)
+      case _          => None
     }
 
-    private def getSaUtrIfProvided(userAnswers: UserAnswers): Option[String] = {
-      userAnswers.get(SelfAssessmentUTRPage) match {
+  private def getSaUtrIfProvided(userAnswers: UserAnswers): Option[String] =
+    userAnswers.get(SelfAssessmentUTRPage) match {
 
-        case Some(utr) => Some(utr.uniqueTaxPayerReference)
-        case _ => None
-      }
+      case Some(utr) => Some(utr.uniqueTaxPayerReference)
+      case _         => None
     }
 
-    private def getCtUtrIfProvided(userAnswers: UserAnswers): Option[String] = {
-      userAnswers.get(CorporationTaxUTRPage) match {
+  private def getCtUtrIfProvided(userAnswers: UserAnswers): Option[String] =
+    userAnswers.get(CorporationTaxUTRPage) match {
 
-        case Some(utr) => Some(utr.uniqueTaxPayerReference)
-        case _ => None
-      }
+      case Some(utr) => Some(utr.uniqueTaxPayerReference)
+      case _         => None
     }
 
-    private def getNonUkPostCodeIfProvided(userAnswers: UserAnswers): Option[String] = {
-      userAnswers.get(WhatIsYourAddressPage) match {
+  private def getNonUkPostCodeIfProvided(userAnswers: UserAnswers): Option[String] =
+    userAnswers.get(WhatIsYourAddressPage) match {
 
-        case Some(address) => address.postCode
-        case _ => None
-      }
+      case Some(address) => address.postCode
+      case _             => None
     }
 
 }

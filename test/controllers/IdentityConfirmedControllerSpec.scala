@@ -43,12 +43,14 @@ class IdentityConfirmedControllerSpec extends SpecBase with JsonMatchers {
 
       val nino = new Generator().nextNino
       val userAnswers: UserAnswers = UserAnswers(userAnswersId)
-        .set(NinoPage, nino).success.value
+        .set(NinoPage, nino)
+        .success
+        .value
 
-      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
-      val request = FakeRequest(GET, identityConfirmedRoute)
+      val application    = applicationBuilder(userAnswers = Some(userAnswers)).build()
+      val request        = FakeRequest(GET, identityConfirmedRoute)
       val templateCaptor = ArgumentCaptor.forClass(classOf[String])
-      val jsonCaptor = ArgumentCaptor.forClass(classOf[JsObject])
+      val jsonCaptor     = ArgumentCaptor.forClass(classOf[JsObject])
 
       val result = route(application, request).value
 
@@ -72,12 +74,14 @@ class IdentityConfirmedControllerSpec extends SpecBase with JsonMatchers {
         .thenReturn(Future.successful(Html("")))
 
       val userAnswers: UserAnswers = UserAnswers(userAnswersId)
-        .set(BusinessTypePage, BusinessType.NotSpecified).success.value
+        .set(BusinessTypePage, BusinessType.NotSpecified)
+        .success
+        .value
 
-      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
-      val request = FakeRequest(GET, identityConfirmedRoute)
+      val application    = applicationBuilder(userAnswers = Some(userAnswers)).build()
+      val request        = FakeRequest(GET, identityConfirmedRoute)
       val templateCaptor = ArgumentCaptor.forClass(classOf[String])
-      val jsonCaptor = ArgumentCaptor.forClass(classOf[JsObject])
+      val jsonCaptor     = ArgumentCaptor.forClass(classOf[JsObject])
 
       val result = route(application, request).value
 
@@ -101,12 +105,14 @@ class IdentityConfirmedControllerSpec extends SpecBase with JsonMatchers {
         .thenReturn(Future.successful(Html("")))
 
       val userAnswers: UserAnswers = UserAnswers(userAnswersId)
-        .set(BusinessTypePage, BusinessType.LimitedLiability).success.value
+        .set(BusinessTypePage, BusinessType.LimitedLiability)
+        .success
+        .value
 
-      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
-      val request = FakeRequest(GET, identityConfirmedRoute)
+      val application    = applicationBuilder(userAnswers = Some(userAnswers)).build()
+      val request        = FakeRequest(GET, identityConfirmedRoute)
       val templateCaptor = ArgumentCaptor.forClass(classOf[String])
-      val jsonCaptor = ArgumentCaptor.forClass(classOf[JsObject])
+      val jsonCaptor     = ArgumentCaptor.forClass(classOf[JsObject])
 
       val result = route(application, request).value
 

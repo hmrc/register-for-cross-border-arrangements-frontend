@@ -28,35 +28,35 @@ trait UserAnswersGenerator extends TryValues {
 
   val generators: Seq[Gen[(QuestionPage[_], JsValue)]] =
     arbitrary[(SecondaryContactTelephoneQuestionPage.type, JsValue)] ::
-    arbitrary[(SelectAddressPage.type, JsValue)] ::
-    arbitrary[(SecondaryContactTelephoneNumberPage.type, JsValue)] ::
-    arbitrary[(SecondaryContactEmailAddressPage.type, JsValue)] ::
-    arbitrary[(CorporationTaxUTRPage.type, JsValue)] ::
-    arbitrary[(SecondaryContactNamePage.type, JsValue)] ::
-    arbitrary[(WhatIsYourAddressUkPage.type, JsValue)] ::
-    arbitrary[(TelephoneNumberQuestionPage.type, JsValue)] ::
-    arbitrary[(ContactTelephoneNumberPage.type, JsValue)] ::
-    arbitrary[(HaveSecondContactPage.type, JsValue)] ::
-    arbitrary[(ConfirmBusinessPage.type, JsValue)] ::
-    arbitrary[(ContactNamePage.type, JsValue)] ::
-    arbitrary[(ContactEmailAddressPage.type, JsValue)] ::
-    arbitrary[(BusinessAddressPage.type, JsValue)] ::
-    arbitrary[(BusinessWithoutIDNamePage.type, JsValue)] ::
-    arbitrary[(BusinessNamePage.type, JsValue)] ::
-    arbitrary[(WhatIsYourAddressPage.type, JsValue)] ::
-    arbitrary[(IndividualUKPostcodePage.type, JsValue)] ::
-    arbitrary[(DoYouLiveInTheUKPage.type, JsValue)] ::
-    arbitrary[(DateOfBirthPage.type, JsValue)] ::
-    arbitrary[(DoYouHaveUTRPage.type, JsValue)] ::
-    arbitrary[(RegistrationTypePage.type, JsValue)] ::
-    arbitrary[(NamePage.type, JsValue)] ::
-    arbitrary[(NinoPage.type, JsValue)] ::
-    arbitrary[(DoYouHaveANationalInsuranceNumberPage.type, JsValue)] ::
-    arbitrary[(PostCodePage.type, JsValue)] ::
-    arbitrary[(SelfAssessmentUTRPage.type, JsValue)] ::
-    arbitrary[(BusinessTypePage.type, JsValue)] ::
-    arbitrary[(SoleTraderNamePage.type, JsValue)] ::
-    Nil
+      arbitrary[(SelectAddressPage.type, JsValue)] ::
+      arbitrary[(SecondaryContactTelephoneNumberPage.type, JsValue)] ::
+      arbitrary[(SecondaryContactEmailAddressPage.type, JsValue)] ::
+      arbitrary[(CorporationTaxUTRPage.type, JsValue)] ::
+      arbitrary[(SecondaryContactNamePage.type, JsValue)] ::
+      arbitrary[(WhatIsYourAddressUkPage.type, JsValue)] ::
+      arbitrary[(TelephoneNumberQuestionPage.type, JsValue)] ::
+      arbitrary[(ContactTelephoneNumberPage.type, JsValue)] ::
+      arbitrary[(HaveSecondContactPage.type, JsValue)] ::
+      arbitrary[(ConfirmBusinessPage.type, JsValue)] ::
+      arbitrary[(ContactNamePage.type, JsValue)] ::
+      arbitrary[(ContactEmailAddressPage.type, JsValue)] ::
+      arbitrary[(BusinessAddressPage.type, JsValue)] ::
+      arbitrary[(BusinessWithoutIDNamePage.type, JsValue)] ::
+      arbitrary[(BusinessNamePage.type, JsValue)] ::
+      arbitrary[(WhatIsYourAddressPage.type, JsValue)] ::
+      arbitrary[(IndividualUKPostcodePage.type, JsValue)] ::
+      arbitrary[(DoYouLiveInTheUKPage.type, JsValue)] ::
+      arbitrary[(DateOfBirthPage.type, JsValue)] ::
+      arbitrary[(DoYouHaveUTRPage.type, JsValue)] ::
+      arbitrary[(RegistrationTypePage.type, JsValue)] ::
+      arbitrary[(NamePage.type, JsValue)] ::
+      arbitrary[(NinoPage.type, JsValue)] ::
+      arbitrary[(DoYouHaveANationalInsuranceNumberPage.type, JsValue)] ::
+      arbitrary[(PostCodePage.type, JsValue)] ::
+      arbitrary[(SelfAssessmentUTRPage.type, JsValue)] ::
+      arbitrary[(BusinessTypePage.type, JsValue)] ::
+      arbitrary[(SoleTraderNamePage.type, JsValue)] ::
+      Nil
 
   implicit lazy val arbitraryUserData: Arbitrary[UserAnswers] = {
 
@@ -64,12 +64,12 @@ trait UserAnswersGenerator extends TryValues {
 
     Arbitrary {
       for {
-        id      <- nonEmptyString
-        data    <- generators match {
+        id <- nonEmptyString
+        data <- generators match {
           case Nil => Gen.const(Map[QuestionPage[_], JsValue]())
           case _   => Gen.mapOf(oneOf(generators))
         }
-      } yield UserAnswers (
+      } yield UserAnswers(
         id = id,
         data = data.foldLeft(Json.obj()) {
           case (obj, (path, value)) =>

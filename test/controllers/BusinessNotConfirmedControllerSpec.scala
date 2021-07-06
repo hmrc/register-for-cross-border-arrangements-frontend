@@ -39,10 +39,10 @@ class BusinessNotConfirmedControllerSpec extends SpecBase with NunjucksSupport w
 
       lazy val cantConfirmIdentityRoute = routes.BusinessNotConfirmedController.onPageLoad().url
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
-      val request = FakeRequest(GET, cantConfirmIdentityRoute)
+      val application    = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val request        = FakeRequest(GET, cantConfirmIdentityRoute)
       val templateCaptor = ArgumentCaptor.forClass(classOf[String])
-      val jsonCaptor = ArgumentCaptor.forClass(classOf[JsObject])
+      val jsonCaptor     = ArgumentCaptor.forClass(classOf[JsObject])
 
       val result = route(application, request).value
 

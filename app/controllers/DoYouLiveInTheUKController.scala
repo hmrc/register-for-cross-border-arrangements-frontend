@@ -33,26 +33,28 @@ import uk.gov.hmrc.viewmodels.{NunjucksSupport, Radios}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class DoYouLiveInTheUKController @Inject()(
-    override val messagesApi: MessagesApi,
-    sessionRepository: SessionRepository,
-    navigator: Navigator,
-    identify: IdentifierAction,
-    notEnrolled: NotEnrolledForDAC6Action,
-    getData: DataRetrievalAction,
-    requireData: DataRequiredAction,
-    formProvider: DoYouLiveInTheUKFormProvider,
-    val controllerComponents: MessagesControllerComponents,
-    renderer: Renderer
-)(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with NunjucksSupport {
+class DoYouLiveInTheUKController @Inject() (
+  override val messagesApi: MessagesApi,
+  sessionRepository: SessionRepository,
+  navigator: Navigator,
+  identify: IdentifierAction,
+  notEnrolled: NotEnrolledForDAC6Action,
+  getData: DataRetrievalAction,
+  requireData: DataRequiredAction,
+  formProvider: DoYouLiveInTheUKFormProvider,
+  val controllerComponents: MessagesControllerComponents,
+  renderer: Renderer
+)(implicit ec: ExecutionContext)
+    extends FrontendBaseController
+    with I18nSupport
+    with NunjucksSupport {
 
   private val form = formProvider()
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen notEnrolled andThen getData andThen requireData).async {
     implicit request =>
-
       val preparedForm = request.userAnswers.get(DoYouLiveInTheUKPage) match {
-        case None => form
+        case None        => form
         case Some(value) => form.fill(value)
       }
 
@@ -67,32 +69,32 @@ class DoYouLiveInTheUKController @Inject()(
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen notEnrolled andThen getData andThen requireData).async {
     implicit request =>
+      form
+        .bindFromRequest()
+        .fold(
+          formWithErrors => {
 
-      form.bindFromRequest().fold(
-        formWithErrors => {
+            val json = Json.obj(
+              "form"   -> formWithErrors,
+              "mode"   -> mode,
+              "radios" -> Radios.yesNo(formWithErrors("confirm"))
+            )
 
-          val json = Json.obj(
-            "form"   -> formWithErrors,
-            "mode"   -> mode,
-            "radios" -> Radios.yesNo(formWithErrors("confirm"))
-          )
+            renderer.render("doYouLiveInTheUK.njk", json).map(BadRequest(_))
+          },
+          value => {
+            val redirectUsers = redirectToSummary(value, DoYouLiveInTheUKPage, mode, request.userAnswers)
 
-          renderer.render("doYouLiveInTheUK.njk", json).map(BadRequest(_))
-        },
-        value => {
-          val redirectUsers = redirectToSummary(value, DoYouLiveInTheUKPage, mode, request.userAnswers)
-
-          for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(DoYouLiveInTheUKPage, value))
-            _              <- sessionRepository.set(updatedAnswers)
-          } yield {
-            if (redirectUsers) {
-              Redirect(routes.CheckYourAnswersController.onPageLoad())
-            } else {
-              Redirect(navigator.nextPage(DoYouLiveInTheUKPage, mode, updatedAnswers))
-            }
+            for {
+              updatedAnswers <- Future.fromTry(request.userAnswers.set(DoYouLiveInTheUKPage, value))
+              _              <- sessionRepository.set(updatedAnswers)
+            } yield
+              if (redirectUsers) {
+                Redirect(routes.CheckYourAnswersController.onPageLoad())
+              } else {
+                Redirect(navigator.nextPage(DoYouLiveInTheUKPage, mode, updatedAnswers))
+              }
           }
-        }
-      )
+        )
   }
 }

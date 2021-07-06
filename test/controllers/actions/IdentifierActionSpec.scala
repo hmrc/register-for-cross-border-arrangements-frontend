@@ -36,9 +36,11 @@ import utils.RetrievalOps._
 
 import scala.concurrent.Future
 
-class Harness @Inject()(authAction: IdentifierAction) extends InjectedController {
-  def onPageLoad(): Action[AnyContent] = authAction { request: UserRequest[AnyContent] =>
-    Ok
+class Harness @Inject() (authAction: IdentifierAction) extends InjectedController {
+
+  def onPageLoad(): Action[AnyContent] = authAction {
+    request: UserRequest[AnyContent] =>
+      Ok
   }
 }
 
@@ -50,22 +52,21 @@ class IdentifierActionSpec extends SpecBase with BeforeAndAfterEach {
       mockAuthConnector
     )
 
-  override implicit lazy val app: Application = GuiceApplicationBuilder()
-  .overrides(bind[AuthConnector].toInstance(mockAuthConnector))
-  .configure(Map("metrics.enabled" -> false))
-  .build()
+  implicit override lazy val app: Application = GuiceApplicationBuilder()
+    .overrides(bind[AuthConnector].toInstance(mockAuthConnector))
+    .configure(Map("metrics.enabled" -> false))
+    .build()
 
   type AuthRetrievals = Option[String] ~ Enrolments ~ Option[AffinityGroup] ~ Option[CredentialRole]
   val emptyEnrolments: Enrolments = Enrolments(Set.empty)
 
-
   "An Agent" - {
     "must be taken to the agent unauthorised controller" in {
-      val retrieval : AuthRetrievals = None ~ emptyEnrolments ~ Some(Agent) ~ None
+      val retrieval: AuthRetrievals = None ~ emptyEnrolments ~ Some(Agent) ~ None
       when(mockAuthConnector.authorise[AuthRetrievals](any(), any())(any(), any())) thenReturn Future.successful(retrieval)
 
       val harness = app.injector.instanceOf[Harness]
-      val result = harness.onPageLoad()(FakeRequest("GET", "/"))
+      val result  = harness.onPageLoad()(FakeRequest("GET", "/"))
 
       status(result) mustBe SEE_OTHER
       redirectLocation(result) mustBe Some(routes.UnauthorisedAgentController.onPageLoad().url)
@@ -74,11 +75,11 @@ class IdentifierActionSpec extends SpecBase with BeforeAndAfterEach {
 
   "An Assistant" - {
     "must be taken to the unauthorised assistant controller" in {
-      val retrieval : AuthRetrievals = None ~ emptyEnrolments ~ None ~ Some(Assistant)
+      val retrieval: AuthRetrievals = None ~ emptyEnrolments ~ None ~ Some(Assistant)
       when(mockAuthConnector.authorise[AuthRetrievals](any(), any())(any(), any())) thenReturn Future.successful(retrieval)
 
       val harness = app.injector.instanceOf[Harness]
-      val result = harness.onPageLoad()(FakeRequest("GET", "/"))
+      val result  = harness.onPageLoad()(FakeRequest("GET", "/"))
 
       status(result) mustBe SEE_OTHER
       redirectLocation(result) mustBe Some(routes.UnauthorisedAssistantController.onPageLoad().url)
@@ -86,12 +87,12 @@ class IdentifierActionSpec extends SpecBase with BeforeAndAfterEach {
 
     "must be allowed through the refiner if they are enrolled" in {
 
-      val dac6Enrolment = Enrolment(key = "HMRC-DAC6-ORG")
-      val retrieval : AuthRetrievals = Some("internalID") ~ Enrolments(Set(dac6Enrolment)) ~ Some(Organisation) ~ Some(Assistant)
+      val dac6Enrolment             = Enrolment(key = "HMRC-DAC6-ORG")
+      val retrieval: AuthRetrievals = Some("internalID") ~ Enrolments(Set(dac6Enrolment)) ~ Some(Organisation) ~ Some(Assistant)
       when(mockAuthConnector.authorise[AuthRetrievals](any(), any())(any(), any())) thenReturn Future.successful(retrieval)
 
       val harness = app.injector.instanceOf[Harness]
-      val result = harness.onPageLoad()(FakeRequest("GET", "/"))
+      val result  = harness.onPageLoad()(FakeRequest("GET", "/"))
       status(result) mustBe OK
 
     }
@@ -99,22 +100,22 @@ class IdentifierActionSpec extends SpecBase with BeforeAndAfterEach {
 
   "A user role for an organisation" - {
     "must be allowed through the refiner" in {
-      val retrieval : AuthRetrievals = Some("internalID") ~ emptyEnrolments ~ Some(Organisation) ~ Some(User)
+      val retrieval: AuthRetrievals = Some("internalID") ~ emptyEnrolments ~ Some(Organisation) ~ Some(User)
       when(mockAuthConnector.authorise[AuthRetrievals](any(), any())(any(), any())) thenReturn Future.successful(retrieval)
 
       val harness = app.injector.instanceOf[Harness]
-      val result = harness.onPageLoad()(FakeRequest("GET", "/"))
+      val result  = harness.onPageLoad()(FakeRequest("GET", "/"))
       status(result) mustBe OK
     }
 
     "must be allowed through the refiner if they are enrolled" in {
 
-      val dac6Enrolment = Enrolment(key = "HMRC-DAC6-ORG")
-      val retrieval : AuthRetrievals = Some("internalID") ~ Enrolments(Set(dac6Enrolment)) ~ Some(Organisation) ~ Some(User)
+      val dac6Enrolment             = Enrolment(key = "HMRC-DAC6-ORG")
+      val retrieval: AuthRetrievals = Some("internalID") ~ Enrolments(Set(dac6Enrolment)) ~ Some(Organisation) ~ Some(User)
       when(mockAuthConnector.authorise[AuthRetrievals](any(), any())(any(), any())) thenReturn Future.successful(retrieval)
 
       val harness = app.injector.instanceOf[Harness]
-      val result = harness.onPageLoad()(FakeRequest("GET", "/"))
+      val result  = harness.onPageLoad()(FakeRequest("GET", "/"))
       status(result) mustBe OK
     }
   }

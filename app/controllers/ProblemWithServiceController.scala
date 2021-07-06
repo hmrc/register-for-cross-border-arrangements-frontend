@@ -25,17 +25,18 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
 import scala.concurrent.ExecutionContext
 
-class ProblemWithServiceController @Inject()(
-    override val messagesApi: MessagesApi,
-    identify: IdentifierAction,
-    notEnrolled: NotEnrolledForDAC6Action,
-    val controllerComponents: MessagesControllerComponents,
-    renderer: Renderer
-)(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+class ProblemWithServiceController @Inject() (
+  override val messagesApi: MessagesApi,
+  identify: IdentifierAction,
+  notEnrolled: NotEnrolledForDAC6Action,
+  val controllerComponents: MessagesControllerComponents,
+  renderer: Renderer
+)(implicit ec: ExecutionContext)
+    extends FrontendBaseController
+    with I18nSupport {
 
   def onPageLoad: Action[AnyContent] = (identify andThen notEnrolled).async {
     implicit request =>
-
       renderer.render("problemWithService.njk").map(Ok(_))
   }
 }

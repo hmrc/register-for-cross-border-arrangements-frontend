@@ -33,46 +33,46 @@ import uk.gov.hmrc.viewmodels.NunjucksSupport
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class ContactTelephoneNumberController @Inject()(
-    override val messagesApi: MessagesApi,
-    sessionRepository: SessionRepository,
-    navigator: Navigator,
-    identify: IdentifierAction,
-    notEnrolled: NotEnrolledForDAC6Action,
-    getData: DataRetrievalAction,
-    requireData: DataRequiredAction,
-    formProvider: ContactTelephoneNumberFormProvider,
-    val controllerComponents: MessagesControllerComponents,
-    renderer: Renderer
-)(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with NunjucksSupport {
+class ContactTelephoneNumberController @Inject() (
+  override val messagesApi: MessagesApi,
+  sessionRepository: SessionRepository,
+  navigator: Navigator,
+  identify: IdentifierAction,
+  notEnrolled: NotEnrolledForDAC6Action,
+  getData: DataRetrievalAction,
+  requireData: DataRequiredAction,
+  formProvider: ContactTelephoneNumberFormProvider,
+  val controllerComponents: MessagesControllerComponents,
+  renderer: Renderer
+)(implicit ec: ExecutionContext)
+    extends FrontendBaseController
+    with I18nSupport
+    with NunjucksSupport {
 
   private val form = formProvider()
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen notEnrolled andThen getData andThen requireData).async {
     implicit request =>
-
       (isOrganisationJourney(request.userAnswers), request.userAnswers.get(ContactNamePage)) match {
         case (true, None) => Future.successful(Redirect(routes.ContactNameController.onPageLoad(NormalMode)))
         case _ =>
           val preparedForm = request.userAnswers.get(ContactTelephoneNumberPage) match {
-            case None => form
+            case None        => form
             case Some(value) => form.fill(value)
           }
 
           val (pageTitle, heading) = request.userAnswers.get(ContactNamePage) match {
             case Some(name) =>
-              (Messages("contactTelephoneNumber.business.title"),
-                Messages("contactTelephoneNumber.business.heading", name))
+              (Messages("contactTelephoneNumber.business.title"), Messages("contactTelephoneNumber.business.heading", name))
             case None =>
-              (Messages("contactTelephoneNumber.individual.title"),
-                Messages("contactTelephoneNumber.individual.heading"))
+              (Messages("contactTelephoneNumber.individual.title"), Messages("contactTelephoneNumber.individual.heading"))
           }
 
           val json = Json.obj(
-            "form" -> preparedForm,
-            "mode" -> mode,
+            "form"      -> preparedForm,
+            "mode"      -> mode,
             "pageTitle" -> pageTitle,
-            "heading" -> heading
+            "heading"   -> heading
           )
 
           renderer.render("contactTelephoneNumber.njk", json).map(Ok(_))
@@ -81,41 +81,39 @@ class ContactTelephoneNumberController @Inject()(
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen notEnrolled andThen getData andThen requireData).async {
     implicit request =>
-
       val (pageTitle, heading) = request.userAnswers.get(ContactNamePage) match {
         case Some(name) =>
-          (Messages("contactTelephoneNumber.business.title"),
-            Messages("contactTelephoneNumber.business.heading", name))
+          (Messages("contactTelephoneNumber.business.title"), Messages("contactTelephoneNumber.business.heading", name))
         case None =>
-          (Messages("contactTelephoneNumber.individual.title"),
-            Messages("contactTelephoneNumber.individual.heading"))
+          (Messages("contactTelephoneNumber.individual.title"), Messages("contactTelephoneNumber.individual.heading"))
       }
 
-      form.bindFromRequest().fold(
-        formWithErrors => {
-          val json = Json.obj(
-            "form" -> formWithErrors,
-            "mode" -> mode,
-            "pageTitle" -> pageTitle,
-            "heading" -> heading
-          )
+      form
+        .bindFromRequest()
+        .fold(
+          formWithErrors => {
+            val json = Json.obj(
+              "form"      -> formWithErrors,
+              "mode"      -> mode,
+              "pageTitle" -> pageTitle,
+              "heading"   -> heading
+            )
 
-          renderer.render("contactTelephoneNumber.njk", json).map(BadRequest(_))
-        },
-        value => {
-          val redirectUsers = redirectToSummary(value, ContactTelephoneNumberPage, mode, request.userAnswers)
+            renderer.render("contactTelephoneNumber.njk", json).map(BadRequest(_))
+          },
+          value => {
+            val redirectUsers = redirectToSummary(value, ContactTelephoneNumberPage, mode, request.userAnswers)
 
-          for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(ContactTelephoneNumberPage, value))
-            _ <- sessionRepository.set(updatedAnswers)
-          } yield {
-            if (redirectUsers) {
-              Redirect(routes.CheckYourAnswersController.onPageLoad())
-            } else {
-              Redirect(navigator.nextPage(ContactTelephoneNumberPage, mode, updatedAnswers))
-            }
+            for {
+              updatedAnswers <- Future.fromTry(request.userAnswers.set(ContactTelephoneNumberPage, value))
+              _              <- sessionRepository.set(updatedAnswers)
+            } yield
+              if (redirectUsers) {
+                Redirect(routes.CheckYourAnswersController.onPageLoad())
+              } else {
+                Redirect(navigator.nextPage(ContactTelephoneNumberPage, mode, updatedAnswers))
+              }
           }
-        }
-      )
+        )
   }
 }

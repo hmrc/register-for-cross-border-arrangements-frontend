@@ -29,7 +29,7 @@ class CountryListFactorySpec extends SpecBase {
     "return option of country sequence when given a valid json file" in {
 
       val conf: FrontendAppConfig = mock[FrontendAppConfig]
-      val env = mock[Environment]
+      val env                     = mock[Environment]
 
       val countries = Json.arr(Json.obj("state" -> "valid", "code" -> "XX", "description" -> "Somewhere"))
 
@@ -45,7 +45,7 @@ class CountryListFactorySpec extends SpecBase {
 
     "return None when country list cannot be loaded from environment" in {
       val conf: FrontendAppConfig = mock[FrontendAppConfig]
-      val env = mock[Environment]
+      val env                     = mock[Environment]
 
       when(conf.countryCodeJson).thenReturn("doesntmatter.json")
       when(env.resourceAsStream(any())).thenReturn(None)
@@ -57,7 +57,6 @@ class CountryListFactorySpec extends SpecBase {
 
   }
 
-  def sut(env: Environment = mock[Environment], config: FrontendAppConfig = mock[FrontendAppConfig]) = {
+  def sut(env: Environment = mock[Environment], config: FrontendAppConfig = mock[FrontendAppConfig]) =
     new CountryListFactory(env, config)
-  }
 }

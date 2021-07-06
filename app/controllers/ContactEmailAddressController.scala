@@ -33,7 +33,7 @@ import uk.gov.hmrc.viewmodels.NunjucksSupport
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class ContactEmailAddressController @Inject()(
+class ContactEmailAddressController @Inject() (
   override val messagesApi: MessagesApi,
   sessionRepository: SessionRepository,
   navigator: Navigator,
@@ -44,35 +44,35 @@ class ContactEmailAddressController @Inject()(
   formProvider: ContactEmailAddressFormProvider,
   val controllerComponents: MessagesControllerComponents,
   renderer: Renderer
-)(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with NunjucksSupport {
+)(implicit ec: ExecutionContext)
+    extends FrontendBaseController
+    with I18nSupport
+    with NunjucksSupport {
 
   private val form = formProvider()
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen notEnrolled andThen getData andThen requireData).async {
     implicit request =>
-
       (isOrganisationJourney(request.userAnswers), request.userAnswers.get(ContactNamePage)) match {
         case (true, None) => Future.successful(Redirect(routes.ContactNameController.onPageLoad(NormalMode)))
         case _ =>
           val preparedForm = request.userAnswers.get(ContactEmailAddressPage) match {
-            case None => form
+            case None        => form
             case Some(value) => form.fill(value)
           }
 
           val (pageTitle, heading) = request.userAnswers.get(ContactNamePage) match {
             case Some(name) =>
-              (Messages("contactEmailAddress.business.title"),
-                Messages("contactEmailAddress.business.heading", name))
+              (Messages("contactEmailAddress.business.title"), Messages("contactEmailAddress.business.heading", name))
             case None =>
-              (Messages("contactEmailAddress.individual.title"),
-                Messages("contactEmailAddress.individual.heading"))
+              (Messages("contactEmailAddress.individual.title"), Messages("contactEmailAddress.individual.heading"))
           }
 
           val json = Json.obj(
-            "form" -> preparedForm,
-            "mode" -> mode,
+            "form"      -> preparedForm,
+            "mode"      -> mode,
             "pageTitle" -> pageTitle,
-            "heading" -> heading
+            "heading"   -> heading
           )
 
           renderer.render("contactEmailAddress.njk", json).map(Ok(_))
@@ -81,32 +81,31 @@ class ContactEmailAddressController @Inject()(
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen notEnrolled andThen getData andThen requireData).async {
     implicit request =>
-
       val (pageTitle, heading) = request.userAnswers.get(ContactNamePage) match {
         case Some(name) =>
-          (Messages("contactEmailAddress.business.title"),
-            Messages("contactEmailAddress.business.heading", name))
+          (Messages("contactEmailAddress.business.title"), Messages("contactEmailAddress.business.heading", name))
         case None =>
-          (Messages("contactEmailAddress.individual.title"),
-            Messages("contactEmailAddress.individual.heading"))
+          (Messages("contactEmailAddress.individual.title"), Messages("contactEmailAddress.individual.heading"))
       }
 
-      form.bindFromRequest().fold(
-        formWithErrors => {
-          val json = Json.obj(
-            "form" -> formWithErrors,
-            "mode" -> mode,
-            "pageTitle" -> pageTitle,
-            "heading" -> heading
-          )
+      form
+        .bindFromRequest()
+        .fold(
+          formWithErrors => {
+            val json = Json.obj(
+              "form"      -> formWithErrors,
+              "mode"      -> mode,
+              "pageTitle" -> pageTitle,
+              "heading"   -> heading
+            )
 
-          renderer.render("contactEmailAddress.njk", json).map(BadRequest(_))
-        },
-        value =>
-          for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(ContactEmailAddressPage, value))
-            _              <- sessionRepository.set(updatedAnswers)
-          } yield Redirect(navigator.nextPage(ContactEmailAddressPage, mode, updatedAnswers))
-      )
+            renderer.render("contactEmailAddress.njk", json).map(BadRequest(_))
+          },
+          value =>
+            for {
+              updatedAnswers <- Future.fromTry(request.userAnswers.set(ContactEmailAddressPage, value))
+              _              <- sessionRepository.set(updatedAnswers)
+            } yield Redirect(navigator.nextPage(ContactEmailAddressPage, mode, updatedAnswers))
+        )
   }
 }

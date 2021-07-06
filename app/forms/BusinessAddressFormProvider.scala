@@ -30,32 +30,36 @@ class BusinessAddressFormProvider @Inject() extends Mappings with RegexConstants
 
   def apply(countryList: Seq[Country]): Form[Address] = Form(
     mapping(
-      "addressLine1" ->  validatedText("businessAddress.error.addressLine1.required",
+      "addressLine1" -> validatedText(
+        "businessAddress.error.addressLine1.required",
         "businessAddress.error.addressLine1.invalid",
         "businessAddress.error.addressLine1.length",
         apiAddressRegex,
         addressLineLength
       ),
-      "addressLine2" ->  validatedOptionalText("businessAddress.error.addressLine2.invalid",
-        "businessAddress.error.addressLine2.length",
-        apiAddressRegex,
-        addressLineLength
+      "addressLine2" -> validatedOptionalText("businessAddress.error.addressLine2.invalid",
+                                              "businessAddress.error.addressLine2.length",
+                                              apiAddressRegex,
+                                              addressLineLength
       ),
-      "addressLine3" -> validatedText("businessAddress.error.addressLine3.required",
+      "addressLine3" -> validatedText(
+        "businessAddress.error.addressLine3.required",
         "businessAddress.error.addressLine3.invalid",
         "businessAddress.error.addressLine3.length",
         apiAddressRegex,
-        addressLineLength),
+        addressLineLength
+      ),
       "addressLine4" -> validatedOptionalText("businessAddress.error.addressLine4.invalid",
-        "businessAddress.error.addressLine4.length",
-        apiAddressRegex,
-        addressLineLength),
+                                              "businessAddress.error.addressLine4.length",
+                                              apiAddressRegex,
+                                              addressLineLength
+      ),
       "postCode" -> optionalPostcode(
         requiredKey = "businessAddress.error.postcode.required",
         lengthKey = "businessAddress.error.postcode.length",
         countryFieldName = "country"
       ),
-      "country" ->  text("businessAddress.error.country.required")
+      "country" -> text("businessAddress.error.country.required")
         .verifying("businessAddress.error.country.required", value => countryList.exists(_.code == value))
         .transform[Country](value => countryList.find(_.code == value).get, _.code)
     )(Address.apply)(Address.unapply)

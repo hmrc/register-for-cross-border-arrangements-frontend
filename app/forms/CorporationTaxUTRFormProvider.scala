@@ -30,8 +30,11 @@ class CorporationTaxUTRFormProvider @Inject() extends Mappings with RegexConstan
   def apply(): Form[UniqueTaxpayerReference] = Form(
     mapping(
       "corporationTaxUTR" -> validatedFixedLengthText("corporationTaxUTR.error.required",
-        "corporationTaxUTR.error.invalid",
-        "corporationTaxUTR.error.length", utrRegex, utrLength)
+                                                      "corporationTaxUTR.error.invalid",
+                                                      "corporationTaxUTR.error.length",
+                                                      utrRegex,
+                                                      utrLength
+      )
     )(UniqueTaxpayerReference.apply)(UniqueTaxpayerReference.unapply)
   )
 }

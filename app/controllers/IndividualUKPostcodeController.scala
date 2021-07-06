@@ -34,33 +34,35 @@ import uk.gov.hmrc.viewmodels.NunjucksSupport
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class IndividualUKPostcodeController @Inject()(
-    override val messagesApi: MessagesApi,
-    sessionRepository: SessionRepository,
-    navigator: Navigator,
-    addressLookupConnector: AddressLookupConnector,
-    identify: IdentifierAction,
-    notEnrolled: NotEnrolledForDAC6Action,
-    getData: DataRetrievalAction,
-    requireData: DataRequiredAction,
-    formProvider: IndividualUKPostcodeFormProvider,
-    val controllerComponents: MessagesControllerComponents,
-    renderer: Renderer
-)(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with NunjucksSupport {
+class IndividualUKPostcodeController @Inject() (
+  override val messagesApi: MessagesApi,
+  sessionRepository: SessionRepository,
+  navigator: Navigator,
+  addressLookupConnector: AddressLookupConnector,
+  identify: IdentifierAction,
+  notEnrolled: NotEnrolledForDAC6Action,
+  getData: DataRetrievalAction,
+  requireData: DataRequiredAction,
+  formProvider: IndividualUKPostcodeFormProvider,
+  val controllerComponents: MessagesControllerComponents,
+  renderer: Renderer
+)(implicit ec: ExecutionContext)
+    extends FrontendBaseController
+    with I18nSupport
+    with NunjucksSupport {
 
   private val form = formProvider()
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen notEnrolled andThen getData andThen requireData).async {
     implicit request =>
-
       val preparedForm = request.userAnswers.get(IndividualUKPostcodePage) match {
-        case None => form
+        case None        => form
         case Some(value) => form.fill(value)
       }
 
       val json = Json.obj(
-        "form" -> preparedForm,
-        "mode" -> mode,
+        "form"             -> preparedForm,
+        "mode"             -> mode,
         "manualAddressURL" -> routes.WhatIsYourAddressUkController.onPageLoad(mode).url
       )
 
@@ -69,39 +71,42 @@ class IndividualUKPostcodeController @Inject()(
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen notEnrolled andThen getData andThen requireData).async {
     implicit request =>
-
       val manualAddressURL: String = routes.WhatIsYourAddressUkController.onPageLoad(mode).url
-      val formReturned = form.bindFromRequest()
+      val formReturned             = form.bindFromRequest()
 
       formReturned.fold(
         formWithErrors => {
 
           val json = Json.obj(
-            "form" -> formWithErrors,
-            "mode" -> mode,
+            "form"             -> formWithErrors,
+            "mode"             -> mode,
             "manualAddressURL" -> manualAddressURL
           )
 
-          {for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.remove(IndividualUKPostcodePage))
-            _              <- sessionRepository.set(updatedAnswers)
-          } yield renderer.render("individualUKPostcode.njk", json).map(BadRequest(_))}.flatten
+          {
+            for {
+              updatedAnswers <- Future.fromTry(request.userAnswers.remove(IndividualUKPostcodePage))
+              _              <- sessionRepository.set(updatedAnswers)
+            } yield renderer.render("individualUKPostcode.njk", json).map(BadRequest(_))
+          }.flatten
         },
-        postCode => {
+        postCode =>
           addressLookupConnector.addressLookupByPostcode(postCode).flatMap {
             case Nil =>
               val formError = formReturned.withError(FormError("postCode", List("individualUKPostcode.error.notFound")))
 
               val json = Json.obj(
-                "form" -> formError,
-                "mode" -> mode,
+                "form"             -> formError,
+                "mode"             -> mode,
                 "manualAddressURL" -> manualAddressURL
               )
 
-              {for {
-                updatedAnswers <- Future.fromTry(request.userAnswers.set(IndividualUKPostcodePage, postCode))
-                _              <- sessionRepository.set(updatedAnswers)
-              } yield renderer.render("individualUKPostcode.njk", json).map(BadRequest(_))}.flatten
+              {
+                for {
+                  updatedAnswers <- Future.fromTry(request.userAnswers.set(IndividualUKPostcodePage, postCode))
+                  _              <- sessionRepository.set(updatedAnswers)
+                } yield renderer.render("individualUKPostcode.njk", json).map(BadRequest(_))
+              }.flatten
             case addresses =>
               for {
                 updatedAnswers              <- Future.fromTry(request.userAnswers.set(IndividualUKPostcodePage, postCode))
@@ -109,7 +114,6 @@ class IndividualUKPostcodeController @Inject()(
                 _                           <- sessionRepository.set(updatedAnswersWithAddresses)
               } yield Redirect(navigator.nextPage(IndividualUKPostcodePage, mode, updatedAnswersWithAddresses))
           }
-        }
       )
   }
 }

@@ -32,37 +32,39 @@ import uk.gov.hmrc.viewmodels.NunjucksSupport
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class SecondaryContactTelephoneNumberController @Inject()(
-    override val messagesApi: MessagesApi,
-    sessionRepository: SessionRepository,
-    navigator: Navigator,
-    identify: IdentifierAction,
-    notEnrolled: NotEnrolledForDAC6Action,
-    getData: DataRetrievalAction,
-    requireData: DataRequiredAction,
-    formProvider: SecondaryContactTelephoneNumberFormProvider,
-    val controllerComponents: MessagesControllerComponents,
-    renderer: Renderer
-)(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with NunjucksSupport {
+class SecondaryContactTelephoneNumberController @Inject() (
+  override val messagesApi: MessagesApi,
+  sessionRepository: SessionRepository,
+  navigator: Navigator,
+  identify: IdentifierAction,
+  notEnrolled: NotEnrolledForDAC6Action,
+  getData: DataRetrievalAction,
+  requireData: DataRequiredAction,
+  formProvider: SecondaryContactTelephoneNumberFormProvider,
+  val controllerComponents: MessagesControllerComponents,
+  renderer: Renderer
+)(implicit ec: ExecutionContext)
+    extends FrontendBaseController
+    with I18nSupport
+    with NunjucksSupport {
 
   private val form = formProvider()
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen notEnrolled andThen getData andThen requireData).async {
     implicit request =>
-
       val preparedForm = request.userAnswers.get(SecondaryContactTelephoneNumberPage) match {
-        case None => form
+        case None        => form
         case Some(value) => form.fill(value)
       }
 
       val contactName = request.userAnswers.get(SecondaryContactNamePage) match {
-        case None => "your second contact"
-        case Some(contactName) => s"${contactName}"
+        case None              => "your second contact"
+        case Some(contactName) => s"$contactName"
       }
 
       val json = Json.obj(
-        "form" -> preparedForm,
-        "mode" -> mode,
+        "form"        -> preparedForm,
+        "mode"        -> mode,
         "contactName" -> contactName
       )
 
@@ -71,27 +73,28 @@ class SecondaryContactTelephoneNumberController @Inject()(
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen notEnrolled andThen getData andThen requireData).async {
     implicit request =>
-
       val contactName = request.userAnswers.get(SecondaryContactNamePage) match {
-        case None => "your second contact"
-        case Some(contactName) => s"${contactName}"
+        case None              => "your second contact"
+        case Some(contactName) => s"$contactName"
       }
 
-      form.bindFromRequest().fold(
-        formWithErrors => {
-          val json = Json.obj(
-            "form" -> formWithErrors,
-            "mode" -> mode,
-            "contactName" -> contactName
-          )
+      form
+        .bindFromRequest()
+        .fold(
+          formWithErrors => {
+            val json = Json.obj(
+              "form"        -> formWithErrors,
+              "mode"        -> mode,
+              "contactName" -> contactName
+            )
 
-          renderer.render("secondaryContactTelephoneNumber.njk", json).map(BadRequest(_))
-        },
-        value =>
-          for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(SecondaryContactTelephoneNumberPage, value))
-            _              <- sessionRepository.set(updatedAnswers)
-          } yield Redirect(navigator.nextPage(SecondaryContactTelephoneNumberPage, mode, updatedAnswers))
-      )
+            renderer.render("secondaryContactTelephoneNumber.njk", json).map(BadRequest(_))
+          },
+          value =>
+            for {
+              updatedAnswers <- Future.fromTry(request.userAnswers.set(SecondaryContactTelephoneNumberPage, value))
+              _              <- sessionRepository.set(updatedAnswers)
+            } yield Redirect(navigator.nextPage(SecondaryContactTelephoneNumberPage, mode, updatedAnswers))
+        )
   }
 }

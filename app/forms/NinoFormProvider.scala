@@ -21,8 +21,7 @@ import javax.inject.Inject
 import play.api.data.Form
 import utils.RegexConstants
 
-
-class NinoFormProvider @Inject() extends Mappings with RegexConstants{
+class NinoFormProvider @Inject() extends Mappings with RegexConstants {
 
   def removeWhitespace(string: String): String = string.split("\\s+").mkString
 

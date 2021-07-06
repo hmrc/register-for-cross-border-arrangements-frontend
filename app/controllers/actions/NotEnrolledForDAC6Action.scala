@@ -24,11 +24,10 @@ import play.api.mvc.{ActionRefiner, Result}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class NotEnrolledForDAC6Action @Inject()(config:FrontendAppConfig)(implicit val executionContext: ExecutionContext)
-  extends ActionRefiner[UserRequest, IdentifierRequest] {
+class NotEnrolledForDAC6Action @Inject() (config: FrontendAppConfig)(implicit val executionContext: ExecutionContext)
+    extends ActionRefiner[UserRequest, IdentifierRequest] {
 
   override protected def refine[A](request: UserRequest[A]): Future[Either[Result, IdentifierRequest[A]]] =
-
     if (request.enrolments.enrolments.exists(_.key == "HMRC-DAC6-ORG")) {
       Future.successful(Left(Redirect(config.dacSubmissionsUrl)))
     } else {

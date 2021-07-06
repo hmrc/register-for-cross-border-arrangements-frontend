@@ -27,11 +27,11 @@ class ContactEmailAddressFormProvider @Inject() extends Mappings with RegexConst
 
   def apply(): Form[String] =
     Form(
-      "email" -> validatedText(
-        "contactEmailAddress.error.required",
-        "contactEmailAddress.error.email.invalid",
-        "contactEmailAddress.error.length",
-        emailRegex,
-        maxLength)
+      "email" -> validatedText("contactEmailAddress.error.required",
+                               "contactEmailAddress.error.email.invalid",
+                               "contactEmailAddress.error.length",
+                               emailRegex,
+                               maxLength
+      )
     )
 }

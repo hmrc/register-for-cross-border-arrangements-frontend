@@ -16,7 +16,6 @@
 
 package forms
 
-
 import forms.mappings.Mappings
 import models.{Address, Country}
 import play.api.data.Form
@@ -29,25 +28,37 @@ class WhatIsYourAddressUkFormProvider @Inject() extends Mappings with RegexConst
 
   val addressLineMaxLength = 35
 
-   def apply(countryList: Seq[Country]): Form[Address] = Form(
-     mapping(
-      "addressLine1" -> validatedText("whatIsYourUkAddress.error.addressLine1.required",
-       "whatIsYourUkAddress.error.addressLine1.invalid",
-       "whatIsYourUkAddress.error.addressLine1.length",
-       apiAddressRegex, addressLineMaxLength ),
+  def apply(countryList: Seq[Country]): Form[Address] = Form(
+    mapping(
+      "addressLine1" -> validatedText(
+        "whatIsYourUkAddress.error.addressLine1.required",
+        "whatIsYourUkAddress.error.addressLine1.invalid",
+        "whatIsYourUkAddress.error.addressLine1.length",
+        apiAddressRegex,
+        addressLineMaxLength
+      ),
       "addressLine2" -> validatedOptionalText("whatIsYourUkAddress.error.addressLine2.invalid",
-       "whatIsYourUkAddress.error.addressLine2.length",apiAddressRegex, addressLineMaxLength),
-       "addressLine3" -> validatedText("whatIsYourUkAddress.error.addressLine3.required",
+                                              "whatIsYourUkAddress.error.addressLine2.length",
+                                              apiAddressRegex,
+                                              addressLineMaxLength
+      ),
+      "addressLine3" -> validatedText(
+        "whatIsYourUkAddress.error.addressLine3.required",
         "whatIsYourUkAddress.error.addressLine3.invalid",
-        "whatIsYourUkAddress.error.addressLine3.length",apiAddressRegex, addressLineMaxLength),
+        "whatIsYourUkAddress.error.addressLine3.length",
+        apiAddressRegex,
+        addressLineMaxLength
+      ),
       "addressLine4" -> validatedOptionalText("whatIsYourUkAddress.error.addressLine4.invalid",
-        "whatIsYourUkAddress.error.addressLine4.length",apiAddressRegex, addressLineMaxLength),
-       "postCode" -> addressPostcode("whatIsYourUkAddress.error.postcode.invalid", regexPostcode,
-        "whatIsYourUkAddress.error.postcode.required"),
-       "country" ->  text("whatIsYourUkAddress.error.country.required")
-         .verifying("whatIsYourAddress.error.country.required", value => countryList.exists(_.code == value))
-         .transform[Country](value => countryList.find(_.code == value).get, _.code)
+                                              "whatIsYourUkAddress.error.addressLine4.length",
+                                              apiAddressRegex,
+                                              addressLineMaxLength
+      ),
+      "postCode" -> addressPostcode("whatIsYourUkAddress.error.postcode.invalid", regexPostcode, "whatIsYourUkAddress.error.postcode.required"),
+      "country" -> text("whatIsYourUkAddress.error.country.required")
+        .verifying("whatIsYourAddress.error.country.required", value => countryList.exists(_.code == value))
+        .transform[Country](value => countryList.find(_.code == value).get, _.code)
     )(Address.apply)(Address.unapply)
-   )
+  )
 
 }

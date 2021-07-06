@@ -42,7 +42,7 @@ class BusinessNameOrganisationControllerSpec extends SpecBase with NunjucksSuppo
   def onwardRoute = Call("GET", "/foo")
 
   val formProvider = new BusinessNameOrganisationFormProvider()
-  val form = formProvider()
+  val form         = formProvider()
 
   lazy val businessNamePageRoute = routes.BusinessNameOrganisationController.onPageLoad(NormalMode).url
 
@@ -53,11 +53,11 @@ class BusinessNameOrganisationControllerSpec extends SpecBase with NunjucksSuppo
       when(mockRenderer.render(any(), any())(any()))
         .thenReturn(Future.successful(Html("")))
 
-      val userAnswers = UserAnswers(userAnswersId).set(BusinessTypePage, Partnership).success.value
-      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
-      val request = FakeRequest(GET, businessNamePageRoute)
+      val userAnswers    = UserAnswers(userAnswersId).set(BusinessTypePage, Partnership).success.value
+      val application    = applicationBuilder(userAnswers = Some(userAnswers)).build()
+      val request        = FakeRequest(GET, businessNamePageRoute)
       val templateCaptor = ArgumentCaptor.forClass(classOf[String])
-      val jsonCaptor = ArgumentCaptor.forClass(classOf[JsObject])
+      val jsonCaptor     = ArgumentCaptor.forClass(classOf[JsObject])
 
       val result = route(application, request).value
 
@@ -82,12 +82,16 @@ class BusinessNameOrganisationControllerSpec extends SpecBase with NunjucksSuppo
         .thenReturn(Future.successful(Html("")))
 
       val userAnswers = UserAnswers(userAnswersId)
-        .set(BusinessTypePage, Partnership).success.value
-        .set(BusinessNamePage, "answer").success.value
-      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
-      val request = FakeRequest(GET, businessNamePageRoute)
+        .set(BusinessTypePage, Partnership)
+        .success
+        .value
+        .set(BusinessNamePage, "answer")
+        .success
+        .value
+      val application    = applicationBuilder(userAnswers = Some(userAnswers)).build()
+      val request        = FakeRequest(GET, businessNamePageRoute)
       val templateCaptor = ArgumentCaptor.forClass(classOf[String])
-      val jsonCaptor = ArgumentCaptor.forClass(classOf[JsObject])
+      val jsonCaptor     = ArgumentCaptor.forClass(classOf[JsObject])
 
       val result = route(application, request).value
 
@@ -140,11 +144,11 @@ class BusinessNameOrganisationControllerSpec extends SpecBase with NunjucksSuppo
       when(mockRenderer.render(any(), any())(any()))
         .thenReturn(Future.successful(Html("")))
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
-      val request = FakeRequest(POST, businessNamePageRoute).withFormUrlEncodedBody(("value", ""))
-      val boundForm = form.bind(Map("value" -> ""))
+      val application    = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val request        = FakeRequest(POST, businessNamePageRoute).withFormUrlEncodedBody(("value", ""))
+      val boundForm      = form.bind(Map("value" -> ""))
       val templateCaptor = ArgumentCaptor.forClass(classOf[String])
-      val jsonCaptor = ArgumentCaptor.forClass(classOf[JsObject])
+      val jsonCaptor     = ArgumentCaptor.forClass(classOf[JsObject])
 
       val result = route(application, request).value
 

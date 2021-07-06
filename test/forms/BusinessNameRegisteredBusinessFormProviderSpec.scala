@@ -19,13 +19,12 @@ package forms
 import forms.behaviours.StringFieldBehaviours
 import play.api.data.FormError
 
-
-class BusinessNameRegisteredBusinessFormProviderSpec extends StringFieldBehaviours  {
+class BusinessNameRegisteredBusinessFormProviderSpec extends StringFieldBehaviours {
 
   val requiredKey = "businessName.registered.error.required"
-  val lengthKey = "businessName.registered.error.length"
-  val invalidKey = "businessName.registered.error.invalid"
-  val maxLength = 105
+  val lengthKey   = "businessName.registered.error.length"
+  val invalidKey  = "businessName.registered.error.invalid"
+  val maxLength   = 105
 
   val form = new BusinessNameRegisteredBusinessFormProvider()()
 

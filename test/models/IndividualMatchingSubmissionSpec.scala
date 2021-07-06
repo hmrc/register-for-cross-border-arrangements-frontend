@@ -24,23 +24,25 @@ import play.api.libs.json.{JsObject, JsSuccess, Json}
 
 class IndividualMatchingSubmissionSpec extends SpecBase with ScalaCheckPropertyChecks with Generators {
 
-   "IndividualMatchingSubmission mode" - {
-     "must serialise" in {
-       forAll(arbitrary[IndividualMatchingSubmission]) {
-         individualMatchingSubmission =>
+  "IndividualMatchingSubmission mode" - {
+    "must serialise" in {
+      forAll(arbitrary[IndividualMatchingSubmission]) {
+        individualMatchingSubmission =>
           val json = generateSubmissionJson(individualMatchingSubmission)
-           json.validate[IndividualMatchingSubmission] mustEqual JsSuccess(individualMatchingSubmission)
-       }
-     }
-   }
+          json.validate[IndividualMatchingSubmission] mustEqual JsSuccess(individualMatchingSubmission)
+      }
+    }
+  }
 
-  def generateSubmissionJson(ims: IndividualMatchingSubmission) : JsObject =
-    Json.obj("regime" -> ims.regime,
-    "requiresNameMatch" -> ims.requiresNameMatch,
-    "isAnAgent" -> ims.isAnAgent,
-    "individual" -> Json.obj(
-      "firstName" -> ims.individual.name.firstName ,
-      "lastName" -> ims.individual.name.secondName,
-      "dateOfBirth" -> ims.individual.dateOfBirth.toString
-    ))
+  def generateSubmissionJson(ims: IndividualMatchingSubmission): JsObject =
+    Json.obj(
+      "regime"            -> ims.regime,
+      "requiresNameMatch" -> ims.requiresNameMatch,
+      "isAnAgent"         -> ims.isAnAgent,
+      "individual" -> Json.obj(
+        "firstName"   -> ims.individual.name.firstName,
+        "lastName"    -> ims.individual.name.secondName,
+        "dateOfBirth" -> ims.individual.dateOfBirth.toString
+      )
+    )
 }

@@ -43,16 +43,19 @@ class DateOfBirthFormProviderSpec extends DateBehaviours {
       key = fieldName,
       max = today,
       formError = FormError(
-        fieldName, "dateOfBirth.error.futureDate", Seq(DateHelper.formatDateToString(today))
+        fieldName,
+        "dateOfBirth.error.futureDate",
+        Seq(DateHelper.formatDateToString(today))
       )
     )
 
     behave like dateFieldWithMin(
       form = form,
       key = fieldName,
-      min = LocalDate.of(1900,1,1),
+      min = LocalDate.of(1900, 1, 1),
       formError = FormError(
-        fieldName, "dateOfBirth.error.pastDate"
+        fieldName,
+        "dateOfBirth.error.pastDate"
       )
     )
 

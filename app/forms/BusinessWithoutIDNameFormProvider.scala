@@ -22,12 +22,9 @@ import play.api.data.Form
 import utils.RegexConstants
 
 class BusinessWithoutIDNameFormProvider @Inject() extends Mappings with RegexConstants {
-    val maxLength: Int = 105
+  val maxLength: Int = 105
 
-   def apply(): Form[String] = Form(
-      "businessWithoutIDName" -> maxLengthText(
-        "businessWithoutIDName.error.businessName.required",
-          "businessWithoutIDName.error.businessName.length",
-                    maxLength)
-   )
- }
+  def apply(): Form[String] = Form(
+    "businessWithoutIDName" -> maxLengthText("businessWithoutIDName.error.businessName.required", "businessWithoutIDName.error.businessName.length", maxLength)
+  )
+}

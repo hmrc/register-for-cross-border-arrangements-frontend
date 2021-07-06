@@ -22,16 +22,16 @@ import play.api.data.FormError
 
 class BusinessAddressFormProviderSpec extends StringFieldBehaviours {
   val countries = Seq(Country("valid", "AD", "Andorra"))
-  val form = new BusinessAddressFormProvider()(countries)
+  val form      = new BusinessAddressFormProvider()(countries)
 
   val addressLineMaxLength = 35
 
   ".addressLine1" - {
 
-    val fieldName = "addressLine1"
+    val fieldName   = "addressLine1"
     val requiredKey = "businessAddress.error.addressLine1.required"
-    val invalidKey = "businessAddress.error.addressLine1.invalid"
-    val lengthKey = "businessAddress.error.addressLine1.length"
+    val invalidKey  = "businessAddress.error.addressLine1.invalid"
+    val lengthKey   = "businessAddress.error.addressLine1.length"
 
     behave like fieldThatBindsValidData(
       form,
@@ -68,9 +68,9 @@ class BusinessAddressFormProviderSpec extends StringFieldBehaviours {
 
   ".addressLine2" - {
 
-    val fieldName = "addressLine2"
+    val fieldName  = "addressLine2"
     val invalidKey = "businessAddress.error.addressLine2.invalid"
-    val lengthKey = "businessAddress.error.addressLine2.length"
+    val lengthKey  = "businessAddress.error.addressLine2.length"
 
     behave like fieldThatBindsValidData(
       form,
@@ -95,10 +95,10 @@ class BusinessAddressFormProviderSpec extends StringFieldBehaviours {
 
   ".addressLine3" - {
 
-    val fieldName = "addressLine3"
+    val fieldName   = "addressLine3"
     val requiredKey = "businessAddress.error.addressLine3.required"
-    val invalidKey = "businessAddress.error.addressLine3.invalid"
-    val lengthKey = "businessAddress.error.addressLine3.length"
+    val invalidKey  = "businessAddress.error.addressLine3.invalid"
+    val lengthKey   = "businessAddress.error.addressLine3.length"
 
     behave like fieldThatBindsValidData(
       form,
@@ -135,9 +135,9 @@ class BusinessAddressFormProviderSpec extends StringFieldBehaviours {
 
   ".addressLine4" - {
 
-    val fieldName = "addressLine4"
+    val fieldName  = "addressLine4"
     val invalidKey = "businessAddress.error.addressLine4.invalid"
-    val lengthKey = "businessAddress.error.addressLine4.length"
+    val lengthKey  = "businessAddress.error.addressLine4.length"
 
     behave like fieldThatBindsValidData(
       form,
@@ -162,9 +162,9 @@ class BusinessAddressFormProviderSpec extends StringFieldBehaviours {
 
   ".postCode" - {
 
-    val fieldName = "postCode"
-    val requiredKey = "businessAddress.error.postcode.required"
-    val lengthKey = "businessAddress.error.postcode.length"
+    val fieldName         = "postCode"
+    val requiredKey       = "businessAddress.error.postcode.required"
+    val lengthKey         = "businessAddress.error.postcode.length"
     val postCodeMaxLength = 10
 
     behave like fieldThatBindsValidData(

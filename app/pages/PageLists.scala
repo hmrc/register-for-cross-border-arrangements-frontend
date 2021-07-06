@@ -23,7 +23,10 @@ import scala.util.Try
 object PageLists {
 
   val removePage: (Try[UserAnswers], QuestionPage[_]) => Try[UserAnswers] =
-    (ua: Try[UserAnswers], page: QuestionPage[_]) => ua.flatMap(x => x.remove(page))
+    (ua: Try[UserAnswers], page: QuestionPage[_]) =>
+      ua.flatMap(
+        x => x.remove(page)
+      )
 
   val allAfterRegistrationTypePages = List(
     BusinessAddressPage,
@@ -51,14 +54,13 @@ object PageLists {
     PostCodePage
   )
 
-  val allAfterHaveUTRPages =   List(RegistrationTypePage,
-    BusinessTypePage,
-    CorporationTaxUTRPage,
-    SelfAssessmentUTRPage,
-    BusinessNamePage,
-    ConfirmBusinessPage,
-    SoleTraderNamePage
+  val allAfterHaveUTRPages = List(RegistrationTypePage,
+                                  BusinessTypePage,
+                                  CorporationTaxUTRPage,
+                                  SelfAssessmentUTRPage,
+                                  BusinessNamePage,
+                                  ConfirmBusinessPage,
+                                  SoleTraderNamePage
   ) ++ allAfterRegistrationTypePages
-
 
 }

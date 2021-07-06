@@ -28,10 +28,7 @@ import play.api.Application
 import play.api.http.Status.{BAD_REQUEST, NOT_FOUND, OK}
 import play.api.inject.guice.GuiceApplicationBuilder
 
-class EmailConnectorSpec extends SpecBase
-  with WireMockServerHandler
-  with Generators
-  with ScalaCheckPropertyChecks {
+class EmailConnectorSpec extends SpecBase with WireMockServerHandler with Generators with ScalaCheckPropertyChecks {
 
   override lazy val app: Application = new GuiceApplicationBuilder()
     .configure(
@@ -39,7 +36,7 @@ class EmailConnectorSpec extends SpecBase
     )
     .build()
 
-    lazy val connector: EmailConnector = app.injector.instanceOf[EmailConnector]
+  lazy val connector: EmailConnector = app.injector.instanceOf[EmailConnector]
 
   "EmailConnector" - {
     "must return status as OK for valid email submission" in {
@@ -74,9 +71,9 @@ class EmailConnectorSpec extends SpecBase
           result.futureValue.status mustBe NOT_FOUND
       }
     }
-}
+  }
 
-    private def stubResponse(expectedUrl: String, expectedStatus: Int): StubMapping =
+  private def stubResponse(expectedUrl: String, expectedStatus: Int): StubMapping =
     server.stubFor(
       post(urlEqualTo(expectedUrl))
         .willReturn(

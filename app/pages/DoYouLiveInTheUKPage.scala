@@ -31,7 +31,8 @@ case object DoYouLiveInTheUKPage extends QuestionPage[Boolean] {
     value match {
       case Some(true) => userAnswers.remove(WhatIsYourAddressPage)
       case Some(false) =>
-        userAnswers.remove(IndividualUKPostcodePage)
+        userAnswers
+          .remove(IndividualUKPostcodePage)
           .flatMap(_.remove(SelectAddressPage))
           .flatMap(_.remove(WhatIsYourAddressUkPage))
       case None => super.cleanup(value, userAnswers)

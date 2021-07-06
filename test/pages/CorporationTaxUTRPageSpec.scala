@@ -19,7 +19,6 @@ package pages
 import models.UniqueTaxpayerReference
 import pages.behaviours.PageBehaviours
 
-
 class CorporationTaxUTRPageSpec extends PageBehaviours {
 
   "CorporationTaxUTRPage" - {

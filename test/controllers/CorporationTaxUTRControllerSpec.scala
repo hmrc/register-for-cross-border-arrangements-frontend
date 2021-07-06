@@ -42,15 +42,13 @@ class CorporationTaxUTRControllerSpec extends SpecBase with NunjucksSupport with
   def onwardRoute = Call("GET", "/foo")
 
   val formProvider = new CorporationTaxUTRFormProvider()
-  val form = formProvider()
+  val form         = formProvider()
 
   val utr = new SaUtrGenerator().nextSaUtr.toString()
 
-
   lazy val corporationTaxUTRRoute = routes.CorporationTaxUTRController.onPageLoad(NormalMode).url
 
- val userAnswers = UserAnswers(userAnswersId).set(CorporationTaxUTRPage,UniqueTaxpayerReference(utr)).success.value
-
+  val userAnswers = UserAnswers(userAnswersId).set(CorporationTaxUTRPage, UniqueTaxpayerReference(utr)).success.value
 
   "CorporationTaxUTR Controller" - {
 
@@ -59,10 +57,10 @@ class CorporationTaxUTRControllerSpec extends SpecBase with NunjucksSupport with
       when(mockRenderer.render(any(), any())(any()))
         .thenReturn(Future.successful(Html("")))
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
-      val request = FakeRequest(GET, corporationTaxUTRRoute)
+      val application    = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val request        = FakeRequest(GET, corporationTaxUTRRoute)
       val templateCaptor = ArgumentCaptor.forClass(classOf[String])
-      val jsonCaptor = ArgumentCaptor.forClass(classOf[JsObject])
+      val jsonCaptor     = ArgumentCaptor.forClass(classOf[JsObject])
 
       val result = route(application, request).value
 
@@ -86,10 +84,10 @@ class CorporationTaxUTRControllerSpec extends SpecBase with NunjucksSupport with
       when(mockRenderer.render(any(), any())(any()))
         .thenReturn(Future.successful(Html("")))
 
-      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
-      val request = FakeRequest(GET, corporationTaxUTRRoute)
+      val application    = applicationBuilder(userAnswers = Some(userAnswers)).build()
+      val request        = FakeRequest(GET, corporationTaxUTRRoute)
       val templateCaptor = ArgumentCaptor.forClass(classOf[String])
-      val jsonCaptor = ArgumentCaptor.forClass(classOf[JsObject])
+      val jsonCaptor     = ArgumentCaptor.forClass(classOf[JsObject])
 
       val result = route(application, request).value
 
@@ -129,7 +127,6 @@ class CorporationTaxUTRControllerSpec extends SpecBase with NunjucksSupport with
           )
           .build()
 
-
       val request =
         FakeRequest(POST, corporationTaxUTRRoute)
           .withFormUrlEncodedBody(("corporationTaxUTR", utr))
@@ -148,11 +145,11 @@ class CorporationTaxUTRControllerSpec extends SpecBase with NunjucksSupport with
       when(mockRenderer.render(any(), any())(any()))
         .thenReturn(Future.successful(Html("")))
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
-      val request = FakeRequest(POST, corporationTaxUTRRoute).withFormUrlEncodedBody(("value", ""))
-      val boundForm = form.bind(Map("value" -> ""))
+      val application    = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val request        = FakeRequest(POST, corporationTaxUTRRoute).withFormUrlEncodedBody(("value", ""))
+      val boundForm      = form.bind(Map("value" -> ""))
       val templateCaptor = ArgumentCaptor.forClass(classOf[String])
-      val jsonCaptor = ArgumentCaptor.forClass(classOf[JsObject])
+      val jsonCaptor     = ArgumentCaptor.forClass(classOf[JsObject])
 
       val result = route(application, request).value
 

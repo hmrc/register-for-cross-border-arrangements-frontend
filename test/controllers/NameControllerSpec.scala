@@ -39,11 +39,11 @@ import scala.concurrent.Future
 
 class NameControllerSpec extends SpecBase with NunjucksSupport with JsonMatchers {
 
-  def onwardRoute: Call = Call("GET", "/foo")
+  def onwardRoute: Call                        = Call("GET", "/foo")
   val mockSessionRepository: SessionRepository = mock[SessionRepository]
   val mockFrontendAppConfig: FrontendAppConfig = mock[FrontendAppConfig]
 
-  val formProvider = new NamePageFormProvider()
+  val formProvider     = new NamePageFormProvider()
   val form: Form[Name] = formProvider()
 
   lazy val namePageRoute: String = routes.NameController.onPageLoad(NormalMode).url
@@ -55,10 +55,10 @@ class NameControllerSpec extends SpecBase with NunjucksSupport with JsonMatchers
       when(mockRenderer.render(any(), any())(any()))
         .thenReturn(Future.successful(Html("")))
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
-      val request = FakeRequest(GET, namePageRoute)
+      val application    = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val request        = FakeRequest(GET, namePageRoute)
       val templateCaptor = ArgumentCaptor.forClass(classOf[String])
-      val jsonCaptor = ArgumentCaptor.forClass(classOf[JsObject])
+      val jsonCaptor     = ArgumentCaptor.forClass(classOf[JsObject])
 
       val result = route(application, request).value
 
@@ -82,11 +82,11 @@ class NameControllerSpec extends SpecBase with NunjucksSupport with JsonMatchers
       when(mockRenderer.render(any(), any())(any()))
         .thenReturn(Future.successful(Html("")))
 
-      val userAnswers = UserAnswers(userAnswersId).set(NamePage, Name("Mel", "Brooks")).success.value
-      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
-      val request = FakeRequest(GET, namePageRoute)
+      val userAnswers    = UserAnswers(userAnswersId).set(NamePage, Name("Mel", "Brooks")).success.value
+      val application    = applicationBuilder(userAnswers = Some(userAnswers)).build()
+      val request        = FakeRequest(GET, namePageRoute)
       val templateCaptor = ArgumentCaptor.forClass(classOf[String])
-      val jsonCaptor = ArgumentCaptor.forClass(classOf[JsObject])
+      val jsonCaptor     = ArgumentCaptor.forClass(classOf[JsObject])
 
       val result = route(application, request).value
 
@@ -94,10 +94,12 @@ class NameControllerSpec extends SpecBase with NunjucksSupport with JsonMatchers
 
       verify(mockRenderer, times(1)).render(templateCaptor.capture(), jsonCaptor.capture())(any())
 
-      val filledForm = form.bind(Map(
-        "firstName" -> "Mel",
-        "secondName" -> "Brooks"
-      ))
+      val filledForm = form.bind(
+        Map(
+          "firstName"  -> "Mel",
+          "secondName" -> "Brooks"
+        )
+      )
 
       val expectedJson = Json.obj(
         "form" -> filledForm,
@@ -124,8 +126,7 @@ class NameControllerSpec extends SpecBase with NunjucksSupport with JsonMatchers
 
       val request =
         FakeRequest(POST, namePageRoute)
-          .withFormUrlEncodedBody(("firstName", "Mel"),
-            ("secondName", "Brooks"))
+          .withFormUrlEncodedBody(("firstName", "Mel"), ("secondName", "Brooks"))
 
       val result = route(application, request).value
 
@@ -140,11 +141,11 @@ class NameControllerSpec extends SpecBase with NunjucksSupport with JsonMatchers
       when(mockRenderer.render(any(), any())(any()))
         .thenReturn(Future.successful(Html("")))
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
-      val request = FakeRequest(POST, namePageRoute).withFormUrlEncodedBody(("firstName", ""), ("secondName", ""))
-      val boundForm = form.bind(Map("firstName" -> "", "secondName" -> ""))
+      val application    = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val request        = FakeRequest(POST, namePageRoute).withFormUrlEncodedBody(("firstName", ""), ("secondName", ""))
+      val boundForm      = form.bind(Map("firstName" -> "", "secondName" -> ""))
       val templateCaptor = ArgumentCaptor.forClass(classOf[String])
-      val jsonCaptor = ArgumentCaptor.forClass(classOf[JsObject])
+      val jsonCaptor     = ArgumentCaptor.forClass(classOf[JsObject])
 
       val result = route(application, request).value
 

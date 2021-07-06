@@ -33,7 +33,6 @@ class BusinessTypeSpec extends SpecBase with ScalaCheckPropertyChecks with Optio
 
       forAll(gen) {
         businessType =>
-
           JsString(businessType.toString).validate[BusinessType].asOpt.value mustEqual businessType
       }
     }
@@ -44,7 +43,6 @@ class BusinessTypeSpec extends SpecBase with ScalaCheckPropertyChecks with Optio
 
       forAll(gen) {
         invalidValue =>
-
           JsString(invalidValue).validate[BusinessType] mustEqual JsError("error.invalid")
       }
     }

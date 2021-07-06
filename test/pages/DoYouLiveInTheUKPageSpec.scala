@@ -20,7 +20,6 @@ import models.{Address, Country, UserAnswers}
 import org.scalacheck.Arbitrary.arbitrary
 import pages.behaviours.PageBehaviours
 
-
 class DoYouLiveInTheUKPageSpec extends PageBehaviours {
 
   val address: Address = Address("", None, "", None, None, Country("", "", ""))

@@ -32,10 +32,10 @@ import uk.gov.hmrc.domain.Generator
 class CheckModeNavigatorSpec extends SpecBase with ScalaCheckPropertyChecks with Generators {
 
   val mockFrontendConfig: FrontendAppConfig = mock[FrontendAppConfig]
-  val navigator: Navigator = new Navigator(mockFrontendConfig)
+  val navigator: Navigator                  = new Navigator(mockFrontendConfig)
 
-  val name: Name = Name("FirstName", "LastName")
-  val address: Address = Address("", None, "", None, None, Country("", "", ""))
+  val name: Name                   = Name("FirstName", "LastName")
+  val address: Address             = Address("", None, "", None, None, Country("", "", ""))
   val utr: UniqueTaxpayerReference = UniqueTaxpayerReference("0123456789")
 
   "Navigator in Check mode" - {
@@ -247,21 +247,21 @@ class CheckModeNavigatorSpec extends SpecBase with ScalaCheckPropertyChecks with
       "What is the partnership name?, " +
       "What is the registered name of your business? and " +
       "What is the name of your organisation? pages to" - {
-      "Business matching when answer is a name" in {
-        forAll(arbitrary[UserAnswers]) {
-          answers =>
-            val updatedAnswers =
-              answers
-                .set(BusinessNamePage, "Business name")
-                .success
-                .value
+        "Business matching when answer is a name" in {
+          forAll(arbitrary[UserAnswers]) {
+            answers =>
+              val updatedAnswers =
+                answers
+                  .set(BusinessNamePage, "Business name")
+                  .success
+                  .value
 
-            navigator
-              .nextPage(BusinessNamePage, CheckMode, updatedAnswers)
-              .mustBe(routes.BusinessMatchingController.matchBusiness())
+              navigator
+                .nextPage(BusinessNamePage, CheckMode, updatedAnswers)
+                .mustBe(routes.BusinessMatchingController.matchBusiness())
+          }
         }
       }
-    }
 
     "must got from What is your name? page to" - {
       "Business matching when answer is a Sole proprietor name" in {
@@ -648,8 +648,7 @@ class CheckModeNavigatorSpec extends SpecBase with ScalaCheckPropertyChecks with
       }
     }
 
-      //**************************Contact Details etc.**********************************
-
+    //**************************Contact Details etc.**********************************
 
     "must go from Who should we contact...? page to" - {
       "What is *name*’s email address? page when answer is a contact name" in {
@@ -834,11 +833,10 @@ class CheckModeNavigatorSpec extends SpecBase with ScalaCheckPropertyChecks with
       }
     }
 
-      "must go from the does *name*? have a telephone number page " +
-        "to what is the telephone number for *name*? page when option 'yes' is selected" in {
+    "must go from the does *name*? have a telephone number page " +
+      "to what is the telephone number for *name*? page when option 'yes' is selected" in {
         forAll(arbitrary[UserAnswers]) {
           answers =>
-
             val updatedAnswers =
               answers
                 .set(SecondaryContactNamePage, "DAC6 Team")
@@ -854,11 +852,10 @@ class CheckModeNavigatorSpec extends SpecBase with ScalaCheckPropertyChecks with
         }
       }
 
-      "must go from the does *name*? have a telephone number page " +
-        "to Check your answers page when option 'no' is selected" in {
+    "must go from the does *name*? have a telephone number page " +
+      "to Check your answers page when option 'no' is selected" in {
         forAll(arbitrary[UserAnswers]) {
           answers =>
-
             val updatedAnswers =
               answers
                 .set(SecondaryContactNamePage, "DAC6 Team")
@@ -897,8 +894,8 @@ class CheckModeNavigatorSpec extends SpecBase with ScalaCheckPropertyChecks with
 
       forAll(arbitrary[UserAnswers]) {
         answers =>
-
-          navigator.nextPage(UnknownPage, CheckMode, answers)
+          navigator
+            .nextPage(UnknownPage, CheckMode, answers)
             .mustBe(routes.CheckYourAnswersController.onPageLoad())
       }
     }

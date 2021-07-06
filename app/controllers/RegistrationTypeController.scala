@@ -33,33 +33,35 @@ import uk.gov.hmrc.viewmodels.NunjucksSupport
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 
-class RegistrationTypeController @Inject()(
-                                            override val messagesApi: MessagesApi,
-                                            sessionRepository: SessionRepository,
-                                            navigator: Navigator,
-                                            identify: IdentifierAction,
-                                            notEnrolled: NotEnrolledForDAC6Action,
-                                            getData: DataRetrievalAction,
-                                            requireData: DataRequiredAction,
-                                            formProvider: RegistrationTypeFormProvider,
-                                            val controllerComponents: MessagesControllerComponents,
-                                            renderer: Renderer
-                                          )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with NunjucksSupport {
+class RegistrationTypeController @Inject() (
+  override val messagesApi: MessagesApi,
+  sessionRepository: SessionRepository,
+  navigator: Navigator,
+  identify: IdentifierAction,
+  notEnrolled: NotEnrolledForDAC6Action,
+  getData: DataRetrievalAction,
+  requireData: DataRequiredAction,
+  formProvider: RegistrationTypeFormProvider,
+  val controllerComponents: MessagesControllerComponents,
+  renderer: Renderer
+)(implicit ec: ExecutionContext)
+    extends FrontendBaseController
+    with I18nSupport
+    with NunjucksSupport {
 
   private val form = formProvider()
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen notEnrolled andThen getData andThen requireData).async {
     implicit request =>
-
       val preparedForm = request.userAnswers.get(RegistrationTypePage) match {
-        case None => form
+        case None        => form
         case Some(value) => form.fill(value)
       }
 
       val json = Json.obj(
-        "form"   ->  preparedForm,
+        "form"   -> preparedForm,
         "mode"   -> mode,
-        "radios"  -> RegistrationType.radios(preparedForm)
+        "radios" -> RegistrationType.radios(preparedForm)
       )
 
       renderer.render("registrationType.njk", json).map(Ok(_))
@@ -67,32 +69,32 @@ class RegistrationTypeController @Inject()(
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen notEnrolled andThen getData andThen requireData).async {
     implicit request =>
+      form
+        .bindFromRequest()
+        .fold(
+          formWithErrors => {
 
-      form.bindFromRequest().fold(
-        formWithErrors => {
+            val json = Json.obj(
+              "form"   -> formWithErrors,
+              "mode"   -> mode,
+              "radios" -> RegistrationType.radios(formWithErrors)
+            )
 
-          val json = Json.obj(
-            "form"   -> formWithErrors,
-            "mode"   -> mode,
-            "radios" -> RegistrationType.radios(formWithErrors)
-          )
+            renderer.render("registrationType.njk", json).map(BadRequest(_))
+          },
+          registrationType => {
+            val redirectUsers = redirectToSummary(registrationType, RegistrationTypePage, mode, request.userAnswers)
 
-          renderer.render("registrationType.njk", json).map(BadRequest(_))
-        },
-        registrationType => {
-          val redirectUsers = redirectToSummary(registrationType, RegistrationTypePage, mode, request.userAnswers)
-
-          for {
-            updatedAnswers <- UserAnswersHelper.updateUserAnswersIfValueChanged(request.userAnswers, RegistrationTypePage, registrationType)
-            _              <- sessionRepository.set(updatedAnswers)
-          } yield {
-            if (redirectUsers) {
-              Redirect(routes.CheckYourAnswersController.onPageLoad())
-            } else {
-              Redirect(navigator.nextPage(RegistrationTypePage, mode, updatedAnswers))
-            }
+            for {
+              updatedAnswers <- UserAnswersHelper.updateUserAnswersIfValueChanged(request.userAnswers, RegistrationTypePage, registrationType)
+              _              <- sessionRepository.set(updatedAnswers)
+            } yield
+              if (redirectUsers) {
+                Redirect(routes.CheckYourAnswersController.onPageLoad())
+              } else {
+                Redirect(navigator.nextPage(RegistrationTypePage, mode, updatedAnswers))
+              }
           }
-        }
-      )
+        )
   }
 }

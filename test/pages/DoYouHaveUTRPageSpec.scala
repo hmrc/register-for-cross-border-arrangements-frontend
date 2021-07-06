@@ -41,29 +41,41 @@ class DoYouHaveUTRPageSpec extends PageBehaviours {
         answers =>
           val result = answers
             .set(RegistrationTypePage, Individual)
-            .success.value
+            .success
+            .value
             .set(DoYouHaveANationalInsuranceNumberPage, true)
-            .success.value
+            .success
+            .value
             .set(NinoPage, new Generator().nextNino)
-            .success.value
+            .success
+            .value
             .set(NamePage, Name("Fist", "Last"))
-            .success.value
+            .success
+            .value
             .set(NonUkNamePage, Name("Fist", "Last"))
-            .success.value
+            .success
+            .value
             .set(DateOfBirthPage, LocalDate.now())
-            .success.value
+            .success
+            .value
             .set(DoYouLiveInTheUKPage, false)
-            .success.value
+            .success
+            .value
             .set(IndividualUKPostcodePage, "ZZ1 1ZZ")
-            .success.value
+            .success
+            .value
             .set(SelectAddressPage, "Some UK address")
-            .success.value
+            .success
+            .value
             .set(WhatIsYourAddressPage, address)
-            .success.value
+            .success
+            .value
             .set(WhatIsYourAddressUkPage, address)
-            .success.value
+            .success
+            .value
             .set(DoYouHaveUTRPage, true)
-            .success.value
+            .success
+            .value
 
           result.get(RegistrationTypePage) mustBe None
           result.get(DoYouHaveANationalInsuranceNumberPage) mustBe None
@@ -84,9 +96,11 @@ class DoYouHaveUTRPageSpec extends PageBehaviours {
         answers =>
           val result = answers
             .set(BusinessWithoutIDNamePage, "Business Name")
-            .success.value
+            .success
+            .value
             .set(DoYouHaveUTRPage, true)
-            .success.value
+            .success
+            .value
 
           result.get(BusinessWithoutIDNamePage) mustBe None
       }
@@ -97,17 +111,23 @@ class DoYouHaveUTRPageSpec extends PageBehaviours {
         answers =>
           val result = answers
             .set(BusinessTypePage, BusinessType.CorporateBody)
-            .success.value
+            .success
+            .value
             .set(CorporationTaxUTRPage, UniqueTaxpayerReference("0123456789"))
-            .success.value
+            .success
+            .value
             .set(SelfAssessmentUTRPage, UniqueTaxpayerReference("0123456789"))
-            .success.value
+            .success
+            .value
             .set(BusinessNamePage, "Business name")
-            .success.value
+            .success
+            .value
             .set(ConfirmBusinessPage, true)
-            .success.value
+            .success
+            .value
             .set(DoYouHaveUTRPage, false)
-            .success.value
+            .success
+            .value
 
           result.get(BusinessTypePage) mustBe None
           result.get(CorporationTaxUTRPage) mustBe None

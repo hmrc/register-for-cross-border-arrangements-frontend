@@ -40,16 +40,16 @@ import scala.concurrent.Future
 
 class WhatIsYourAddressUkControllerSpec extends SpecBase with NunjucksSupport with JsonMatchers {
 
-  def onwardRoute: Call = Call("GET", "/foo")
+  def onwardRoute: Call                        = Call("GET", "/foo")
   val mockSessionRepository: SessionRepository = mock[SessionRepository]
   val mockFrontendAppConfig: FrontendAppConfig = mock[FrontendAppConfig]
 
   val mockCountryFactory: CountryListFactory = mock[CountryListFactory]
 
-  val country = Country("valid","GB","United Kingdom")
+  val country = Country("valid", "GB", "United Kingdom")
   val address = Address("value 1", Some("value 2"), "value 3", Some("value 4"), Some("XX9 9XX"), country)
 
-  val formProvider = new WhatIsYourAddressUkFormProvider()
+  val formProvider        = new WhatIsYourAddressUkFormProvider()
   val form: Form[Address] = formProvider(Seq(country))
 
   lazy val whatIsYourAddressUkRoute: String = routes.WhatIsYourAddressUkController.onPageLoad(NormalMode).url
@@ -61,10 +61,10 @@ class WhatIsYourAddressUkControllerSpec extends SpecBase with NunjucksSupport wi
       when(mockRenderer.render(any(), any())(any()))
         .thenReturn(Future.successful(Html("")))
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
-      val request = FakeRequest(GET, whatIsYourAddressUkRoute)
+      val application    = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val request        = FakeRequest(GET, whatIsYourAddressUkRoute)
       val templateCaptor = ArgumentCaptor.forClass(classOf[String])
-      val jsonCaptor = ArgumentCaptor.forClass(classOf[JsObject])
+      val jsonCaptor     = ArgumentCaptor.forClass(classOf[JsObject])
 
       val result = route(application, request).value
 
@@ -92,10 +92,10 @@ class WhatIsYourAddressUkControllerSpec extends SpecBase with NunjucksSupport wi
 
       val userAnswers = UserAnswers(userAnswersId).set(WhatIsYourAddressUkPage, address).success.value
 
-      val application = applicationBuilder(userAnswers = Some(userAnswers)).overrides(bind[CountryListFactory].toInstance(mockCountryFactory)).build()
-      val request = FakeRequest(GET, whatIsYourAddressUkRoute)
+      val application    = applicationBuilder(userAnswers = Some(userAnswers)).overrides(bind[CountryListFactory].toInstance(mockCountryFactory)).build()
+      val request        = FakeRequest(GET, whatIsYourAddressUkRoute)
       val templateCaptor = ArgumentCaptor.forClass(classOf[String])
-      val jsonCaptor = ArgumentCaptor.forClass(classOf[JsObject])
+      val jsonCaptor     = ArgumentCaptor.forClass(classOf[JsObject])
 
       val result = route(application, request).value
 
@@ -109,8 +109,8 @@ class WhatIsYourAddressUkControllerSpec extends SpecBase with NunjucksSupport wi
           "addressLine2" -> "value 2",
           "addressLine3" -> "value 3",
           "addressLine4" -> "value 4",
-          "postCode" -> "XX9 9XX",
-          "country" -> "GB"
+          "postCode"     -> "XX9 9XX",
+          "country"      -> "GB"
         )
       )
 
@@ -133,13 +133,16 @@ class WhatIsYourAddressUkControllerSpec extends SpecBase with NunjucksSupport wi
       when(mockCountryFactory.uk).thenReturn(country)
 
       val userAnswers = UserAnswers(userAnswersId)
-        .set(IndividualUKPostcodePage, "XX9 9XX").success.value
+        .set(IndividualUKPostcodePage, "XX9 9XX")
+        .success
+        .value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers))
-        .overrides(bind[CountryListFactory].toInstance(mockCountryFactory)).build()
-      val request = FakeRequest(GET, whatIsYourAddressUkRoute)
+        .overrides(bind[CountryListFactory].toInstance(mockCountryFactory))
+        .build()
+      val request        = FakeRequest(GET, whatIsYourAddressUkRoute)
       val templateCaptor = ArgumentCaptor.forClass(classOf[String])
-      val jsonCaptor = ArgumentCaptor.forClass(classOf[JsObject])
+      val jsonCaptor     = ArgumentCaptor.forClass(classOf[JsObject])
 
       val result = route(application, request).value
 
@@ -164,7 +167,7 @@ class WhatIsYourAddressUkControllerSpec extends SpecBase with NunjucksSupport wi
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
-      when(mockCountryFactory.getCountryList).thenReturn(Some(Seq(country,Country("valid","ES","Spain"))))
+      when(mockCountryFactory.getCountryList).thenReturn(Some(Seq(country, Country("valid", "ES", "Spain"))))
 
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers))
@@ -177,8 +180,13 @@ class WhatIsYourAddressUkControllerSpec extends SpecBase with NunjucksSupport wi
 
       val request =
         FakeRequest(POST, whatIsYourAddressUkRoute)
-          .withFormUrlEncodedBody(("addressLine1", "value 1"), ("addressLine2", "value 2"),("addressLine3", "value 3"), ("addressLine4", "value 4"),
-            ("postCode", "XX9 9XX"),("country", "GB"))
+          .withFormUrlEncodedBody(("addressLine1", "value 1"),
+                                  ("addressLine2", "value 2"),
+                                  ("addressLine3", "value 3"),
+                                  ("addressLine4", "value 4"),
+                                  ("postCode", "XX9 9XX"),
+                                  ("country", "GB")
+          )
 
       val result = route(application, request).value
 
@@ -193,11 +201,11 @@ class WhatIsYourAddressUkControllerSpec extends SpecBase with NunjucksSupport wi
       when(mockRenderer.render(any(), any())(any()))
         .thenReturn(Future.successful(Html("")))
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
-      val request = FakeRequest(POST, whatIsYourAddressUkRoute).withFormUrlEncodedBody(("value", ""))
-      val boundForm = form.bind(Map("value" -> ""))
+      val application    = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val request        = FakeRequest(POST, whatIsYourAddressUkRoute).withFormUrlEncodedBody(("value", ""))
+      val boundForm      = form.bind(Map("value" -> ""))
       val templateCaptor = ArgumentCaptor.forClass(classOf[String])
-      val jsonCaptor = ArgumentCaptor.forClass(classOf[JsObject])
+      val jsonCaptor     = ArgumentCaptor.forClass(classOf[JsObject])
 
       val result = route(application, request).value
 
@@ -218,10 +226,10 @@ class WhatIsYourAddressUkControllerSpec extends SpecBase with NunjucksSupport wi
 
     "must redirect to the Check your answers page when user doesn't change their answer" in {
       val whatIsYourAddressUkRoute: String = routes.WhatIsYourAddressUkController.onPageLoad(CheckMode).url
-      val userAnswers = UserAnswers(userAnswersId).set(WhatIsYourAddressUkPage, address).success.value
+      val userAnswers                      = UserAnswers(userAnswersId).set(WhatIsYourAddressUkPage, address).success.value
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
-      when(mockCountryFactory.getCountryList).thenReturn(Some(Seq(country, Country("valid","ES","Spain"))))
+      when(mockCountryFactory.getCountryList).thenReturn(Some(Seq(country, Country("valid", "ES", "Spain"))))
 
       val application =
         applicationBuilder(userAnswers = Some(userAnswers))

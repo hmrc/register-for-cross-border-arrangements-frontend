@@ -39,7 +39,7 @@ import scala.concurrent.Future
 class RegistrationServiceSpec extends SpecBase with Generators with ScalaCheckPropertyChecks with BeforeAndAfterEach {
 
   val mockRegistrationConnector: RegistrationConnector = mock[RegistrationConnector]
-  val registrationService: RegistrationService = app.injector.instanceOf[RegistrationService]
+  val registrationService: RegistrationService         = app.injector.instanceOf[RegistrationService]
 
   override lazy val app: Application = new GuiceApplicationBuilder()
     .overrides(
@@ -47,55 +47,54 @@ class RegistrationServiceSpec extends SpecBase with Generators with ScalaCheckPr
     )
     .build()
 
-"registration service" - {
-  "when able to construct a registration object" - {
-    "should send a request to the registration connector" in {
+  "registration service" - {
+    "when able to construct a registration object" - {
+      "should send a request to the registration connector" in {
 
-      val validNoIdAddress = Address("address1", Some("address2"), "address3", Some("address4"),Some("postcode"), Country("active","GB","UK"))
+        val validNoIdAddress = Address("address1", Some("address2"), "address3", Some("address4"), Some("postcode"), Country("active", "GB", "UK"))
 
+        forAll(arbitrary[UserAnswers], validPersonalName, validPersonalName, arbitrary[LocalDate]) {
 
-      forAll(arbitrary[UserAnswers], validPersonalName, validPersonalName, arbitrary[LocalDate]){
+          (userAnswers, firstName, lastName, dob) =>
+            val answers = userAnswers
+              .set(RegistrationTypePage, Individual)
+              .success
+              .value
+              .set(NonUkNamePage, Name(firstName, lastName))
+              .success
+              .value
+              .set(DateOfBirthPage, dob)
+              .success
+              .value
+              .set(WhatIsYourAddressPage, validNoIdAddress)
+              .success
+              .value
+              .set(ContactTelephoneNumberPage, "07000000000")
+              .success
+              .value
+              .set(ContactEmailAddressPage, "test@test.com")
+              .success
+              .value
+              .set(DoYouLiveInTheUKPage, false)
+              .success
+              .value
 
-        (userAnswers, firstName, lastName, dob) =>
-          val answers = userAnswers
-            .set(RegistrationTypePage, Individual)
-            .success
-            .value
-            .set(NonUkNamePage, Name(firstName, lastName))
-            .success
-            .value
-            .set(DateOfBirthPage, dob)
-            .success
-            .value
-            .set(WhatIsYourAddressPage, validNoIdAddress )
-            .success
-            .value
-            .set(ContactTelephoneNumberPage, "07000000000")
-            .success
-            .value
-            .set(ContactEmailAddressPage, "test@test.com")
-            .success
-            .value
-            .set(DoYouLiveInTheUKPage, false)
-            .success
-            .value
+            when(mockRegistrationConnector.sendWithoutIDInformation(any())(any(), any()))
+              .thenReturn(
+                Future.successful(HttpResponse(OK, ""))
+              )
 
-          when(mockRegistrationConnector.sendWithoutIDInformation(any())(any(), any()))
-            .thenReturn(
-              Future.successful(HttpResponse(OK, ""))
-            )
+            val result = registrationService.sendRegistration(answers)
 
-          val result = registrationService.sendRegistration(answers)
+            whenReady(result) {
+              _.map(_.status) mustBe Some(OK)
+            }
 
-          whenReady(result){
-            _.map(_.status) mustBe Some(OK)
-          }
+            verify(mockRegistrationConnector, times(1)).sendWithoutIDInformation(any())(any(), any())
 
-          verify(mockRegistrationConnector, times(1)).sendWithoutIDInformation(any())(any(),any())
-
-          reset(mockRegistrationConnector)
+            reset(mockRegistrationConnector)
+        }
       }
     }
   }
-}
 }

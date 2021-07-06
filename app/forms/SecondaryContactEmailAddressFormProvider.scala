@@ -27,8 +27,12 @@ class SecondaryContactEmailAddressFormProvider @Inject() extends Mappings with R
 
   def apply(): Form[String] =
     Form(
-      "email" -> validatedText("secondaryContactEmailAddress.error.required",
+      "email" -> validatedText(
+        "secondaryContactEmailAddress.error.required",
         "secondaryContactEmailAddress.error.email.invalid",
-        "secondaryContactEmailAddress.error.length", emailRegex, maxLength)
+        "secondaryContactEmailAddress.error.length",
+        emailRegex,
+        maxLength
+      )
     )
 }

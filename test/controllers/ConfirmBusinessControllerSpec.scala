@@ -41,7 +41,7 @@ class ConfirmBusinessControllerSpec extends SpecBase with NunjucksSupport with J
   def onwardRoute = Call("GET", "/foo")
 
   val formProvider = new ConfirmBusinessFormProvider()
-  val form = formProvider()
+  val form         = formProvider()
 
   lazy val confirmBusinessRoute = routes.ConfirmBusinessController.onPageLoad(NormalMode).url
 
@@ -55,13 +55,15 @@ class ConfirmBusinessControllerSpec extends SpecBase with NunjucksSupport with J
       val address = Address("", None, "", None, None, Country("", "", ""))
       val userAnswers = UserAnswers(userAnswersId)
         .set(BusinessAddressPage, address)
-        .success.value
+        .success
+        .value
         .set(RetrievedNamePage, "My Business")
-        .success.value
-      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
-      val request = FakeRequest(GET, confirmBusinessRoute)
+        .success
+        .value
+      val application    = applicationBuilder(userAnswers = Some(userAnswers)).build()
+      val request        = FakeRequest(GET, confirmBusinessRoute)
       val templateCaptor = ArgumentCaptor.forClass(classOf[String])
-      val jsonCaptor = ArgumentCaptor.forClass(classOf[JsObject])
+      val jsonCaptor     = ArgumentCaptor.forClass(classOf[JsObject])
 
       val result = route(application, request).value
 
@@ -89,16 +91,19 @@ class ConfirmBusinessControllerSpec extends SpecBase with NunjucksSupport with J
       val address = Address("", None, "", None, None, Country("", "", ""))
       val userAnswers = UserAnswers(userAnswersId)
         .set(BusinessAddressPage, address)
-        .success.value
+        .success
+        .value
         .set(RetrievedNamePage, "My Business")
-        .success.value
+        .success
+        .value
         .set(ConfirmBusinessPage, true)
-        .success.value
+        .success
+        .value
 
-      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
-      val request = FakeRequest(GET, confirmBusinessRoute)
+      val application    = applicationBuilder(userAnswers = Some(userAnswers)).build()
+      val request        = FakeRequest(GET, confirmBusinessRoute)
       val templateCaptor = ArgumentCaptor.forClass(classOf[String])
-      val jsonCaptor = ArgumentCaptor.forClass(classOf[JsObject])
+      val jsonCaptor     = ArgumentCaptor.forClass(classOf[JsObject])
 
       val result = route(application, request).value
 
@@ -156,17 +161,20 @@ class ConfirmBusinessControllerSpec extends SpecBase with NunjucksSupport with J
       val address = Address("", None, "", None, None, Country("", "", ""))
       val userAnswers = UserAnswers(userAnswersId)
         .set(BusinessAddressPage, address)
-        .success.value
+        .success
+        .value
         .set(RetrievedNamePage, "My Business")
-        .success.value
+        .success
+        .value
         .set(ConfirmBusinessPage, true)
-        .success.value
+        .success
+        .value
 
-      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
-      val request = FakeRequest(POST, confirmBusinessRoute).withFormUrlEncodedBody(("confirm", ""))
-      val boundForm = form.bind(Map("confirm" -> ""))
+      val application    = applicationBuilder(userAnswers = Some(userAnswers)).build()
+      val request        = FakeRequest(POST, confirmBusinessRoute).withFormUrlEncodedBody(("confirm", ""))
+      val boundForm      = form.bind(Map("confirm" -> ""))
       val templateCaptor = ArgumentCaptor.forClass(classOf[String])
-      val jsonCaptor = ArgumentCaptor.forClass(classOf[JsObject])
+      val jsonCaptor     = ArgumentCaptor.forClass(classOf[JsObject])
 
       val result = route(application, request).value
 
@@ -176,10 +184,10 @@ class ConfirmBusinessControllerSpec extends SpecBase with NunjucksSupport with J
 
       val expectedJson = Json.obj(
         "businessName" -> "My Business",
-        "address" -> Json.toJson(address),
-        "form"   -> boundForm,
-        "mode"   -> NormalMode,
-        "radios" -> Radios.yesNo(boundForm("confirm"))
+        "address"      -> Json.toJson(address),
+        "form"         -> boundForm,
+        "mode"         -> NormalMode,
+        "radios"       -> Radios.yesNo(boundForm("confirm"))
       )
 
       templateCaptor.getValue mustEqual "confirmBusiness.njk"

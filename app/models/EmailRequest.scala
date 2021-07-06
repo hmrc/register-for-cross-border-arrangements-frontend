@@ -16,7 +16,6 @@
 
 package models
 
-
 import play.api.libs.json.{Json, OFormat}
 
 case class EmailRequest(to: List[String], templateId: String, parameters: Map[String, String])
@@ -26,14 +25,14 @@ object EmailRequest {
 
   def registration(email: String, name: Option[String], dac6ID: String): EmailRequest = {
 
-    val contactName = name.fold("Registrant")(name => name)
+    val contactName = name.fold("Registrant")(
+      name => name
+    )
 
     EmailRequest(
       List(email),
       "dac6_registration_successful",
-      Map("dac6ID" -> dac6ID,
-      "name" -> contactName
-      )
+      Map("dac6ID" -> dac6ID, "name" -> contactName)
     )
   }
 }

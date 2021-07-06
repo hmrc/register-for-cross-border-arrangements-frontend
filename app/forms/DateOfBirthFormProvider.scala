@@ -29,12 +29,12 @@ class DateOfBirthFormProvider @Inject() extends Mappings {
     val todayWithZone = ZonedDateTime.now(ZoneId.of("Europe/London")).toLocalDate
     Form(
       "value" -> localDate(
-        invalidKey     = "dateOfBirth.error.invalid",
+        invalidKey = "dateOfBirth.error.invalid",
         allRequiredKey = "dateOfBirth.error.required.all",
         twoRequiredKey = "dateOfBirth.error.required.two",
-        requiredKey    = "dateOfBirth.error.required"
+        requiredKey = "dateOfBirth.error.required"
       ).verifying(maxDate(todayWithZone, "dateOfBirth.error.futureDate", formatDateToString(todayWithZone)))
-       .verifying(minDate(LocalDate.of(1909,1,1),"dateOfBirth.error.pastDate"))
+        .verifying(minDate(LocalDate.of(1909, 1, 1), "dateOfBirth.error.pastDate"))
     )
   }
 }

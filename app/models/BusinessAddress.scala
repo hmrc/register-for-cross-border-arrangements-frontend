@@ -22,47 +22,43 @@ import play.api.libs.json.{JsPath, Json, Reads, Writes}
 case class BusinessDetails(name: String, address: BusinessAddress)
 
 object BusinessDetails {
+
   implicit lazy val reads: Reads[BusinessDetails] = (
     (JsPath \ "organisation" \ "organisationName").read[String] and
       (JsPath \ "address").read[BusinessAddress]
-    )(BusinessDetails.apply _)
+  )(BusinessDetails.apply _)
 
   implicit lazy val writes: Writes[BusinessDetails] = Json.writes[BusinessDetails]
 
   def fromRegistrationMatch(payload: PayloadRegistrationWithIDResponse): Option[BusinessDetails] = {
     val addressExtracted: Option[AddressResponse] =
-      payload
-      .registerWithIDResponse
-      .responseDetail.map(_.address)
+      payload.registerWithIDResponse.responseDetail.map(_.address)
 
     val nameExtracted: Option[String] =
-      payload
-        .registerWithIDResponse
-        .responseDetail.map {
-          _.partnerDetails match {
-            case individualResponse: IndividualResponse => s"${individualResponse.firstName} ${individualResponse.lastName}"
-            case organisationResponse: OrganisationResponse => organisationResponse.organisationName
-          }
+      payload.registerWithIDResponse.responseDetail.map {
+        _.partnerDetails match {
+          case individualResponse: IndividualResponse     => s"${individualResponse.firstName} ${individualResponse.lastName}"
+          case organisationResponse: OrganisationResponse => organisationResponse.organisationName
         }
+      }
 
     for {
       address <- addressExtracted
-      name <- nameExtracted
-    } yield
-      BusinessDetails(
-        name,
-        BusinessAddress.fromAddressResponse(address)
-      )
+      name    <- nameExtracted
+    } yield BusinessDetails(
+      name,
+      BusinessAddress.fromAddressResponse(address)
+    )
   }
 }
 
-case class BusinessAddress(
-  addressLine1: String,
-  addressLine2: Option[String],
-  addressLine3: Option[String],
-  addressLine4: Option[String],
-  postCode: String,
-  countryCode: String){
+case class BusinessAddress(addressLine1: String,
+                           addressLine2: Option[String],
+                           addressLine3: Option[String],
+                           addressLine4: Option[String],
+                           postCode: String,
+                           countryCode: String
+) {
 
   def toAddress: Address =
     Address(
@@ -79,13 +75,13 @@ case class BusinessAddress(
 object BusinessAddress {
 
   implicit lazy val reads: Reads[BusinessAddress] = (
-      (JsPath \ "addressLine1").read[String] and
+    (JsPath \ "addressLine1").read[String] and
       (JsPath \ "addressLine2").readNullable[String] and
       (JsPath \ "addressLine3").readNullable[String] and
       (JsPath \ "addressLine4").readNullable[String] and
       (JsPath \ "postalCode").read[String] and
       (JsPath \ "countryCode").read[String]
-    )(BusinessAddress.apply _)
+  )(BusinessAddress.apply _)
 
   implicit lazy val writes: Writes[BusinessAddress] = Json.writes[BusinessAddress]
 

@@ -22,8 +22,8 @@ import play.api.data.FormError
 class ContactNameFormProviderSpec extends StringFieldBehaviours {
 
   val requiredKey = "contactName.error.required"
-  val lengthKey = "contactName.error.length"
-  val invalidKey = "contactName.error.invalid"
+  val lengthKey   = "contactName.error.length"
+  val invalidKey  = "contactName.error.invalid"
 
   val maxLength = 35
 
