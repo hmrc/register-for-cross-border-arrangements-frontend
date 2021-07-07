@@ -18,18 +18,20 @@ package models
 
 import play.api.libs.json.{Json, OFormat}
 
-
 case class ResponseDetailForDACSubscription(subscriptionID: String)
+
 object ResponseDetailForDACSubscription {
   implicit val format: OFormat[ResponseDetailForDACSubscription] = Json.format[ResponseDetailForDACSubscription]
 }
 
 case class SubscriptionForDACResponse(responseCommon: ResponseCommon, responseDetail: ResponseDetailForDACSubscription)
+
 object SubscriptionForDACResponse {
   implicit val format: OFormat[SubscriptionForDACResponse] = Json.format[SubscriptionForDACResponse]
 }
 
 case class CreateSubscriptionForDACResponse(createSubscriptionForDACResponse: SubscriptionForDACResponse)
+
 object CreateSubscriptionForDACResponse {
   implicit val format: OFormat[CreateSubscriptionForDACResponse] = Json.format[CreateSubscriptionForDACResponse]
 }

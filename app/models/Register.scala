@@ -24,7 +24,6 @@ import models.RegistrationType.Business
 import pages._
 import play.api.libs.json._
 
-
 case class NoIdOrganisation(organisationName: String)
 
 object NoIdOrganisation {
@@ -36,19 +35,22 @@ case class AddressNoId(addressLine1: String,
                        addressLine3: String,
                        addressLine4: Option[String],
                        postalCode: Option[String],
-                       countryCode: String)
+                       countryCode: String
+)
 
 object AddressNoId {
-  def apply(address: Address): Option[AddressNoId] =
-    Some(AddressNoId(
-      addressLine1 = address.addressLine1,
-      addressLine2 = address.addressLine2,
-      addressLine3 = address.addressLine3,
-      addressLine4 = address.addressLine4,
-      postalCode = address.postCode,
-      countryCode = address.country.code
-    ))
 
+  def apply(address: Address): Option[AddressNoId] =
+    Some(
+      AddressNoId(
+        addressLine1 = address.addressLine1,
+        addressLine2 = address.addressLine2,
+        addressLine3 = address.addressLine3,
+        addressLine4 = address.addressLine4,
+        postalCode = address.postCode,
+        countryCode = address.country.code
+      )
+    )
 
   implicit lazy val writes: OWrites[AddressNoId] = OWrites[AddressNoId] {
     address =>
@@ -57,8 +59,8 @@ object AddressNoId {
         "addressLine2" -> address.addressLine2,
         "addressLine3" -> address.addressLine3,
         "addressLine4" -> address.addressLine4,
-        "postalCode" -> address.postalCode,
-        "countryCode" -> address.countryCode
+        "postalCode"   -> address.postalCode,
+        "countryCode"  -> address.countryCode
       )
   }
 
@@ -71,16 +73,18 @@ object AddressNoId {
         (__ \ "addressLine4").readNullable[String] and
         (__ \ "postalCode").readNullable[String] and
         (__ \ "countryCode").read[String]
-      )((a1, a2,a3, a4, pc, cc) => AddressNoId(a1, a2,a3, a4, pc, cc))
+    )(
+      (a1, a2, a3, a4, pc, cc) => AddressNoId(a1, a2, a3, a4, pc, cc)
+    )
   }
 }
 
 case class ContactDetails(
-                           phoneNumber: Option[String],
-                           mobileNumber: Option[String],
-                           faxNumber: Option[String],
-                           emailAddress: Option[String]
-                         )
+  phoneNumber: Option[String],
+  mobileNumber: Option[String],
+  faxNumber: Option[String],
+  emailAddress: Option[String]
+)
 
 object ContactDetails {
   implicit val formats = Json.format[ContactDetails]
@@ -99,11 +103,11 @@ object RequestParameters {
 }
 
 case class RequestCommon(
-                          receiptDate: String,
-                          regime:String,
-                          acknowledgementReference: String,
-                          requestParameters: Option[Seq[RequestParameters]]
-                        )
+  receiptDate: String,
+  regime: String,
+  acknowledgementReference: String,
+  requestParameters: Option[Seq[RequestParameters]]
+)
 
 object RequestCommon {
   implicit val format = Json.format[RequestCommon]
@@ -123,81 +127,92 @@ case class RequestDetails(organisation: Option[NoIdOrganisation],
                           individual: Option[Individual],
                           address: AddressNoId,
                           contactDetails: ContactDetails,
-                          identification: Option[Identification])
+                          identification: Option[Identification]
+)
 
 object RequestDetails {
   implicit val formats = Json.format[RequestDetails]
 }
 
-object Registration{
+object Registration {
+
   def apply(userAnswers: UserAnswers): Option[RequestDetails] = userAnswers.get(RegistrationTypePage) match {
     case Some(models.RegistrationType.Individual) => IndRegistration(userAnswers)
-    case Some(Business) => OrgRegistration(userAnswers)
-    case _ => throw new Exception("Cannot retrieve registration type")
+    case Some(Business)                           => OrgRegistration(userAnswers)
+    case _                                        => throw new Exception("Cannot retrieve registration type")
   }
 }
 
-object OrgRegistration  {
+object OrgRegistration {
 
   def apply(userAnswers: UserAnswers): Option[RequestDetails] =
     for {
       organisationName <- getBusinessName(userAnswers)
-      addressBusiness <- userAnswers.get(BusinessAddressPage)
-      address <- AddressNoId(addressBusiness)
-    } yield {
-      RequestDetails(Some(NoIdOrganisation(organisationName)), None, address,
-        ContactDetails(userAnswers.get(ContactTelephoneNumberPage), None, None, userAnswers.get(ContactEmailAddressPage)), None)
-    }
+      addressBusiness  <- userAnswers.get(BusinessAddressPage)
+      address          <- AddressNoId(addressBusiness)
+    } yield RequestDetails(
+      Some(NoIdOrganisation(organisationName)),
+      None,
+      address,
+      ContactDetails(userAnswers.get(ContactTelephoneNumberPage), None, None, userAnswers.get(ContactEmailAddressPage)),
+      None
+    )
 
-  private def getBusinessName(userAnswers: UserAnswers): Option[String] = {
+  private def getBusinessName(userAnswers: UserAnswers): Option[String] =
     userAnswers.get(BusinessTypePage) match {
-      case Some(BusinessType.NotSpecified) => {
-        userAnswers.get(SoleTraderNamePage).map { name => s"${name.firstName} ${name.secondName}"}
-      }
-      case _ =>  userAnswers.get(BusinessWithoutIDNamePage)
+      case Some(BusinessType.NotSpecified) =>
+        userAnswers.get(SoleTraderNamePage).map {
+          name => s"${name.firstName} ${name.secondName}"
+        }
+      case _ => userAnswers.get(BusinessWithoutIDNamePage)
     }
-  }
 }
 
 object IndRegistration {
-  def apply(userAnswers: UserAnswers): Option[RequestDetails] = for {
-    name <- userAnswers.get(NonUkNamePage)
-    dob <- userAnswers.get(DateOfBirthPage)
-    addressInd <- getAddress(userAnswers)
-    address <- AddressNoId(addressInd)
-  } yield {
-    RequestDetails(None, Some(Individual(name, dob)), address,
-      ContactDetails(userAnswers.get(ContactTelephoneNumberPage), None, None, userAnswers.get(ContactEmailAddressPage)), None)
-  }
 
-  private def getAddress(userAnswers: UserAnswers): Option[Address] = {
+  def apply(userAnswers: UserAnswers): Option[RequestDetails] = for {
+    name       <- userAnswers.get(NonUkNamePage)
+    dob        <- userAnswers.get(DateOfBirthPage)
+    addressInd <- getAddress(userAnswers)
+    address    <- AddressNoId(addressInd)
+  } yield RequestDetails(
+    None,
+    Some(Individual(name, dob)),
+    address,
+    ContactDetails(userAnswers.get(ContactTelephoneNumberPage), None, None, userAnswers.get(ContactEmailAddressPage)),
+    None
+  )
+
+  private def getAddress(userAnswers: UserAnswers): Option[Address] =
     userAnswers.get(DoYouLiveInTheUKPage) match {
-      case Some(true) => userAnswers.get(WhatIsYourAddressUkPage).orElse(toAddress(userAnswers))
+      case Some(true)  => userAnswers.get(WhatIsYourAddressUkPage).orElse(toAddress(userAnswers))
       case Some(false) => userAnswers.get(WhatIsYourAddressPage)
-      case _ => throw new Exception("Cannot get address")
+      case _           => throw new Exception("Cannot get address")
     }
-  }
 
   private def toAddress(userAnswers: UserAnswers) =
-    userAnswers.get(SelectedAddressLookupPage) map { lookUp =>
-      Address(lookUp.addressLine1.getOrElse(""),
-        lookUp.addressLine2,
-        lookUp.addressLine3.getOrElse(""),
-        lookUp.addressLine4,
-        Some(lookUp.postcode),
-        Country("valid", "UK", "United Kingdom"))
+    userAnswers.get(SelectedAddressLookupPage) map {
+      lookUp =>
+        Address(
+          lookUp.addressLine1.getOrElse(""),
+          lookUp.addressLine2,
+          lookUp.addressLine3.getOrElse(""),
+          lookUp.addressLine4,
+          Some(lookUp.postcode),
+          Country("valid", "UK", "United Kingdom")
+        )
     }
 }
 
 case class RegisterWithoutIDRequest(requestCommon: RequestCommon, requestDetail: RequestDetails)
 
-object RegisterWithoutIDRequest{
+object RegisterWithoutIDRequest {
   implicit val format = Json.format[RegisterWithoutIDRequest]
 }
 
 case class Register(
-                         registerWithoutIDRequest: RegisterWithoutIDRequest
-                       )
+  registerWithoutIDRequest: RegisterWithoutIDRequest
+)
 
 object Register {
   implicit val format = Json.format[Register]

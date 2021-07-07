@@ -40,11 +40,11 @@ import scala.concurrent.Future
 
 class NinoControllerSpec extends SpecBase with NunjucksSupport with JsonMatchers {
 
-  def onwardRoute: Call = Call("GET", "/foo")
+  def onwardRoute: Call                        = Call("GET", "/foo")
   val mockSessionRepository: SessionRepository = mock[SessionRepository]
   val mockFrontendAppConfig: FrontendAppConfig = mock[FrontendAppConfig]
 
-  val formProvider = new NinoFormProvider()
+  val formProvider       = new NinoFormProvider()
   val form: Form[String] = formProvider()
 
   lazy val ninoRoute: String = routes.NinoController.onPageLoad(NormalMode).url
@@ -56,10 +56,10 @@ class NinoControllerSpec extends SpecBase with NunjucksSupport with JsonMatchers
       when(mockRenderer.render(any(), any())(any()))
         .thenReturn(Future.successful(Html("")))
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
-      val request = FakeRequest(GET, ninoRoute)
+      val application    = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val request        = FakeRequest(GET, ninoRoute)
       val templateCaptor = ArgumentCaptor.forClass(classOf[String])
-      val jsonCaptor = ArgumentCaptor.forClass(classOf[JsObject])
+      val jsonCaptor     = ArgumentCaptor.forClass(classOf[JsObject])
 
       val result = route(application, request).value
 
@@ -83,12 +83,12 @@ class NinoControllerSpec extends SpecBase with NunjucksSupport with JsonMatchers
       when(mockRenderer.render(any(), any())(any()))
         .thenReturn(Future.successful(Html("")))
 
-      val nino = (new Generator()).nextNino
-      val userAnswers = UserAnswers(userAnswersId).set(NinoPage, nino).success.value
-      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
-      val request = FakeRequest(GET, ninoRoute)
+      val nino           = (new Generator()).nextNino
+      val userAnswers    = UserAnswers(userAnswersId).set(NinoPage, nino).success.value
+      val application    = applicationBuilder(userAnswers = Some(userAnswers)).build()
+      val request        = FakeRequest(GET, ninoRoute)
       val templateCaptor = ArgumentCaptor.forClass(classOf[String])
-      val jsonCaptor = ArgumentCaptor.forClass(classOf[JsObject])
+      val jsonCaptor     = ArgumentCaptor.forClass(classOf[JsObject])
 
       val result = route(application, request).value
 
@@ -140,11 +140,11 @@ class NinoControllerSpec extends SpecBase with NunjucksSupport with JsonMatchers
       when(mockRenderer.render(any(), any())(any()))
         .thenReturn(Future.successful(Html("")))
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
-      val request = FakeRequest(POST, ninoRoute).withFormUrlEncodedBody(("value", ""))
-      val boundForm = form.bind(Map("value" -> ""))
+      val application    = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val request        = FakeRequest(POST, ninoRoute).withFormUrlEncodedBody(("value", ""))
+      val boundForm      = form.bind(Map("value" -> ""))
       val templateCaptor = ArgumentCaptor.forClass(classOf[String])
-      val jsonCaptor = ArgumentCaptor.forClass(classOf[JsObject])
+      val jsonCaptor     = ArgumentCaptor.forClass(classOf[JsObject])
 
       val result = route(application, request).value
 
@@ -179,7 +179,7 @@ class NinoControllerSpec extends SpecBase with NunjucksSupport with JsonMatchers
     }
 
     "must redirect to Session Expired for a POST if no existing data is found" in {
-      val nino = (new Generator()).nextNino
+      val nino        = (new Generator()).nextNino
       val application = applicationBuilder(userAnswers = None).build()
 
       val request =

@@ -41,8 +41,8 @@ class SecondaryContactNameControllerSpec extends SpecBase with NunjucksSupport w
 
   def onwardRoute: Call = Call("GET", "/foo")
 
-  val formProvider = new SecondaryContactNameFormProvider()
-  val form: Form[String] = formProvider()
+  val formProvider                             = new SecondaryContactNameFormProvider()
+  val form: Form[String]                       = formProvider()
   val mockSessionRepository: SessionRepository = mock[SessionRepository]
   val mockFrontendAppConfig: FrontendAppConfig = mock[FrontendAppConfig]
 
@@ -55,10 +55,10 @@ class SecondaryContactNameControllerSpec extends SpecBase with NunjucksSupport w
       when(mockRenderer.render(any(), any())(any()))
         .thenReturn(Future.successful(Html("")))
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
-      val request = FakeRequest(GET, secondaryContactNameRoute)
+      val application    = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val request        = FakeRequest(GET, secondaryContactNameRoute)
       val templateCaptor = ArgumentCaptor.forClass(classOf[String])
-      val jsonCaptor = ArgumentCaptor.forClass(classOf[JsObject])
+      val jsonCaptor     = ArgumentCaptor.forClass(classOf[JsObject])
 
       val result = route(application, request).value
 
@@ -82,11 +82,11 @@ class SecondaryContactNameControllerSpec extends SpecBase with NunjucksSupport w
       when(mockRenderer.render(any(), any())(any()))
         .thenReturn(Future.successful(Html("")))
 
-      val userAnswers = UserAnswers(userAnswersId).set(SecondaryContactNamePage, "answer").success.value
-      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
-      val request = FakeRequest(GET, secondaryContactNameRoute)
+      val userAnswers    = UserAnswers(userAnswersId).set(SecondaryContactNamePage, "answer").success.value
+      val application    = applicationBuilder(userAnswers = Some(userAnswers)).build()
+      val request        = FakeRequest(GET, secondaryContactNameRoute)
       val templateCaptor = ArgumentCaptor.forClass(classOf[String])
-      val jsonCaptor = ArgumentCaptor.forClass(classOf[JsObject])
+      val jsonCaptor     = ArgumentCaptor.forClass(classOf[JsObject])
 
       val result = route(application, request).value
 
@@ -136,11 +136,11 @@ class SecondaryContactNameControllerSpec extends SpecBase with NunjucksSupport w
       when(mockRenderer.render(any(), any())(any()))
         .thenReturn(Future.successful(Html("")))
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
-      val request = FakeRequest(POST, secondaryContactNameRoute).withFormUrlEncodedBody(("secondaryContactName", ""))
-      val boundForm = form.bind(Map("secondaryContactName" -> ""))
+      val application    = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val request        = FakeRequest(POST, secondaryContactNameRoute).withFormUrlEncodedBody(("secondaryContactName", ""))
+      val boundForm      = form.bind(Map("secondaryContactName" -> ""))
       val templateCaptor = ArgumentCaptor.forClass(classOf[String])
-      val jsonCaptor = ArgumentCaptor.forClass(classOf[JsObject])
+      val jsonCaptor     = ArgumentCaptor.forClass(classOf[JsObject])
 
       val result = route(application, request).value
 
@@ -162,7 +162,7 @@ class SecondaryContactNameControllerSpec extends SpecBase with NunjucksSupport w
     "must redirect to the Check your answers page when user doesn't change their answer" in {
 
       val secondaryContactNameRoute: String = routes.SecondaryContactNameController.onPageLoad(CheckMode).url
-      val userAnswers = UserAnswers(userAnswersId).set(SecondaryContactNamePage, "answer").success.value
+      val userAnswers                       = UserAnswers(userAnswersId).set(SecondaryContactNamePage, "answer").success.value
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 

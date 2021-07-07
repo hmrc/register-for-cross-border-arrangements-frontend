@@ -23,7 +23,6 @@ import org.scalacheck.Arbitrary.arbitrary
 import pages.behaviours.PageBehaviours
 import uk.gov.hmrc.domain.Generator
 
-
 class DoYouHaveANationalInsuranceNumberPageSpec extends PageBehaviours {
 
   "DoYouHaveANationalInsuranceNumberPage" - {

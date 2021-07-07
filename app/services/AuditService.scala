@@ -30,30 +30,36 @@ import uk.gov.hmrc.play.audit.model.ExtendedDataEvent
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class AuditService @Inject()(appConfig: FrontendAppConfig, auditConnector: AuditConnector){
+class AuditService @Inject() (appConfig: FrontendAppConfig, auditConnector: AuditConnector) {
   private val refererHeaderKey = "Referer"
-  private val logger: Logger = Logger(this.getClass)
+  private val logger: Logger   = Logger(this.getClass)
 
-  def sendAuditEvent(eventName: String, detail: JsValue, transactionName: String, path: String)(implicit hc: HeaderCarrier, request: Request[_]): Future[AuditResult] = {
-
-    auditConnector.sendExtendedEvent(ExtendedDataEvent(
-      auditSource = appConfig.appName,
-      auditType = eventName,
-      detail = detail,
-      tags = AuditExtensions.auditHeaderCarrier(hc).toAuditDetails()
-        ++ AuditExtensions.auditHeaderCarrier(hc).toAuditTags(transactionName, path)
-    )) map { ar: AuditResult => ar match {
-      case Failure(msg, ex) =>
-        ex match {
-          case Some(throwable) =>
-            logger.warn(s"The attempt to issue audit event $eventName failed with message : $msg", throwable)
-          case None =>
-            logger.warn(s"The attempt to issue audit event $eventName failed with message : $msg")
+  def sendAuditEvent(eventName: String, detail: JsValue, transactionName: String, path: String)(implicit
+    hc: HeaderCarrier,
+    request: Request[_]
+  ): Future[AuditResult] =
+    auditConnector.sendExtendedEvent(
+      ExtendedDataEvent(
+        auditSource = appConfig.appName,
+        auditType = eventName,
+        detail = detail,
+        tags = AuditExtensions.auditHeaderCarrier(hc).toAuditDetails()
+          ++ AuditExtensions.auditHeaderCarrier(hc).toAuditTags(transactionName, path)
+      )
+    ) map {
+      ar: AuditResult =>
+        ar match {
+          case Failure(msg, ex) =>
+            ex match {
+              case Some(throwable) =>
+                logger.warn(s"The attempt to issue audit event $eventName failed with message : $msg", throwable)
+              case None =>
+                logger.warn(s"The attempt to issue audit event $eventName failed with message : $msg")
+            }
+            ar
+          case Disabled =>
+            logger.warn(s"The attempt to issue audit event $eventName was unsuccessful, as auditing is currently disabled in config"); ar
+          case _ => logger.debug(s"Audit event $eventName issued successsfully."); ar
         }
-        ar
-      case Disabled =>
-        logger.warn(s"The attempt to issue audit event $eventName was unsuccessful, as auditing is currently disabled in config"); ar
-      case _ => logger.debug(s"Audit event $eventName issued successsfully."); ar
-    }}
-  }
+    }
 }

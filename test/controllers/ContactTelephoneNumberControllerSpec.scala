@@ -39,11 +39,11 @@ import scala.concurrent.Future
 
 class ContactTelephoneNumberControllerSpec extends SpecBase with NunjucksSupport with JsonMatchers {
 
-  def onwardRoute: Call = Call("GET", "/foo")
+  def onwardRoute: Call                        = Call("GET", "/foo")
   val mockSessionRepository: SessionRepository = mock[SessionRepository]
   val mockFrontendAppConfig: FrontendAppConfig = mock[FrontendAppConfig]
 
-  val formProvider = new ContactTelephoneNumberFormProvider()
+  val formProvider       = new ContactTelephoneNumberFormProvider()
   val form: Form[String] = formProvider()
 
   lazy val contactTelephoneNumberRoute: String = routes.ContactTelephoneNumberController.onPageLoad(NormalMode).url
@@ -55,10 +55,10 @@ class ContactTelephoneNumberControllerSpec extends SpecBase with NunjucksSupport
       when(mockRenderer.render(any(), any())(any()))
         .thenReturn(Future.successful(Html("")))
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
-      val request = FakeRequest(GET, contactTelephoneNumberRoute)
+      val application    = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val request        = FakeRequest(GET, contactTelephoneNumberRoute)
       val templateCaptor = ArgumentCaptor.forClass(classOf[String])
-      val jsonCaptor = ArgumentCaptor.forClass(classOf[JsObject])
+      val jsonCaptor     = ArgumentCaptor.forClass(classOf[JsObject])
 
       val result = route(application, request).value
 
@@ -82,11 +82,11 @@ class ContactTelephoneNumberControllerSpec extends SpecBase with NunjucksSupport
       when(mockRenderer.render(any(), any())(any()))
         .thenReturn(Future.successful(Html("")))
 
-      val userAnswers = UserAnswers(userAnswersId).set(ContactTelephoneNumberPage, "07540000000").success.value
-      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
-      val request = FakeRequest(GET, contactTelephoneNumberRoute)
+      val userAnswers    = UserAnswers(userAnswersId).set(ContactTelephoneNumberPage, "07540000000").success.value
+      val application    = applicationBuilder(userAnswers = Some(userAnswers)).build()
+      val request        = FakeRequest(GET, contactTelephoneNumberRoute)
       val templateCaptor = ArgumentCaptor.forClass(classOf[String])
-      val jsonCaptor = ArgumentCaptor.forClass(classOf[JsObject])
+      val jsonCaptor     = ArgumentCaptor.forClass(classOf[JsObject])
 
       val result = route(application, request).value
 
@@ -94,9 +94,11 @@ class ContactTelephoneNumberControllerSpec extends SpecBase with NunjucksSupport
 
       verify(mockRenderer, times(1)).render(templateCaptor.capture(), jsonCaptor.capture())(any())
 
-      val filledForm = form.bind(Map(
-        "telephoneNumber" -> "07540000000"
-      ))
+      val filledForm = form.bind(
+        Map(
+          "telephoneNumber" -> "07540000000"
+        )
+      )
 
       val expectedJson = Json.obj(
         "form" -> filledForm,
@@ -138,11 +140,11 @@ class ContactTelephoneNumberControllerSpec extends SpecBase with NunjucksSupport
       when(mockRenderer.render(any(), any())(any()))
         .thenReturn(Future.successful(Html("")))
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
-      val request = FakeRequest(POST, contactTelephoneNumberRoute).withFormUrlEncodedBody(("value", ""))
-      val boundForm = form.bind(Map("value" -> ""))
+      val application    = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val request        = FakeRequest(POST, contactTelephoneNumberRoute).withFormUrlEncodedBody(("value", ""))
+      val boundForm      = form.bind(Map("value" -> ""))
       val templateCaptor = ArgumentCaptor.forClass(classOf[String])
-      val jsonCaptor = ArgumentCaptor.forClass(classOf[JsObject])
+      val jsonCaptor     = ArgumentCaptor.forClass(classOf[JsObject])
 
       val result = route(application, request).value
 
@@ -179,7 +181,7 @@ class ContactTelephoneNumberControllerSpec extends SpecBase with NunjucksSupport
     "must redirect to the Check your answers page when user doesn't change their answer" in {
 
       val contactTelephoneNumberRoute: String = routes.ContactTelephoneNumberController.onPageLoad(CheckMode).url
-      val userAnswers = UserAnswers(userAnswersId).set(ContactTelephoneNumberPage, "07540000000").success.value
+      val userAnswers                         = UserAnswers(userAnswersId).set(ContactTelephoneNumberPage, "07540000000").success.value
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 

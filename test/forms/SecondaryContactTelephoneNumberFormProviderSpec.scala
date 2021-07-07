@@ -22,9 +22,9 @@ import play.api.data.FormError
 class SecondaryContactTelephoneNumberFormProviderSpec extends StringFieldBehaviours {
 
   val requiredKey = "secondaryContactTelephoneNumber.error.required"
-  val lengthKey = "secondaryContactTelephoneNumber.error.invalid"
-  val invalidKey = "secondaryContactTelephoneNumber.error.invalid"
-  val maxLength = 24
+  val lengthKey   = "secondaryContactTelephoneNumber.error.invalid"
+  val invalidKey  = "secondaryContactTelephoneNumber.error.invalid"
+  val maxLength   = 24
 
   val form = new SecondaryContactTelephoneNumberFormProvider()()
 

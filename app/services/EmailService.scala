@@ -26,36 +26,53 @@ import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class EmailService @Inject()(emailConnector:EmailConnector)(implicit executionContext: ExecutionContext) {
+class EmailService @Inject() (emailConnector: EmailConnector)(implicit executionContext: ExecutionContext) {
 
   def sendEmail(userAnswers: UserAnswers)(implicit hc: HeaderCarrier): Future[Option[HttpResponse]] = {
 
     val emailAddress = userAnswers.get(ContactEmailAddressPage)
 
     val contactName = (userAnswers.get(ContactNamePage).isDefined, userAnswers.get(NamePage).isDefined, userAnswers.get(NonUkNamePage).isDefined) match {
-      case (true, false, false) => userAnswers.get(ContactNamePage).map(n => n)
-      case (false, true, false) => userAnswers.get(NamePage).map(n => n.firstName + " " + n.secondName)
-      case (false, false, true) => userAnswers.get(NonUkNamePage).map(n => n.firstName + " " + n.secondName)
+      case (true, false, false) =>
+        userAnswers
+          .get(ContactNamePage)
+          .map(
+            n => n
+          )
+      case (false, true, false) =>
+        userAnswers
+          .get(NamePage)
+          .map(
+            n => n.firstName + " " + n.secondName
+          )
+      case (false, false, true) =>
+        userAnswers
+          .get(NonUkNamePage)
+          .map(
+            n => n.firstName + " " + n.secondName
+          )
       case _ => None
     }
 
     val dac6ID: String = userAnswers.get(SubscriptionIDPage).get
 
     val secondaryEmailAddress = userAnswers.get(SecondaryContactEmailAddressPage)
-    val secondaryName = userAnswers.get(SecondaryContactNamePage)
+    val secondaryName         = userAnswers.get(SecondaryContactNamePage)
 
     for {
       primaryResponse <- emailAddress
-                          .filter(EmailAddress.isValid)
-                          .fold(Future.successful(Option.empty[HttpResponse])) { email =>
-                             emailConnector.sendEmail(EmailRequest.registration(email, contactName, dac6ID)).map(Some.apply)}
+        .filter(EmailAddress.isValid)
+        .fold(Future.successful(Option.empty[HttpResponse])) {
+          email =>
+            emailConnector.sendEmail(EmailRequest.registration(email, contactName, dac6ID)).map(Some.apply)
+        }
 
       _ <- secondaryEmailAddress
-         .filter(EmailAddress.isValid)
-          .fold(Future.successful(Option.empty[HttpResponse])) { secondaryEmailAddress =>
+        .filter(EmailAddress.isValid)
+        .fold(Future.successful(Option.empty[HttpResponse])) {
+          secondaryEmailAddress =>
             emailConnector.sendEmail(EmailRequest.registration(secondaryEmailAddress, secondaryName, dac6ID)).map(Some.apply)
-            }
-    }
-      yield primaryResponse
+        }
+    } yield primaryResponse
   }
 }

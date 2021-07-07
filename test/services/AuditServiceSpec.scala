@@ -32,7 +32,7 @@ import scala.concurrent.Future
 class AuditServiceSpec extends SpecBase {
 
   val mockAuditConnector = mock[AuditConnector]
-  val eventDetail = Json.obj("test-param1" -> "test-value-1")
+  val eventDetail        = Json.obj("test-param1" -> "test-value-1")
 
   override lazy val app: Application = new GuiceApplicationBuilder()
     .overrides(
@@ -44,10 +44,10 @@ class AuditServiceSpec extends SpecBase {
 
   "Auditservice must" - {
     "call the audit connector and sendExtendedEvent" in {
-      when(mockAuditConnector.sendExtendedEvent(any())(any(),any())).thenReturn(Future.successful(Success))
+      when(mockAuditConnector.sendExtendedEvent(any())(any(), any())).thenReturn(Future.successful(Success))
       val request = FakeRequest(GET, "/")
-      auditService.sendAuditEvent("dummy app",eventDetail, "transactionName", "path")(hc, request)
-      verify(mockAuditConnector,times(1)).sendExtendedEvent(any())(any(),any())
+      auditService.sendAuditEvent("dummy app", eventDetail, "transactionName", "path")(hc, request)
+      verify(mockAuditConnector, times(1)).sendExtendedEvent(any())(any(), any())
     }
   }
 

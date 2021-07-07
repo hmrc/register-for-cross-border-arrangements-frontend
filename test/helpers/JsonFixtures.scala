@@ -16,7 +16,22 @@
 
 package helpers
 
-import models.{AddressResponse, ContactDetails, IndividualResponse, PayloadRegisterWithID, PayloadRegistrationWithIDResponse, RegisterWithIDRequest, RegisterWithIDResponse, RequestCommon, RequestParameters, RequestWithIDDetails, ResponseCommon, ResponseDetail, ReturnParameters, WithIDIndividual}
+import models.{
+  AddressResponse,
+  ContactDetails,
+  IndividualResponse,
+  PayloadRegisterWithID,
+  PayloadRegistrationWithIDResponse,
+  RegisterWithIDRequest,
+  RegisterWithIDResponse,
+  RequestCommon,
+  RequestParameters,
+  RequestWithIDDetails,
+  ResponseCommon,
+  ResponseDetail,
+  ReturnParameters,
+  WithIDIndividual
+}
 import play.api.libs.json.{JsNull, JsObject, JsString, Json}
 
 object JsonFixtures {
@@ -51,37 +66,40 @@ object JsonFixtures {
       |}
       |}""".stripMargin
 
-  val registrationWithRequest: PayloadRegisterWithID = PayloadRegisterWithID(RegisterWithIDRequest(
-    RequestCommon("2016-08-16T15:55:30Z", "DAC", "ec031b045855445e96f98a569ds56cd2",
-      Some(Seq(RequestParameters("REGIME", "DAC")))),
-    RequestWithIDDetails(
-      "NINO",
-      "0123456789",
-      requiresNameMatch = true,
-      isAnAgent = false,
-      WithIDIndividual("Fred", Some("Flintstone"), "Flint", "1999-12-20")))
+  val registrationWithRequest: PayloadRegisterWithID = PayloadRegisterWithID(
+    RegisterWithIDRequest(
+      RequestCommon("2016-08-16T15:55:30Z", "DAC", "ec031b045855445e96f98a569ds56cd2", Some(Seq(RequestParameters("REGIME", "DAC")))),
+      RequestWithIDDetails("NINO",
+                           "0123456789",
+                           requiresNameMatch = true,
+                           isAnAgent = false,
+                           WithIDIndividual("Fred", Some("Flintstone"), "Flint", "1999-12-20")
+      )
+    )
   )
 
   val registerWithIDJson: JsObject = Json.obj(
     "registerWithIDRequest" -> Json.obj(
       "requestCommon" -> Json.obj(
-        "regime" -> "DAC",
-        "receiptDate" -> "2016-08-16T15:55:30Z",
+        "regime"                   -> "DAC",
+        "receiptDate"              -> "2016-08-16T15:55:30Z",
         "acknowledgementReference" -> "ec031b045855445e96f98a569ds56cd2",
-        "requestParameters" -> Json.arr( Json.obj(
-          "paramName" -> "REGIME",
-          "paramValue" -> "DAC"
-        ))
+        "requestParameters" -> Json.arr(
+          Json.obj(
+            "paramName"  -> "REGIME",
+            "paramValue" -> "DAC"
+          )
+        )
       ),
       "requestDetail" -> Json.obj(
-        "IDType" -> "NINO",
-        "IDNumber" -> "0123456789",
+        "IDType"            -> "NINO",
+        "IDNumber"          -> "0123456789",
         "requiresNameMatch" -> true,
-        "isAnAgent" -> false,
+        "isAnAgent"         -> false,
         "individual" -> Json.obj(
-          "firstName" -> "Fred",
-          "middleName" -> "Flintstone",
-          "lastName" -> "Flint",
+          "firstName"   -> "Fred",
+          "middleName"  -> "Flintstone",
+          "lastName"    -> "Flint",
           "dateOfBirth" -> "1999-12-20"
         )
       )
@@ -139,7 +157,7 @@ object JsonFixtures {
       |}
       |}""".stripMargin
 
-  val payloadModel: PayloadRegistrationWithIDResponse = {
+  val payloadModel: PayloadRegistrationWithIDResponse =
     PayloadRegistrationWithIDResponse(
       RegisterWithIDResponse(
         ResponseCommon(
@@ -162,13 +180,7 @@ object JsonFixtures {
               "Burgundy",
               Some("1980-12-12")
             ),
-            address = AddressResponse("100 Parliament Street",
-              None,
-              None,
-              Some("London"),
-              Some("SW1A 2BQ"),
-              "GB"
-            ),
+            address = AddressResponse("100 Parliament Street", None, None, Some("London"), Some("SW1A 2BQ"), "GB"),
             contactDetails = ContactDetails(
               Some("1111111"),
               Some("2222222"),
@@ -179,48 +191,47 @@ object JsonFixtures {
         )
       )
     )
-    }
 
   val withIDResponseJson: JsObject = Json.obj(
     "registerWithIDResponse" -> Json.obj(
       "responseCommon" -> Json.obj(
-        "status" -> "OK",
-        "statusText" -> "Sample status text",
+        "status"         -> "OK",
+        "statusText"     -> "Sample status text",
         "processingDate" -> "2016-08-16T15:55:30Z",
         "returnParameters" -> Json.arr(
           Json.obj(
-            "paramName" -> "SAP_NUMBER",
-          "paramValue" -> "0123456789"
+            "paramName"  -> "SAP_NUMBER",
+            "paramValue" -> "0123456789"
           )
         )
       ),
       "responseDetail" -> Json.obj(
-  "SAFEID" -> "XE0000123456789",
-        "ARN" -> "WARN8764123",
-        "isEditable" -> true,
-        "isAnAgent" -> false,
+        "SAFEID"         -> "XE0000123456789",
+        "ARN"            -> "WARN8764123",
+        "isEditable"     -> true,
+        "isAnAgent"      -> false,
         "isAnIndividual" -> true,
-        "isAnASAgent" -> JsNull,
+        "isAnASAgent"    -> JsNull,
         "individual" -> Json.obj(
-          "firstName" -> "Ron",
-          "middleName" -> "Madisson",
-          "lastName" -> "Burgundy",
+          "firstName"   -> "Ron",
+          "middleName"  -> "Madisson",
+          "lastName"    -> "Burgundy",
           "dateOfBirth" -> "1980-12-12"
         ),
-      "address" -> Json.obj(
-        "addressLine1" -> "100 Parliament Street",
-        "addressLine4" -> "London",
-        "postalCode" -> "SW1A 2BQ",
-        "countryCode" -> "GB"
-      ),
-      "contactDetails" -> Json.obj(
-        "phoneNumber" -> "1111111",
-        "mobileNumber" -> "2222222",
-        "faxNumber" -> "1111111",
-        "emailAddress" -> "test@test.org"
+        "address" -> Json.obj(
+          "addressLine1" -> "100 Parliament Street",
+          "addressLine4" -> "London",
+          "postalCode"   -> "SW1A 2BQ",
+          "countryCode"  -> "GB"
+        ),
+        "contactDetails" -> Json.obj(
+          "phoneNumber"  -> "1111111",
+          "mobileNumber" -> "2222222",
+          "faxNumber"    -> "1111111",
+          "emailAddress" -> "test@test.org"
+        )
       )
     )
-  )
   )
 
   val requestCouldNotBeProcessedResponse: String =
@@ -257,12 +268,10 @@ object JsonFixtures {
       | }
       |}""".stripMargin
 
+  /** *******************For creating an EIS subscription below ********************
+    */
 
-  /*********************For creating an EIS subscription below *********************/
-
-  def jsonPayloadForInd(firstName: JsString,
-                        lastName:JsString,
-                        primaryEmail: JsString): String = {
+  def jsonPayloadForInd(firstName: JsString, lastName: JsString, primaryEmail: JsString): String =
     s"""
        |{
        |  "createSubscriptionForDACRequest": {
@@ -291,11 +300,8 @@ object JsonFixtures {
        |  }
        |}
        |""".stripMargin
-  }
 
-  def jsonPayloadForOrg(organisationName: JsString,
-                        primaryEmail: JsString,
-                        phone: JsString): String = {
+  def jsonPayloadForOrg(organisationName: JsString, primaryEmail: JsString, phone: JsString): String =
     s"""
       |{
       |  "createSubscriptionForDACRequest": {
@@ -325,14 +331,14 @@ object JsonFixtures {
       |  }
       |}
       |""".stripMargin
-  }
 
   def jsonPayloadForIndWithSecondaryContact(firstName: JsString,
-                                            lastName:JsString,
+                                            lastName: JsString,
                                             organisationName: JsString,
                                             primaryEmail: JsString,
                                             secondaryEmail: JsString,
-                                            phone: JsString): String = {
+                                            phone: JsString
+  ): String =
     s"""
        |{
        |  "createSubscriptionForDACRequest": {
@@ -365,14 +371,14 @@ object JsonFixtures {
        |  }
        |}
        |""".stripMargin
-  }
 
   def jsonPayloadForOrgWithSecondaryContact(firstName: JsString,
-                                            lastName:JsString,
+                                            lastName: JsString,
                                             organisationName: JsString,
                                             primaryEmail: JsString,
                                             secondaryEmail: JsString,
-                                            phone: JsString): String = {
+                                            phone: JsString
+  ): String =
     s"""
        |{
        |  "createSubscriptionForDACRequest": {
@@ -405,97 +411,91 @@ object JsonFixtures {
        |  }
        |}
        |""".stripMargin
-  }
 
-  def indRequestJson(firstName: String,
-                     lastName:String,
-                     primaryEmail: String): JsObject = {
+  def indRequestJson(firstName: String, lastName: String, primaryEmail: String): JsObject =
     Json.obj(
       "createSubscriptionForDACRequest" -> Json.obj(
         "requestCommon" -> Json.obj(
-          "regime" -> "DAC",
-          "receiptDate" -> "2020-09-23T16:12:11Z",
+          "regime"                   -> "DAC",
+          "receiptDate"              -> "2020-09-23T16:12:11Z",
           "acknowledgementReference" -> "AB123c",
-          "originatingSystem" -> "MDTP",
+          "originatingSystem"        -> "MDTP",
           "requestParameters" -> Json.arr(
             Json.obj(
-              "paramName" -> "Name",
+              "paramName"  -> "Name",
               "paramValue" -> "Value"
             )
           )
         ),
         "requestDetail" -> Json.obj(
-          "IDType" -> "idType",
+          "IDType"   -> "idType",
           "IDNumber" -> "idNumber",
           "isGBUser" -> true,
           "primaryContact" -> Json.obj(
             "individual" -> Json.obj(
               "firstName" -> firstName,
-              "lastName" -> lastName
+              "lastName"  -> lastName
             ),
             "email" -> primaryEmail
           )
         )
       )
     )
-  }
 
-  def orgRequestJson(organisationName: String,
-                     primaryEmail: String,
-                     phone: String): JsObject = {
+  def orgRequestJson(organisationName: String, primaryEmail: String, phone: String): JsObject =
     Json.obj(
       "createSubscriptionForDACRequest" -> Json.obj(
         "requestCommon" -> Json.obj(
-          "regime" -> "DAC",
-          "receiptDate" -> "2020-09-23T16:12:11Z",
+          "regime"                   -> "DAC",
+          "receiptDate"              -> "2020-09-23T16:12:11Z",
           "acknowledgementReference" -> "AB123c",
-          "originatingSystem" -> "MDTP",
+          "originatingSystem"        -> "MDTP",
           "requestParameters" -> Json.arr(
             Json.obj(
-              "paramName" -> "Name",
+              "paramName"  -> "Name",
               "paramValue" -> "Value"
             )
           )
         ),
         "requestDetail" -> Json.obj(
-          "IDType" -> "idType",
+          "IDType"   -> "idType",
           "IDNumber" -> "idNumber",
           "isGBUser" -> true,
           "primaryContact" -> Json.obj(
             "organisation" -> Json.obj(
               "organisationName" -> organisationName
             ),
-            "email" -> primaryEmail,
-            "phone" -> phone,
+            "email"  -> primaryEmail,
+            "phone"  -> phone,
             "mobile" -> phone
           )
         )
       )
     )
-  }
 
   def indWithSecondaryContactJson(firstName: String,
-                                  lastName:String,
+                                  lastName: String,
                                   organisationName: String,
                                   primaryEmail: String,
                                   secondaryEmail: String,
-                                  phone: String): JsObject = {
+                                  phone: String
+  ): JsObject =
     Json.obj(
       "createSubscriptionForDACRequest" -> Json.obj(
         "requestCommon" -> Json.obj(
-          "regime" -> "DAC",
-          "receiptDate" -> "2020-09-23T16:12:11Z",
+          "regime"                   -> "DAC",
+          "receiptDate"              -> "2020-09-23T16:12:11Z",
           "acknowledgementReference" -> "AB123c",
-          "originatingSystem" -> "MDTP"
+          "originatingSystem"        -> "MDTP"
         ),
         "requestDetail" -> Json.obj(
-          "IDType" -> "idType",
+          "IDType"   -> "idType",
           "IDNumber" -> "idNumber",
           "isGBUser" -> true,
           "primaryContact" -> Json.obj(
             "individual" -> Json.obj(
               "firstName" -> firstName,
-              "lastName" -> lastName
+              "lastName"  -> lastName
             ),
             "email" -> primaryEmail
           ),
@@ -503,52 +503,51 @@ object JsonFixtures {
             "organisation" -> Json.obj(
               "organisationName" -> organisationName
             ),
-            "email" -> secondaryEmail,
-            "phone" -> phone,
+            "email"  -> secondaryEmail,
+            "phone"  -> phone,
             "mobile" -> phone
           )
         )
       )
     )
-  }
 
   def orgWithSecondaryContactJson(firstName: String,
-                                  lastName:String,
+                                  lastName: String,
                                   organisationName: String,
                                   primaryEmail: String,
                                   secondaryEmail: String,
-                                  phone: String): JsObject = {
+                                  phone: String
+  ): JsObject =
     Json.obj(
       "createSubscriptionForDACRequest" -> Json.obj(
         "requestCommon" -> Json.obj(
-          "regime" -> "DAC",
-          "receiptDate" -> "2020-09-23T16:12:11Z",
+          "regime"                   -> "DAC",
+          "receiptDate"              -> "2020-09-23T16:12:11Z",
           "acknowledgementReference" -> "AB123c",
-          "originatingSystem" -> "MDTP"
+          "originatingSystem"        -> "MDTP"
         ),
         "requestDetail" -> Json.obj(
-          "IDType" -> "idType",
+          "IDType"   -> "idType",
           "IDNumber" -> "idNumber",
           "isGBUser" -> true,
           "primaryContact" -> Json.obj(
             "organisation" -> Json.obj(
               "organisationName" -> organisationName
             ),
-            "email" -> primaryEmail,
-            "phone" -> phone,
+            "email"  -> primaryEmail,
+            "phone"  -> phone,
             "mobile" -> phone
           ),
           "secondaryContact" -> Json.obj(
             "individual" -> Json.obj(
               "firstName" -> firstName,
-              "lastName" -> lastName
+              "lastName"  -> lastName
             ),
             "email" -> secondaryEmail
           )
         )
       )
     )
-  }
 
   val registerWithoutIDResponse: String =
     """
@@ -569,8 +568,8 @@ object JsonFixtures {
   val registerWithoutIDResponseJson: JsObject = Json.obj(
     "registerWithoutIDResponse" -> Json.obj(
       "responseCommon" -> Json.obj(
-        "status" -> "OK",
-        "statusText" -> "Success",
+        "status"         -> "OK",
+        "statusText"     -> "Success",
         "processingDate" -> "2020-09-01T01:00:00Z"
       ),
       "responseDetail" -> Json.obj(

@@ -21,11 +21,7 @@ import play.api.data.{Form, FormError}
 
 trait StringFieldBehaviours extends FieldBehaviours {
 
-    def fieldWithMaxLength(form: Form[_],
-                           fieldName: String,
-                           maxLength: Int,
-                           lengthError: FormError): Unit = {
-
+  def fieldWithMaxLength(form: Form[_], fieldName: String, maxLength: Int, lengthError: FormError): Unit =
     s"must not bind strings longer than $maxLength characters" in {
 
       forAll(stringsLongerThan(maxLength) -> "longString") {
@@ -34,13 +30,8 @@ trait StringFieldBehaviours extends FieldBehaviours {
           result.errors shouldEqual Seq(lengthError)
       }
     }
-  }
 
-  def fieldWithMaxLengthAlpha(form: Form[_],
-                         fieldName: String,
-                         maxLength: Int,
-                         lengthError: FormError): Unit = {
-
+  def fieldWithMaxLengthAlpha(form: Form[_], fieldName: String, maxLength: Int, lengthError: FormError): Unit =
     s"must not bind strings longer than $maxLength characters" in {
 
       forAll(stringsLongerThanAlpha(maxLength) -> "longString") {
@@ -49,13 +40,8 @@ trait StringFieldBehaviours extends FieldBehaviours {
           result.errors shouldEqual Seq(lengthError)
       }
     }
-  }
 
-  def fieldWithMaxLengthEmail(form: Form[_],
-                         fieldName: String,
-                         maxLength: Int,
-                         lengthError: FormError): Unit = {
-
+  def fieldWithMaxLengthEmail(form: Form[_], fieldName: String, maxLength: Int, lengthError: FormError): Unit =
     s"must not bind strings longer than $maxLength characters" in {
 
       forAll(validEmailAdressToLong(maxLength) -> "longString") {
@@ -64,14 +50,8 @@ trait StringFieldBehaviours extends FieldBehaviours {
           result.errors shouldEqual Seq(lengthError)
       }
     }
-  }
 
-
-  def fieldWithFixedLength(form: Form[_],
-                         fieldName: String,
-                           length: Int,
-                         lengthError: FormError): Unit = {
-
+  def fieldWithFixedLength(form: Form[_], fieldName: String, length: Int, lengthError: FormError): Unit =
     s"must not bind strings that are not $length characters" in {
 
       forAll(stringsExceptSpecificLength(length) -> "longString") {
@@ -80,13 +60,8 @@ trait StringFieldBehaviours extends FieldBehaviours {
           result.errors shouldEqual Seq(lengthError)
       }
     }
-  }
 
-  def fieldWithFixedLengthNumeric(form: Form[_],
-                         fieldName: String,
-                           length: Int,
-                         lengthError: FormError): Unit = {
-
+  def fieldWithFixedLengthNumeric(form: Form[_], fieldName: String, length: Int, lengthError: FormError): Unit =
     s"must not bind strings that are not $length characters" in {
 
       forAll(stringsNotOfFixedLengthNumeric(length) -> "longString") {
@@ -95,70 +70,45 @@ trait StringFieldBehaviours extends FieldBehaviours {
           result.errors shouldEqual Seq(lengthError)
       }
     }
-  }
 
-  def fieldWithMaxLengthAndInvalid(form: Form[_],
-                                   fieldName: String,
-                                   maxLength: Int,
-                                   invalidError: FormError,
-                                   lengthError: FormError): Unit = {
-
+  def fieldWithMaxLengthAndInvalid(form: Form[_], fieldName: String, maxLength: Int, invalidError: FormError, lengthError: FormError): Unit =
     s"must not bind strings longer than $maxLength characters" in {
 
       forAll(stringsLongerThan(maxLength) -> "longString") {
         string =>
           val result = form.bind(Map(fieldName -> string)).apply(fieldName)
-          result.errors shouldEqual Seq(invalidError,lengthError)
+          result.errors shouldEqual Seq(invalidError, lengthError)
       }
     }
-  }
 
-  def fieldWithMinLengthAndInvalid(form: Form[_],
-                         fieldName: String,
-                         minLength: Int,
-                         invalidError: FormError,
-                         lengthError: FormError): Unit = {
-
+  def fieldWithMinLengthAndInvalid(form: Form[_], fieldName: String, minLength: Int, invalidError: FormError, lengthError: FormError): Unit =
     s"must not bind strings shorter than $minLength characters" in {
 
       forAll(stringsShorterThan(minLength) -> "longString") {
         string =>
           val result = form.bind(Map(fieldName -> string)).apply(fieldName)
-          result.errors shouldEqual Seq(invalidError,lengthError)
+          result.errors shouldEqual Seq(invalidError, lengthError)
       }
     }
-  }
 
-  def fieldWithNonEmptyWhitespace(form: Form[_],
-                                   fieldName: String,
-                                   requiredError: FormError): Unit = {
-
+  def fieldWithNonEmptyWhitespace(form: Form[_], fieldName: String, requiredError: FormError): Unit =
     s"must not bind strings of only whitespace" in {
 
       val result = form.bind(Map(fieldName -> " ")).apply(fieldName)
       result.errors shouldEqual Seq(requiredError)
     }
-  }
 
-  def fieldWithValidatedRegex(form: Form[_],
-                                fieldName: String,
-                                maxLength: Int,
-                                invalidError: FormError): Unit = {
+  def fieldWithValidatedRegex(form: Form[_], fieldName: String, maxLength: Int, invalidError: FormError): Unit =
+    s"must not bind strings longer than $maxLength characters" in {
 
-      s"must not bind strings longer than $maxLength characters" in {
-
-        forAll(stringsLongerThan(maxLength) -> "longString") {
-          string =>
-            val result = form.bind(Map(fieldName -> string)).apply(fieldName)
-            result.errors shouldEqual Seq(invalidError)
-        }
+      forAll(stringsLongerThan(maxLength) -> "longString") {
+        string =>
+          val result = form.bind(Map(fieldName -> string)).apply(fieldName)
+          result.errors shouldEqual Seq(invalidError)
       }
     }
 
-  def fieldWithPostCodeRequired(form: Form[_],
-                                fieldName: String,
-                                countryCodeList: Seq[String],
-                                invalidError: FormError): Unit = {
+  def fieldWithPostCodeRequired(form: Form[_], fieldName: String, countryCodeList: Seq[String], invalidError: FormError): Unit =
     s"must not bind when postcode is required for a country" in {
       forAll(Gen.oneOf(countryCodeList)) {
         country =>
@@ -166,5 +116,4 @@ trait StringFieldBehaviours extends FieldBehaviours {
           result.errors.head shouldEqual invalidError
       }
     }
-  }
 }

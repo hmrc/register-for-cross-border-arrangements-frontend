@@ -25,10 +25,10 @@ class SelfAssessmentUTRFormProviderSpec extends StringFieldBehaviours {
 
   ".selfAssessmentUTR" - {
 
-    val fieldName = "selfAssessmentUTR"
+    val fieldName   = "selfAssessmentUTR"
     val requiredKey = "selfAssessmentUTR.error.required"
-    val lengthKey = "selfAssessmentUTR.error.length"
-    val invalidKey = "selfAssessmentUTR.error.invalid"
+    val lengthKey   = "selfAssessmentUTR.error.length"
+    val invalidKey  = "selfAssessmentUTR.error.invalid"
 
     val length = 10
 

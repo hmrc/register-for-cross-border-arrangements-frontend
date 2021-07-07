@@ -22,9 +22,9 @@ import play.api.data.FormError
 class PostCodeFormProviderSpec extends StringFieldBehaviours {
 
   val requiredKey = "postCode.error.required"
-  val lengthKey = "postCode.error.length"
-  val invalidKey = "postCode.error.invalid"
-  val maxLength = 8
+  val lengthKey   = "postCode.error.length"
+  val invalidKey  = "postCode.error.invalid"
+  val maxLength   = 8
 
   val form = new PostCodeFormProvider()()
 

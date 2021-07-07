@@ -27,15 +27,16 @@ import uk.gov.hmrc.viewmodels.Radios
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 
-class UnauthorisedAgentController @Inject()(
-    val controllerComponents: MessagesControllerComponents,
-    frontendAppConfig: FrontendAppConfig,
-    renderer: Renderer
-)(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+class UnauthorisedAgentController @Inject() (
+  val controllerComponents: MessagesControllerComponents,
+  frontendAppConfig: FrontendAppConfig,
+  renderer: Renderer
+)(implicit ec: ExecutionContext)
+    extends FrontendBaseController
+    with I18nSupport {
 
   def onPageLoad: Action[AnyContent] = Action.async {
     implicit request =>
-
       val json = Json.obj(
         "loginUrl" -> frontendAppConfig.loginUrl
       )

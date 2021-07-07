@@ -27,11 +27,14 @@ import uk.gov.hmrc.viewmodels.NunjucksSupport
 
 import scala.concurrent.ExecutionContext
 
-class BusinessNotConfirmedController @Inject()(
-                                    override val messagesApi: MessagesApi,
-                                    val controllerComponents: MessagesControllerComponents,
-                                    renderer: Renderer
-                                  )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with NunjucksSupport {
+class BusinessNotConfirmedController @Inject() (
+  override val messagesApi: MessagesApi,
+  val controllerComponents: MessagesControllerComponents,
+  renderer: Renderer
+)(implicit ec: ExecutionContext)
+    extends FrontendBaseController
+    with I18nSupport
+    with NunjucksSupport {
 
   def onPageLoad(): Action[AnyContent] = Action.async {
     implicit request =>
@@ -41,6 +44,5 @@ class BusinessNotConfirmedController @Inject()(
 
       renderer.render("businessNotConfirmed.njk", json).map(Ok(_))
   }
-
 
 }

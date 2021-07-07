@@ -22,17 +22,18 @@ import play.api.libs.json.Json
 
 class SubscriptionForDACResponseSpec extends SpecBase with ScalaCheckPropertyChecks {
 
-  val returnParameters: ReturnParameters = ReturnParameters("Name", "Value")
-  val responseCommon: ResponseCommon = ResponseCommon(status = "OK", statusText = None, processingDate = "2020-09-01T01:00:00Z", returnParameters = None)
+  val returnParameters: ReturnParameters               = ReturnParameters("Name", "Value")
+  val responseCommon: ResponseCommon                   = ResponseCommon(status = "OK", statusText = None, processingDate = "2020-09-01T01:00:00Z", returnParameters = None)
   val responseDetail: ResponseDetailForDACSubscription = ResponseDetailForDACSubscription(subscriptionID = "XADAC0000123456")
 
   val dacResponse: CreateSubscriptionForDACResponse = CreateSubscriptionForDACResponse(
     SubscriptionForDACResponse(responseCommon = responseCommon, responseDetail = responseDetail)
   )
+
   val dacResponseFull: CreateSubscriptionForDACResponse = CreateSubscriptionForDACResponse(
-    SubscriptionForDACResponse(
-      responseCommon = responseCommon.copy(statusText = Some("status"), returnParameters = Some(Seq(returnParameters))),
-      responseDetail = responseDetail)
+    SubscriptionForDACResponse(responseCommon = responseCommon.copy(statusText = Some("status"), returnParameters = Some(Seq(returnParameters))),
+                               responseDetail = responseDetail
+    )
   )
 
   "CreateSubscriptionForDACResponse" - {
@@ -67,12 +68,12 @@ class SubscriptionForDACResponseSpec extends SpecBase with ScalaCheckPropertyChe
       val json = Json.obj(
         "createSubscriptionForDACResponse" -> Json.obj(
           "responseCommon" -> Json.obj(
-            "status" -> "OK",
-            "statusText" -> "status",
+            "status"         -> "OK",
+            "statusText"     -> "status",
             "processingDate" -> "2020-09-01T01:00:00Z",
             "returnParameters" -> Json.arr(
               Json.obj(
-                "paramName" -> "Name",
+                "paramName"  -> "Name",
                 "paramValue" -> "Value"
               )
             )
@@ -111,7 +112,7 @@ class SubscriptionForDACResponseSpec extends SpecBase with ScalaCheckPropertyChe
       val json = Json.obj(
         "createSubscriptionForDACResponse" -> Json.obj(
           "responseCommon" -> Json.obj(
-            "status" -> "OK",
+            "status"         -> "OK",
             "processingDate" -> "2020-09-01T01:00:00Z"
           ),
           "responseDetail" -> Json.obj(

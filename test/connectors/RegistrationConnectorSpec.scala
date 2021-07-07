@@ -31,10 +31,7 @@ import play.api.inject.guice.GuiceApplicationBuilder
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class RegistrationConnectorSpec extends SpecBase
-  with WireMockServerHandler
-  with Generators
-  with ScalaCheckPropertyChecks {
+class RegistrationConnectorSpec extends SpecBase with WireMockServerHandler with Generators with ScalaCheckPropertyChecks {
 
   override lazy val app: Application = new GuiceApplicationBuilder()
     .configure(
@@ -47,55 +44,61 @@ class RegistrationConnectorSpec extends SpecBase
   val withIDSubmissionUrl: String = "/register-for-cross-border-arrangements/registration/02.00.00/withId"
 
   "registrationConnector" - {
-      "must return status as OK for registration" in {
+    "must return status as OK for registration" in {
 
+      forAll(arbitrary[Register]) {
+        reg =>
+          stubResponse(s"/register-for-cross-border-arrangements/registration/02.00.00/noId", OK)
 
-        forAll(arbitrary[Register]) {
-          reg =>
-            stubResponse(s"/register-for-cross-border-arrangements/registration/02.00.00/noId", OK)
-
-            val result = connector.sendWithoutIDInformation(reg)
-            result.futureValue.status mustBe OK
-        }
+          val result = connector.sendWithoutIDInformation(reg)
+          result.futureValue.status mustBe OK
       }
+    }
 
-      "must return status as BAD_REQUEST for  registration" in {
+    "must return status as BAD_REQUEST for  registration" in {
 
+      forAll(arbitrary[Register]) {
+        reg =>
+          stubResponse("/register-for-cross-border-arrangements/registration/02.00.00/noId", BAD_REQUEST)
 
-        forAll(arbitrary[Register]) {
-          reg =>
-            stubResponse("/register-for-cross-border-arrangements/registration/02.00.00/noId", BAD_REQUEST)
-
-            val result = connector.sendWithoutIDInformation(reg)
-            result.futureValue.status mustBe BAD_REQUEST
-        }
+          val result = connector.sendWithoutIDInformation(reg)
+          result.futureValue.status mustBe BAD_REQUEST
       }
+    }
 
-      "must return status as INTERNAL_SERVER_ERROR for a technical error" in {
+    "must return status as INTERNAL_SERVER_ERROR for a technical error" in {
 
+      forAll(arbitrary[Register]) {
+        reg =>
+          stubResponse("/register-for-cross-border-arrangements/registration/02.00.00/noId", INTERNAL_SERVER_ERROR)
 
-        forAll(arbitrary[Register]) {
-          reg =>
-            stubResponse("/register-for-cross-border-arrangements/registration/02.00.00/noId", INTERNAL_SERVER_ERROR)
-
-            val result = connector.sendWithoutIDInformation(reg)
-            result.futureValue.status mustBe INTERNAL_SERVER_ERROR
-        }
+          val result = connector.sendWithoutIDInformation(reg)
+          result.futureValue.status mustBe INTERNAL_SERVER_ERROR
       }
+    }
 
     "registerWithID" - {
       "must return PayloadRegistrationWithIDResponse if status is OK" in {
         forAll(arbitrary[PayloadRegisterWithID]) {
           request =>
-
             val expected = PayloadRegistrationWithIDResponse(
               RegisterWithIDResponse(
                 ResponseCommon("OK", Some("Sample status text"), "2016-08-16T15:55:30Z", Some(Vector(ReturnParameters("SAP_NUMBER", "0123456789")))),
-                Some(ResponseDetail("XE0000123456789", Some("WARN8764123"), isEditable = true, isAnAgent = false, None, isAnIndividual = true,
-                  IndividualResponse("Ron", Some("Madisson"), "Burgundy", Some("1980-12-12")),
-                  AddressResponse("100 Parliament Street", None, None, Some("London"), Some("SW1A 2BQ"), "GB"),
-                  ContactDetails(Some("1111111"), Some("2222222"), Some("1111111"), Some("test@test.org")))
-                )))
+                Some(
+                  ResponseDetail(
+                    "XE0000123456789",
+                    Some("WARN8764123"),
+                    isEditable = true,
+                    isAnAgent = false,
+                    None,
+                    isAnIndividual = true,
+                    IndividualResponse("Ron", Some("Madisson"), "Burgundy", Some("1980-12-12")),
+                    AddressResponse("100 Parliament Street", None, None, Some("London"), Some("SW1A 2BQ"), "GB"),
+                    ContactDetails(Some("1111111"), Some("2222222"), Some("1111111"), Some("test@test.org"))
+                  )
+                )
+              )
+            )
 
             stubResponse(withIDSubmissionUrl, OK, withIDResponse)
 
@@ -107,7 +110,6 @@ class RegistrationConnectorSpec extends SpecBase
       "must return None if status is NOT_FOUND" in {
         forAll(arbitrary[PayloadRegisterWithID]) {
           request =>
-
             stubResponse(withIDSubmissionUrl, NOT_FOUND)
 
             val result = connector.registerWithID(request)
@@ -118,9 +120,7 @@ class RegistrationConnectorSpec extends SpecBase
       "must return None if status is not OK and ErrorDetail contains '001 - Request could not be processed' and '503'" in {
         forAll(arbitrary[PayloadRegisterWithID]) {
           request =>
-
-            stubResponse(
-              withIDSubmissionUrl, SERVICE_UNAVAILABLE, requestCouldNotBeProcessedResponse)
+            stubResponse(withIDSubmissionUrl, SERVICE_UNAVAILABLE, requestCouldNotBeProcessedResponse)
 
             val result = connector.registerWithID(request)
             result.futureValue mustBe None
@@ -130,7 +130,6 @@ class RegistrationConnectorSpec extends SpecBase
       "must throw an exception if status is not OK" in {
         forAll(arbitrary[PayloadRegisterWithID]) {
           request =>
-
             stubResponse(withIDSubmissionUrl, BAD_REQUEST, badRequestResponse)
 
             val result = connector.registerWithID(request)
@@ -144,7 +143,6 @@ class RegistrationConnectorSpec extends SpecBase
       "must throw an exception if status is not OK and parsing failed" in {
         forAll(arbitrary[PayloadRegisterWithID]) {
           request =>
-
             val invalidBody =
               """
                 |{
@@ -173,14 +171,13 @@ class RegistrationConnectorSpec extends SpecBase
     }
   }
 
-    private def stubResponse(expectedUrl: String, expectedStatus: Int, expectedBody: String = ""): StubMapping =
-      server.stubFor(
-        post(urlEqualTo(expectedUrl))
-          .willReturn(
-            aResponse()
-              .withStatus(expectedStatus)
-              .withBody(expectedBody)
-          )
-      )
+  private def stubResponse(expectedUrl: String, expectedStatus: Int, expectedBody: String = ""): StubMapping =
+    server.stubFor(
+      post(urlEqualTo(expectedUrl))
+        .willReturn(
+          aResponse()
+            .withStatus(expectedStatus)
+            .withBody(expectedBody)
+        )
+    )
 }
-

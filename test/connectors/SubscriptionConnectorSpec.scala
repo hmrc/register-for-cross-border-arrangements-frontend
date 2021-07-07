@@ -36,52 +36,53 @@ import play.api.libs.json.JsString
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class SubscriptionConnectorSpec extends SpecBase
-  with WireMockServerHandler
-  with Generators
-  with ScalaCheckPropertyChecks {
+class SubscriptionConnectorSpec extends SpecBase with WireMockServerHandler with Generators with ScalaCheckPropertyChecks {
 
   override lazy val app: Application = new GuiceApplicationBuilder()
     .configure(
       conf = "microservice.services.business-matching.port" -> server.port(),
-             "microservice.services.cross-border-arrangements.port" -> server.port()
-
+      "microservice.services.cross-border-arrangements.port" -> server.port()
     )
     .build()
 
   lazy val connector: SubscriptionConnector = app.injector.instanceOf[SubscriptionConnector]
 
-  val primaryContact: PrimaryContact = PrimaryContact(Seq(
-    ContactInformationForIndividual(
-      individual = IndividualDetails(firstName = "FirstName", lastName = "LastName", middleName = None),
-      email = "email@email.com", phone = Some("07111222333"), mobile = Some("07111222333"))
-  ))
-  val secondaryContact: SecondaryContact = SecondaryContact(Seq(
-    ContactInformationForOrganisation(
-      organisation = OrganisationDetails(organisationName = "Organisation Name"),
-      email = "email@email.com", phone = None, mobile = None)
-  ))
+  val primaryContact: PrimaryContact = PrimaryContact(
+    Seq(
+      ContactInformationForIndividual(
+        individual = IndividualDetails(firstName = "FirstName", lastName = "LastName", middleName = None),
+        email = "email@email.com",
+        phone = Some("07111222333"),
+        mobile = Some("07111222333")
+      )
+    )
+  )
 
-  val responseDetail: ResponseDetailForReadSubscription = ResponseDetailForReadSubscription(
-    subscriptionID = "XE0001234567890",
-    tradingName = Some("Trading Name"),
-    isGBUser = true,
-    primaryContact = primaryContact,
-    secondaryContact = Some(secondaryContact))
+  val secondaryContact: SecondaryContact = SecondaryContact(
+    Seq(
+      ContactInformationForOrganisation(organisation = OrganisationDetails(organisationName = "Organisation Name"),
+                                        email = "email@email.com",
+                                        phone = None,
+                                        mobile = None
+      )
+    )
+  )
 
-  val responseCommon: ResponseCommon = ResponseCommon(
-    status = "OK",
-    statusText = None,
-    processingDate = "2020-08-09T11:23:45Z",
-    returnParameters = None)
+  val responseDetail: ResponseDetailForReadSubscription = ResponseDetailForReadSubscription(subscriptionID = "XE0001234567890",
+                                                                                            tradingName = Some("Trading Name"),
+                                                                                            isGBUser = true,
+                                                                                            primaryContact = primaryContact,
+                                                                                            secondaryContact = Some(secondaryContact)
+  )
+
+  val responseCommon: ResponseCommon = ResponseCommon(status = "OK", statusText = None, processingDate = "2020-08-09T11:23:45Z", returnParameters = None)
 
   "SubscriptionConnector" - {
     "must return status as OK for submission of valid enrolment request" in {
 
-
       forAll(arbitrary[UserAnswers], validSafeID, validSubscriptionID) {
-        (userAnswers, safeId, subscriptionId )=>
-          val userAnswerWithSafeId = userAnswers.set(SafeIDPage, safeId).success.value
+        (userAnswers, safeId, subscriptionId) =>
+          val userAnswerWithSafeId         = userAnswers.set(SafeIDPage, safeId).success.value
           val userAnswerWithSubscriptionId = userAnswerWithSafeId.set(SubscriptionIDPage, subscriptionId).success.value
           stubResponse(s"/register-for-cross-border-arrangements/enrolment/create-enrolment", OK)
 
@@ -92,10 +93,9 @@ class SubscriptionConnectorSpec extends SpecBase
 
     "must return status as BAD_REQUEST for invalid request" in {
 
-
       forAll(arbitrary[UserAnswers], validSafeID, validSubscriptionID) {
-        (userAnswers, safeId, subscriptionId )=>
-          val userAnswerWithSafeId = userAnswers.set(SafeIDPage, safeId).success.value
+        (userAnswers, safeId, subscriptionId) =>
+          val userAnswerWithSafeId         = userAnswers.set(SafeIDPage, safeId).success.value
           val userAnswerWithSubscriptionId = userAnswerWithSafeId.set(SubscriptionIDPage, subscriptionId).success.value
           stubResponse(s"/register-for-cross-border-arrangements/enrolment/create-enrolment", BAD_REQUEST)
 
@@ -106,10 +106,9 @@ class SubscriptionConnectorSpec extends SpecBase
 
     "must return status as INTERNAL_SERVER_ERROR for technical error incurred" in {
 
-
       forAll(arbitrary[UserAnswers], validSafeID, validSubscriptionID) {
-        (userAnswers, safeId, subscriptionId )=>
-          val userAnswerWithSafeId = userAnswers.set(SafeIDPage, safeId).success.value
+        (userAnswers, safeId, subscriptionId) =>
+          val userAnswerWithSafeId         = userAnswers.set(SafeIDPage, safeId).success.value
           val userAnswerWithSubscriptionId = userAnswerWithSafeId.set(SubscriptionIDPage, subscriptionId).success.value
           stubResponse(s"/register-for-cross-border-arrangements/enrolment/create-enrolment", INTERNAL_SERVER_ERROR)
 
@@ -125,11 +124,21 @@ class SubscriptionConnectorSpec extends SpecBase
         forAll(validPersonalName, validEmailAddress, validSafeID, validSubscriptionID) {
           (name, email, safeID, subscriptionID) =>
             val updatedUserAnswers = UserAnswers("internalId")
-              .remove(RegistrationTypePage).success.value
-              .set(ContactNamePage, name).success.value
-              .set(ContactEmailAddressPage, email).success.value
-              .set(HaveSecondContactPage, false).success.value
-              .set(SafeIDPage, safeID).success.value
+              .remove(RegistrationTypePage)
+              .success
+              .value
+              .set(ContactNamePage, name)
+              .success
+              .value
+              .set(ContactEmailAddressPage, email)
+              .success
+              .value
+              .set(HaveSecondContactPage, false)
+              .success
+              .value
+              .set(SafeIDPage, safeID)
+              .success
+              .value
 
             def expectedBody(subscriptionID: String): String =
               s"""
@@ -157,11 +166,21 @@ class SubscriptionConnectorSpec extends SpecBase
         forAll(validPersonalName, validEmailAddress, validSafeID, validSubscriptionID) {
           (name, email, safeID, subscriptionID) =>
             val updatedUserAnswers = UserAnswers("internalId")
-              .remove(RegistrationTypePage).success.value
-              .set(ContactNamePage, name).success.value
-              .set(ContactEmailAddressPage, email).success.value
-              .set(HaveSecondContactPage, false).success.value
-              .set(SafeIDPage, safeID).success.value
+              .remove(RegistrationTypePage)
+              .success
+              .value
+              .set(ContactNamePage, name)
+              .success
+              .value
+              .set(ContactEmailAddressPage, email)
+              .success
+              .value
+              .set(HaveSecondContactPage, false)
+              .success
+              .value
+              .set(SafeIDPage, safeID)
+              .success
+              .value
 
             def expectedBody(subscriptionID: String): String =
               s"""
@@ -188,16 +207,27 @@ class SubscriptionConnectorSpec extends SpecBase
 
         forAll(arbitrary[UserAnswers], validPersonalName, validEmailAddress, validSafeID) {
           (userAnswers, name, email, safeID) =>
-            val updatedUserAnswers = userAnswers.set(ContactNamePage, name).success.value
-              .remove(RegistrationTypePage).success.value
-              .set(ContactEmailAddressPage, email).success.value
-              .set(HaveSecondContactPage, true).success.value
-              .set(SafeIDPage, safeID).success.value
+            val updatedUserAnswers = userAnswers
+              .set(ContactNamePage, name)
+              .success
+              .value
+              .remove(RegistrationTypePage)
+              .success
+              .value
+              .set(ContactEmailAddressPage, email)
+              .success
+              .value
+              .set(HaveSecondContactPage, true)
+              .success
+              .value
+              .set(SafeIDPage, safeID)
+              .success
+              .value
 
             stubPostResponse("/register-for-cross-border-arrangements/subscription/create-dac-subscription", OK, "")
 
             val result: Future[Either[RegisterError, String]] = connector.createSubscription(updatedUserAnswers)
-            result.futureValue mustBe(Left(UnableToCreateEMTPSubscriptionError))
+            result.futureValue mustBe (Left(UnableToCreateEMTPSubscriptionError))
         }
       }
 
@@ -205,16 +235,27 @@ class SubscriptionConnectorSpec extends SpecBase
 
         forAll(arbitrary[UserAnswers], validPersonalName, validEmailAddress, validSafeID) {
           (userAnswers, name, email, safeID) =>
-            val updatedUserAnswers = userAnswers.set(RegistrationTypePage, RegistrationType.Individual).success.value
-              .set(NamePage, Name(name, name)).success.value
-              .set(ContactEmailAddressPage, email).success.value
-              .set(SafeIDPage, safeID).success.value
-              .remove(HaveSecondContactPage).success.value
+            val updatedUserAnswers = userAnswers
+              .set(RegistrationTypePage, RegistrationType.Individual)
+              .success
+              .value
+              .set(NamePage, Name(name, name))
+              .success
+              .value
+              .set(ContactEmailAddressPage, email)
+              .success
+              .value
+              .set(SafeIDPage, safeID)
+              .success
+              .value
+              .remove(HaveSecondContactPage)
+              .success
+              .value
 
             stubPostResponse("/register-for-cross-border-arrangements/subscription/create-dac-subscription", SERVICE_UNAVAILABLE, "")
 
             val result = connector.createSubscription(updatedUserAnswers)
-            result.futureValue mustBe(Left(UnableToCreateEMTPSubscriptionError))
+            result.futureValue mustBe (Left(UnableToCreateEMTPSubscriptionError))
         }
       }
 
@@ -222,8 +263,14 @@ class SubscriptionConnectorSpec extends SpecBase
         forAll(validSafeID) {
           safeID =>
             val expectedBody = displaySubscriptionPayload(
-              JsString(safeID), JsString("FirstName"), JsString("LastName"), JsString("Organisation Name"),
-              JsString("email@email.com"), JsString("email@email.com"), JsString("07111222333"))
+              JsString(safeID),
+              JsString("FirstName"),
+              JsString("LastName"),
+              JsString("Organisation Name"),
+              JsString("email@email.com"),
+              JsString("email@email.com"),
+              JsString("07111222333")
+            )
 
             val responseDetailRead: ResponseDetailForReadSubscription = responseDetail.copy(subscriptionID = safeID)
 
@@ -234,8 +281,6 @@ class SubscriptionConnectorSpec extends SpecBase
 
             stubPostResponse("/disclose-cross-border-arrangements/subscription/display-subscription", OK, expectedBody)
 
-
-
             val result = connector.readSubscriptionDetails(safeID)
             result.futureValue mustBe Some(displaySubscriptionForDACResponse)
         }
@@ -244,7 +289,6 @@ class SubscriptionConnectorSpec extends SpecBase
       "must None if json returned is invalid" in {
         forAll(validSafeID) {
           safeID =>
-
             val invalidJson = s"""
                                  |{
                                  |}""".stripMargin
@@ -258,8 +302,7 @@ class SubscriptionConnectorSpec extends SpecBase
       "must None if subscription doesnt exist DisplaySubscriptionForDACResponse" in {
         forAll(validSafeID) {
           safeID =>
-
-            stubPostResponse("/disclose-cross-border-arrangements/subscription/display-subscription", NOT_FOUND , "")
+            stubPostResponse("/disclose-cross-border-arrangements/subscription/display-subscription", NOT_FOUND, "")
 
             val result = connector.readSubscriptionDetails(safeID)
             result.futureValue mustBe None
@@ -287,13 +330,14 @@ class SubscriptionConnectorSpec extends SpecBase
         )
     )
 
- private def displaySubscriptionPayload(subscriptionID: JsString,
-                                 firstName: JsString,
-                                 lastName:JsString,
-                                 organisationName: JsString,
-                                 primaryEmail: JsString,
-                                 secondaryEmail: JsString,
-                                 phone: JsString): String = {
+  private def displaySubscriptionPayload(subscriptionID: JsString,
+                                         firstName: JsString,
+                                         lastName: JsString,
+                                         organisationName: JsString,
+                                         primaryEmail: JsString,
+                                         secondaryEmail: JsString,
+                                         phone: JsString
+  ): String =
     s"""
        |{
        |  "displaySubscriptionForDACResponse": {
@@ -327,5 +371,4 @@ class SubscriptionConnectorSpec extends SpecBase
        |    }
        |  }
        |}""".stripMargin
-  }
 }

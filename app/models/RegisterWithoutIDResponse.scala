@@ -18,20 +18,20 @@ package models
 
 import play.api.libs.json.{Json, OFormat}
 
+case class RegisterWithoutIDResponseDetail(SAFEID: String, ARN: Option[String])
 
-case class RegisterWithoutIDResponseDetail(SAFEID: String,
-                                           ARN: Option[String])
 object RegisterWithoutIDResponseDetail {
   implicit val format: OFormat[RegisterWithoutIDResponseDetail] = Json.format[RegisterWithoutIDResponseDetail]
 }
 
-case class RegisterWithoutIDResponse(responseCommon: ResponseCommon,
-                                     responseDetail: Option[RegisterWithoutIDResponseDetail])
+case class RegisterWithoutIDResponse(responseCommon: ResponseCommon, responseDetail: Option[RegisterWithoutIDResponseDetail])
+
 object RegisterWithoutIDResponse {
   implicit val format: OFormat[RegisterWithoutIDResponse] = Json.format[RegisterWithoutIDResponse]
 }
 
 case class PayloadRegistrationWithoutIDResponse(registerWithoutIDResponse: RegisterWithoutIDResponse)
+
 object PayloadRegistrationWithoutIDResponse {
   implicit val format: OFormat[PayloadRegistrationWithoutIDResponse] = Json.format[PayloadRegistrationWithoutIDResponse]
 }

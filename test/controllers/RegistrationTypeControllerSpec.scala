@@ -39,13 +39,13 @@ import scala.concurrent.Future
 
 class RegistrationTypeControllerSpec extends SpecBase with NunjucksSupport with JsonMatchers {
 
-  def onwardRoute: Call = Call("GET", "/foo")
+  def onwardRoute: Call                        = Call("GET", "/foo")
   val mockSessionRepository: SessionRepository = mock[SessionRepository]
   val mockFrontendAppConfig: FrontendAppConfig = mock[FrontendAppConfig]
 
   lazy val registrationTypeRoute: String = routes.RegistrationTypeController.onPageLoad(NormalMode).url
 
-  val formProvider = new RegistrationTypeFormProvider()
+  val formProvider                 = new RegistrationTypeFormProvider()
   val form: Form[RegistrationType] = formProvider()
 
   "RegistrationType Controller" - {
@@ -55,10 +55,10 @@ class RegistrationTypeControllerSpec extends SpecBase with NunjucksSupport with 
       when(mockRenderer.render(any(), any())(any()))
         .thenReturn(Future.successful(Html("")))
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
-      val request = FakeRequest(GET, registrationTypeRoute)
+      val application    = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val request        = FakeRequest(GET, registrationTypeRoute)
       val templateCaptor = ArgumentCaptor.forClass(classOf[String])
-      val jsonCaptor = ArgumentCaptor.forClass(classOf[JsObject])
+      val jsonCaptor     = ArgumentCaptor.forClass(classOf[JsObject])
 
       val result = route(application, request).value
 
@@ -83,11 +83,11 @@ class RegistrationTypeControllerSpec extends SpecBase with NunjucksSupport with 
       when(mockRenderer.render(any(), any())(any()))
         .thenReturn(Future.successful(Html("")))
 
-      val userAnswers = UserAnswers(userAnswersId).set(RegistrationTypePage, RegistrationType.values.head).success.value
-      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
-      val request = FakeRequest(GET, registrationTypeRoute)
+      val userAnswers    = UserAnswers(userAnswersId).set(RegistrationTypePage, RegistrationType.values.head).success.value
+      val application    = applicationBuilder(userAnswers = Some(userAnswers)).build()
+      val request        = FakeRequest(GET, registrationTypeRoute)
       val templateCaptor = ArgumentCaptor.forClass(classOf[String])
-      val jsonCaptor = ArgumentCaptor.forClass(classOf[JsObject])
+      val jsonCaptor     = ArgumentCaptor.forClass(classOf[JsObject])
 
       val result = route(application, request).value
 
@@ -108,7 +108,6 @@ class RegistrationTypeControllerSpec extends SpecBase with NunjucksSupport with 
 
       application.stop()
     }
-
 
     "must redirect to the next page when valid data is submitted" in {
 
@@ -140,11 +139,11 @@ class RegistrationTypeControllerSpec extends SpecBase with NunjucksSupport with 
       when(mockRenderer.render(any(), any())(any()))
         .thenReturn(Future.successful(Html("")))
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
-      val request = FakeRequest(POST, registrationTypeRoute).withFormUrlEncodedBody(("value", "invalid value"))
-      val boundForm = form.bind(Map("value" -> "invalid value"))
+      val application    = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val request        = FakeRequest(POST, registrationTypeRoute).withFormUrlEncodedBody(("value", "invalid value"))
+      val boundForm      = form.bind(Map("value" -> "invalid value"))
       val templateCaptor = ArgumentCaptor.forClass(classOf[String])
-      val jsonCaptor = ArgumentCaptor.forClass(classOf[JsObject])
+      val jsonCaptor     = ArgumentCaptor.forClass(classOf[JsObject])
 
       val result = route(application, request).value
 

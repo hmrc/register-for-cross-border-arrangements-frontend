@@ -31,20 +31,21 @@ import scala.concurrent.{ExecutionContext, Future}
 class NotEnrolledForDac6ActionSpec extends SpecBase with GuiceOneAppPerSuite {
 
   val mockFrontendAppConfig = mock[FrontendAppConfig]
-  val mockDac6Enrolment = mock[Enrolment]
+  val mockDac6Enrolment     = mock[Enrolment]
 
   implicit val executionContext: ExecutionContext = ExecutionContext.global
-  lazy val appConfig = app.injector.instanceOf[FrontendAppConfig]
-  lazy val mockMcc: MessagesControllerComponents = app.injector.instanceOf[MessagesControllerComponents]
-
+  lazy val appConfig                              = app.injector.instanceOf[FrontendAppConfig]
+  lazy val mockMcc: MessagesControllerComponents  = app.injector.instanceOf[MessagesControllerComponents]
 
   def harness[A]()(implicit request: UserRequest[A]): Future[Result] = {
 
     lazy val actionProvider = app.injector.instanceOf[NotEnrolledForDAC6Action]
 
     actionProvider.invokeBlock(
-      request, { _: IdentifierRequest[_] =>
-        Future.successful(Ok(""))
+      request,
+      {
+        _: IdentifierRequest[_] =>
+          Future.successful(Ok(""))
       }
     )
   }
@@ -56,14 +57,13 @@ class NotEnrolledForDac6ActionSpec extends SpecBase with GuiceOneAppPerSuite {
       FakeRequest()
     )
 
-
   "NotEnrolledForDAC6Action must " - {
 
     "redirect to the unauthorised page when" - {
 
       "the user has a DAC6 enrolment" in {
         implicit val request = createAuthenticatedRequest(dac6Enrolment = Set(Enrolment("HMRC-DAC6-ORG")))
-        val result = harness()(request)
+        val result           = harness()(request)
         status(result) mustBe SEE_OTHER
       }
     }
@@ -72,7 +72,7 @@ class NotEnrolledForDac6ActionSpec extends SpecBase with GuiceOneAppPerSuite {
 
       "the user has no DAC6 enrolment key" in {
         implicit val request = createAuthenticatedRequest(dac6Enrolment = Set(Enrolment("FOO")))
-        val result = harness()(request)
+        val result           = harness()(request)
         status(result) mustBe OK
       }
     }

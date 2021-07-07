@@ -24,12 +24,10 @@ import uk.gov.hmrc.domain.Generator
 
 import java.time.LocalDate
 
-
 class RegistrationTypePageSpec extends PageBehaviours {
 
-  val address: Address = Address("", None, "", None, None, Country("", "", ""))
-  val addlookup: AddressLookup = AddressLookup(None, None, None, None, "town", None,"pcode")
-
+  val address: Address         = Address("", None, "", None, None, Country("", "", ""))
+  val addlookup: AddressLookup = AddressLookup(None, None, None, None, "town", None, "pcode")
 
   val name: Name = Name("FirstName", "LastName")
 
@@ -46,31 +44,39 @@ class RegistrationTypePageSpec extends PageBehaviours {
         answers =>
           val result = answers
             .set(DoYouHaveANationalInsuranceNumberPage, true)
-            .success.value
+            .success
+            .value
             .set(NinoPage, new Generator().nextNino)
-            .success.value
+            .success
+            .value
             .set(NamePage, name)
-            .success.value
+            .success
+            .value
             .set(DateOfBirthPage, LocalDate.now())
-            .success.value
+            .success
+            .value
             .set(NonUkNamePage, name)
-            .success.value
+            .success
+            .value
             .set(DoYouLiveInTheUKPage, false)
-            .success.value
+            .success
+            .value
             .set(WhatIsYourAddressUkPage, address)
-            .success.value
+            .success
+            .value
             .set(WhatIsYourAddressPage, address)
-            .success.value
+            .success
+            .value
             .set(SelectAddressPage, "add")
             .success
             .value
             .set(PostCodePage, "ZZ1Z 7AB")
             .success
             .value
-            .set(SelectedAddressLookupPage, addlookup )
+            .set(SelectedAddressLookupPage, addlookup)
             .success
             .value
-            .set(IndividualUKPostcodePage, "pc" )
+            .set(IndividualUKPostcodePage, "pc")
             .success
             .value
             .set(ContactEmailAddressPage, "test@test.com")
@@ -110,9 +116,11 @@ class RegistrationTypePageSpec extends PageBehaviours {
         answers =>
           val result = answers
             .set(BusinessWithoutIDNamePage, "Business name")
-            .success.value
+            .success
+            .value
             .set(BusinessAddressPage, address)
-            .success.value
+            .success
+            .value
             .set(ContactEmailAddressPage, "test@test.com")
             .success
             .value
@@ -137,9 +145,9 @@ class RegistrationTypePageSpec extends PageBehaviours {
             .set(SecondaryContactTelephoneNumberPage, "99")
             .success
             .value
-
             .set(RegistrationTypePage, Individual)
-            .success.value
+            .success
+            .value
 
           result.get(BusinessWithoutIDNamePage) mustBe None
           result.get(BusinessAddressPage) mustBe None

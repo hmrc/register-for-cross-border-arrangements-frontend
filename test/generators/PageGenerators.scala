@@ -52,16 +52,16 @@ trait PageGenerators {
     Arbitrary(ConfirmBusinessPage)
 
   implicit lazy val arbitraryWhatIsYourAddressPage: Arbitrary[WhatIsYourAddressPage.type] =
-      Arbitrary(WhatIsYourAddressPage)
+    Arbitrary(WhatIsYourAddressPage)
 
   implicit lazy val arbitraryIndividualUKPostcodePage: Arbitrary[IndividualUKPostcodePage.type] =
     Arbitrary(IndividualUKPostcodePage)
 
   implicit lazy val arbitraryDoYouLiveInTheUKPage: Arbitrary[DoYouLiveInTheUKPage.type] =
-      Arbitrary(DoYouLiveInTheUKPage)
+    Arbitrary(DoYouLiveInTheUKPage)
 
   implicit lazy val arbitraryNonUkNamePage: Arbitrary[NonUkNamePage.type] =
-      Arbitrary(NonUkNamePage)
+    Arbitrary(NonUkNamePage)
 
   implicit lazy val arbitraryLocalDate: Arbitrary[LocalDate] = Arbitrary {
     datesBetween(LocalDate.of(1900, 1, 1), LocalDate.of(2100, 1, 1))
@@ -69,7 +69,7 @@ trait PageGenerators {
 
   implicit lazy val arbitraryDateOfBirthPage: Arbitrary[DateOfBirthPage.type] =
     Arbitrary(DateOfBirthPage)
-  
+
   implicit lazy val arbitraryDoYouHaveUTRPage: Arbitrary[DoYouHaveUTRPage.type] =
     Arbitrary(DoYouHaveUTRPage)
 

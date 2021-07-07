@@ -27,37 +27,39 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
 
   lazy val appName: String = configuration.get[String]("appName")
 
-  private val contactHost = configuration.get[String]("contact-frontend.host")
+  private val contactHost                  = configuration.get[String]("contact-frontend.host")
   private val contactFormServiceIdentifier = "DAC6"
 
-  val reportAProblemPartialUrl = s"$contactHost/contact/problem_reports_ajax?service=$contactFormServiceIdentifier"
-  val reportAProblemNonJSUrl = s"$contactHost/contact/problem_reports_nonjs?service=$contactFormServiceIdentifier"
-  lazy val betaFeedbackUrl = s"$contactHost/contact/beta-feedback?service=$contactFormServiceIdentifier"
+  val reportAProblemPartialUrl            = s"$contactHost/contact/problem_reports_ajax?service=$contactFormServiceIdentifier"
+  val reportAProblemNonJSUrl              = s"$contactHost/contact/problem_reports_nonjs?service=$contactFormServiceIdentifier"
+  lazy val betaFeedbackUrl                = s"$contactHost/contact/beta-feedback?service=$contactFormServiceIdentifier"
   lazy val betaFeedbackUnauthenticatedUrl = s"$contactHost/contact/beta-feedback-unauthenticated?service=$contactFormServiceIdentifier"
 
   lazy val countryCodeJson: String = configuration.get[String]("json.countries")
-  val analyticsToken: String = configuration.get[String](s"google-analytics.token")
-  val analyticsHost: String = configuration.get[String](s"google-analytics.host")
-  val signOutUrl: String             = configuration.get[String]("urls.logout")
+  val analyticsToken: String       = configuration.get[String](s"google-analytics.token")
+  val analyticsHost: String        = configuration.get[String](s"google-analytics.host")
+  val signOutUrl: String           = configuration.get[String]("urls.logout")
 
-  lazy val authUrl: String = configuration.get[Service]("auth").baseUrl
-  lazy val loginUrl: String = configuration.get[String]("urls.login")
+  lazy val authUrl: String          = configuration.get[Service]("auth").baseUrl
+  lazy val loginUrl: String         = configuration.get[String]("urls.login")
   lazy val loginContinueUrl: String = configuration.get[String]("urls.loginContinue")
-  lazy val businessMatchingUrl: String = s"${configuration.get[Service]("microservice.services.business-matching").baseUrl}${configuration.get[String]("microservice.services.business-matching.startUrl")}"
+
+  lazy val businessMatchingUrl: String =
+    s"${configuration.get[Service]("microservice.services.business-matching").baseUrl}${configuration.get[String]("microservice.services.business-matching.startUrl")}"
   lazy val crossBorderArrangementsUrl: String = configuration.get[Service]("microservice.services.cross-border-arrangements").baseUrl
-  lazy val addressLookUpUrl: String = configuration.get[Service]("microservice.services.address-lookup").baseUrl
-  lazy val sendEmailUrl: String = configuration.get[Service]("microservice.services.email").baseUrl
+  lazy val addressLookUpUrl: String           = configuration.get[Service]("microservice.services.address-lookup").baseUrl
+  lazy val sendEmailUrl: String               = configuration.get[Service]("microservice.services.email").baseUrl
 
   lazy val dacSubmissionsUrl: String = s"${configuration.get[String]("urls.dac-submissions.host")}${configuration.get[String]("urls.dac-submissions.startUrl")}"
-  lazy val lostUTRUrl: String = "https://www.gov.uk/find-lost-utr-number"
+  lazy val lostUTRUrl: String        = "https://www.gov.uk/find-lost-utr-number"
 
   lazy val languageTranslationEnabled: Boolean =
     configuration.get[Boolean]("microservice.services.features.welsh-translation")
 
-  lazy val timeoutSeconds: String = configuration.get[String]("session.timeoutSeconds")
+  lazy val timeoutSeconds: String   = configuration.get[String]("session.timeoutSeconds")
   lazy val countdownSeconds: String = configuration.get[String]("session.countdownSeconds")
 
   //Toggles
-  lazy val addressLookupToggle: Boolean = configuration.get[String]("addressLookupToggle").toBoolean
+  lazy val addressLookupToggle: Boolean     = configuration.get[String]("addressLookupToggle").toBoolean
   lazy val recruitmentBannerToggle: Boolean = configuration.get[Boolean]("recruitmentBannerToggle")
 }

@@ -34,40 +34,44 @@ import uk.gov.hmrc.viewmodels.{NunjucksSupport, _}
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class SelectAddressController @Inject()(
-    override val messagesApi: MessagesApi,
-    sessionRepository: SessionRepository,
-    navigator: Navigator,
-    identify: IdentifierAction,
-    notEnrolled: NotEnrolledForDAC6Action,
-    getData: DataRetrievalAction,
-    requireData: DataRequiredAction,
-    formProvider: SelectAddressFormProvider,
-    val controllerComponents: MessagesControllerComponents,
-    renderer: Renderer
-)(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with NunjucksSupport {
+class SelectAddressController @Inject() (
+  override val messagesApi: MessagesApi,
+  sessionRepository: SessionRepository,
+  navigator: Navigator,
+  identify: IdentifierAction,
+  notEnrolled: NotEnrolledForDAC6Action,
+  getData: DataRetrievalAction,
+  requireData: DataRequiredAction,
+  formProvider: SelectAddressFormProvider,
+  val controllerComponents: MessagesControllerComponents,
+  renderer: Renderer
+)(implicit ec: ExecutionContext)
+    extends FrontendBaseController
+    with I18nSupport
+    with NunjucksSupport {
 
   private val form = formProvider()
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen notEnrolled andThen getData andThen requireData).async {
     implicit request =>
-    val manualAddressURL: String = routes.WhatIsYourAddressUkController.onPageLoad(mode).url
+      val manualAddressURL: String = routes.WhatIsYourAddressUkController.onPageLoad(mode).url
 
       request.userAnswers.get(AddressLookupPage) match {
         case Some(addresses) =>
           val preparedForm: Form[String] = request.userAnswers.get(SelectAddressPage) match {
-            case None => form
+            case None        => form
             case Some(value) => form.fill(value)
           }
-          val addressItems: Seq[Radios.Radio] = addresses.map(address =>
-            Radios.Radio(label = msg"${formatAddress(address)}", value = s"${formatAddress(address)}"))
+          val addressItems: Seq[Radios.Radio] = addresses.map(
+            address => Radios.Radio(label = msg"${formatAddress(address)}", value = s"${formatAddress(address)}")
+          )
           val radios = Radios(field = preparedForm("value"), items = addressItems)
 
           val json = Json.obj(
-            "form" -> preparedForm,
-            "mode" -> mode,
+            "form"             -> preparedForm,
+            "mode"             -> mode,
             "manualAddressURL" -> manualAddressURL,
-            "radios" -> radios
+            "radios"           -> radios
           )
 
           renderer.render("selectAddress.njk", json).map(Ok(_))
@@ -81,49 +85,52 @@ class SelectAddressController @Inject()(
 
       request.userAnswers.get(AddressLookupPage) match {
         case Some(addresses) =>
-          val addressItems: Seq[Radios.Radio] = addresses.map(address =>
-            Radios.Radio(label = msg"${formatAddress(address)}", value = s"${formatAddress(address)}")
+          val addressItems: Seq[Radios.Radio] = addresses.map(
+            address => Radios.Radio(label = msg"${formatAddress(address)}", value = s"${formatAddress(address)}")
           )
 
-          form.bindFromRequest().fold(
-            formWithErrors => {
+          form
+            .bindFromRequest()
+            .fold(
+              formWithErrors => {
 
-              val radios = Radios(field = formWithErrors("value"), items = addressItems)
+                val radios = Radios(field = formWithErrors("value"), items = addressItems)
 
-              val json = Json.obj(
-                "form" -> formWithErrors,
-                "mode" -> mode,
-                "manualAddressURL" -> manualAddressURL,
-                "radios" -> radios
-              )
+                val json = Json.obj(
+                  "form"             -> formWithErrors,
+                  "mode"             -> mode,
+                  "manualAddressURL" -> manualAddressURL,
+                  "radios"           -> radios
+                )
 
-              renderer.render("selectAddress.njk", json).map(BadRequest(_))
-            },
-            value => {
-              val redirectUsers = redirectToSummary(value, SelectAddressPage, mode, request.userAnswers)
+                renderer.render("selectAddress.njk", json).map(BadRequest(_))
+              },
+              value => {
+                val redirectUsers = redirectToSummary(value, SelectAddressPage, mode, request.userAnswers)
 
-              val addressToStore: AddressLookup = addresses.find(formatAddress(_) == value).getOrElse(throw new Exception("Cannot get address"))
+                val addressToStore: AddressLookup = addresses.find(formatAddress(_) == value).getOrElse(throw new Exception("Cannot get address"))
 
-              for {
-                updatedAnswers <- Future.fromTry(request.userAnswers.set(SelectAddressPage, value))
-                updatedAnswers2 <- Future.fromTry(updatedAnswers.set(SelectedAddressLookupPage, addressToStore))
-                _ <- sessionRepository.set(updatedAnswers2)
-              } yield {
-                if (redirectUsers) {
-                  Redirect(routes.CheckYourAnswersController.onPageLoad())
-                } else {
-                  Redirect(navigator.nextPage(SelectAddressPage, mode, updatedAnswers2))
-                }
+                for {
+                  updatedAnswers  <- Future.fromTry(request.userAnswers.set(SelectAddressPage, value))
+                  updatedAnswers2 <- Future.fromTry(updatedAnswers.set(SelectedAddressLookupPage, addressToStore))
+                  _               <- sessionRepository.set(updatedAnswers2)
+                } yield
+                  if (redirectUsers) {
+                    Redirect(routes.CheckYourAnswersController.onPageLoad())
+                  } else {
+                    Redirect(navigator.nextPage(SelectAddressPage, mode, updatedAnswers2))
+                  }
               }
-            }
-          )
+            )
         case None => Future.successful(Redirect(routes.WhatIsYourAddressUkController.onPageLoad(mode)))
       }
   }
 
   private def formatAddress(address: AddressLookup): String = {
     val lines = Seq(address.addressLine1, address.addressLine2, address.addressLine3, address.addressLine4).flatten.mkString(", ")
-    val county = address.county.fold("")(county => s"$county, ")
+    val county = address.county.fold("")(
+      county => s"$county, "
+    )
 
     s"$lines, ${address.town}, $county${address.postcode}"
   }

@@ -43,7 +43,7 @@ class SessionExpiredControllerSpec extends SpecBase {
       val result = route(application, request).value
 
       val templateCaptor = ArgumentCaptor.forClass(classOf[String])
-      val jsonCaptor = ArgumentCaptor.forClass(classOf[JsObject])
+      val jsonCaptor     = ArgumentCaptor.forClass(classOf[JsObject])
 
       status(result) mustEqual OK
 

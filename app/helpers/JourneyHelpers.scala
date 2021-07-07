@@ -22,22 +22,18 @@ import play.api.libs.json.Reads
 
 object JourneyHelpers {
 
-  def isOrganisationJourney(ua: UserAnswers): Boolean = {
-
+  def isOrganisationJourney(ua: UserAnswers): Boolean =
     (ua.get(BusinessTypePage), ua.get(RegistrationTypePage)) match {
       case (Some(BusinessType.NotSpecified), _) => false
       case (_, Some(RegistrationType.Business)) => true
-      case (Some(_), _) => true
-      case _ => false
+      case (Some(_), _)                         => true
+      case _                                    => false
     }
-  }
 
-  def redirectToSummary[T](value: T, page: QuestionPage[T], mode: Mode, ua: UserAnswers)
-                          (implicit rds: Reads[T]): Boolean = {
+  def redirectToSummary[T](value: T, page: QuestionPage[T], mode: Mode, ua: UserAnswers)(implicit rds: Reads[T]): Boolean =
     ua.get(page) match {
       case Some(ans) if (ans == value) && (mode == CheckMode) => true
-      case _ => false
+      case _                                                  => false
     }
-  }
 
 }

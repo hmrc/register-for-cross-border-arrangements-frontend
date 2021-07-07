@@ -28,14 +28,14 @@ class DateHelperSpec extends SpecBase {
 
       "must return '5 June 1977' if given date 1977-6-5" in {
 
-        val pastDate = LocalDate.of(1977,6,5)
+        val pastDate = LocalDate.of(1977, 6, 5)
         DateHelper.formatDateToString(pastDate) mustBe "5 June 1977"
 
       }
 
       "must return '29 September 2239' if given date 2239-9-29" in {
 
-        val futureDate = LocalDate.of(2239,9,29)
+        val futureDate = LocalDate.of(2239, 9, 29)
         DateHelper.formatDateToString(futureDate) mustBe "29 September 2239"
 
       }

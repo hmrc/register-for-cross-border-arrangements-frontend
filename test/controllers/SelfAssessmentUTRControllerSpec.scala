@@ -42,14 +42,13 @@ class SelfAssessmentUTRControllerSpec extends SpecBase with NunjucksSupport with
   def onwardRoute = Call("GET", "/foo")
 
   val formProvider = new SelfAssessmentUTRFormProvider()
-  val form = formProvider()
+  val form         = formProvider()
 
   val utr = new SaUtrGenerator().nextSaUtr.toString()
 
   lazy val uniqueTaxpayerReferenceRoute = routes.SelfAssessmentUTRController.onPageLoad(NormalMode).url
 
-  val userAnswers = UserAnswers(userAnswersId).set(SelfAssessmentUTRPage,UniqueTaxpayerReference(utr)).success.value
-
+  val userAnswers = UserAnswers(userAnswersId).set(SelfAssessmentUTRPage, UniqueTaxpayerReference(utr)).success.value
 
   "SelfAssessmentUTR Controller" - {
 
@@ -58,10 +57,10 @@ class SelfAssessmentUTRControllerSpec extends SpecBase with NunjucksSupport with
       when(mockRenderer.render(any(), any())(any()))
         .thenReturn(Future.successful(Html("")))
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
-      val request = FakeRequest(GET, uniqueTaxpayerReferenceRoute)
+      val application    = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val request        = FakeRequest(GET, uniqueTaxpayerReferenceRoute)
       val templateCaptor = ArgumentCaptor.forClass(classOf[String])
-      val jsonCaptor = ArgumentCaptor.forClass(classOf[JsObject])
+      val jsonCaptor     = ArgumentCaptor.forClass(classOf[JsObject])
 
       val result = route(application, request).value
 
@@ -85,10 +84,10 @@ class SelfAssessmentUTRControllerSpec extends SpecBase with NunjucksSupport with
       when(mockRenderer.render(any(), any())(any()))
         .thenReturn(Future.successful(Html("")))
 
-      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
-      val request = FakeRequest(GET, uniqueTaxpayerReferenceRoute)
+      val application    = applicationBuilder(userAnswers = Some(userAnswers)).build()
+      val request        = FakeRequest(GET, uniqueTaxpayerReferenceRoute)
       val templateCaptor = ArgumentCaptor.forClass(classOf[String])
-      val jsonCaptor = ArgumentCaptor.forClass(classOf[JsObject])
+      val jsonCaptor     = ArgumentCaptor.forClass(classOf[JsObject])
 
       val result = route(application, request).value
 
@@ -128,7 +127,6 @@ class SelfAssessmentUTRControllerSpec extends SpecBase with NunjucksSupport with
           )
           .build()
 
-
       val request =
         FakeRequest(POST, uniqueTaxpayerReferenceRoute)
           .withFormUrlEncodedBody(("selfAssessmentUTR", utr))
@@ -147,11 +145,11 @@ class SelfAssessmentUTRControllerSpec extends SpecBase with NunjucksSupport with
       when(mockRenderer.render(any(), any())(any()))
         .thenReturn(Future.successful(Html("")))
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
-      val request = FakeRequest(POST, uniqueTaxpayerReferenceRoute).withFormUrlEncodedBody(("value", "invalid value"))
-      val boundForm = form.bind(Map("value" -> "invalid value"))
+      val application    = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val request        = FakeRequest(POST, uniqueTaxpayerReferenceRoute).withFormUrlEncodedBody(("value", "invalid value"))
+      val boundForm      = form.bind(Map("value" -> "invalid value"))
       val templateCaptor = ArgumentCaptor.forClass(classOf[String])
-      val jsonCaptor = ArgumentCaptor.forClass(classOf[JsObject])
+      val jsonCaptor     = ArgumentCaptor.forClass(classOf[JsObject])
 
       val result = route(application, request).value
 
@@ -160,14 +158,14 @@ class SelfAssessmentUTRControllerSpec extends SpecBase with NunjucksSupport with
       verify(mockRenderer, times(1)).render(templateCaptor.capture(), jsonCaptor.capture())(any())
 
       val expectedJson = Json.obj(
-        "form"   -> boundForm,
-        "mode"   -> NormalMode
+        "form" -> boundForm,
+        "mode" -> NormalMode
       )
 
       templateCaptor.getValue mustEqual "selfAssessmentUTR.njk"
       jsonCaptor.getValue must containJson(expectedJson)
 
-       application.stop()
+      application.stop()
     }
 
     "must redirect to Session Expired for a GET if no existing data is found" in {

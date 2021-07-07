@@ -22,9 +22,9 @@ import play.api.data.FormError
 class NinoFormProviderSpec extends StringFieldBehaviours {
 
   val requiredKey = "nino.error.required"
-  val lengthKey = "nino.error.length"
-  val maxLength = 9
-  val invalidKey = "nino.error.invalid"
+  val lengthKey   = "nino.error.length"
+  val maxLength   = 9
+  val invalidKey  = "nino.error.invalid"
 
   val form = new NinoFormProvider()()
 
@@ -43,7 +43,7 @@ class NinoFormProviderSpec extends StringFieldBehaviours {
       fieldName,
       maxLength = maxLength,
       invalidError = FormError(fieldName, invalidKey, Seq(ninoRegex)),
-      lengthError = FormError(fieldName, lengthKey, Seq(maxLength)),
+      lengthError = FormError(fieldName, lengthKey, Seq(maxLength))
     )
 
     behave like mandatoryField(

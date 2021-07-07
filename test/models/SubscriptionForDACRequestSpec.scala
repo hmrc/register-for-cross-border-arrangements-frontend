@@ -37,15 +37,14 @@ class SubscriptionForDACRequestSpec extends SpecBase with Generators with ScalaC
     requestParameters = Some(requestParameter)
   )
 
-  private def requestDetail(primaryContact: PrimaryContact, secondaryContact: Option[SecondaryContact] = None): RequestDetail = {
-    RequestDetail(
-      IDType = "idType",
-      IDNumber = "idNumber",
-      tradingName = None,
-      isGBUser = true,
-      primaryContact = primaryContact,
-      secondaryContact = secondaryContact)
-  }
+  private def requestDetail(primaryContact: PrimaryContact, secondaryContact: Option[SecondaryContact] = None): RequestDetail =
+    RequestDetail(IDType = "idType",
+                  IDNumber = "idNumber",
+                  tradingName = None,
+                  isGBUser = true,
+                  primaryContact = primaryContact,
+                  secondaryContact = secondaryContact
+    )
 
   "CreateSubscriptionForDACRequest" - {
 
@@ -53,15 +52,12 @@ class SubscriptionForDACRequestSpec extends SpecBase with Generators with ScalaC
 
       forAll(validPersonalName, validPersonalName, validEmailAddress) {
         (firstName, lastName, primaryEmail) =>
-
           val primaryContactForInd: PrimaryContact = PrimaryContact(
             ContactInformationForIndividual(IndividualDetails(firstName, None, lastName), primaryEmail, None, None)
           )
 
           val indRequest: CreateSubscriptionForDACRequest = CreateSubscriptionForDACRequest(
-            SubscriptionForDACRequest(
-              requestCommon = requestCommon,
-              requestDetail = requestDetail(primaryContactForInd))
+            SubscriptionForDACRequest(requestCommon = requestCommon, requestDetail = requestDetail(primaryContactForInd))
           )
 
           val jsonPayload = jsonPayloadForInd(JsString(firstName), JsString(lastName), JsString(primaryEmail))
@@ -74,15 +70,12 @@ class SubscriptionForDACRequestSpec extends SpecBase with Generators with ScalaC
 
       forAll(validBusinessName, validEmailAddress, validPhoneNumber) {
         (organisationName, primaryEmail, phoneNumber) =>
-
           val primaryContactForOrg: PrimaryContact = PrimaryContact(
             ContactInformationForOrganisation(OrganisationDetails(organisationName), primaryEmail, Some(phoneNumber), Some(phoneNumber))
           )
 
           val orgRequest: CreateSubscriptionForDACRequest = CreateSubscriptionForDACRequest(
-            SubscriptionForDACRequest(
-              requestCommon = requestCommon,
-              requestDetail = requestDetail(primaryContact = primaryContactForOrg))
+            SubscriptionForDACRequest(requestCommon = requestCommon, requestDetail = requestDetail(primaryContact = primaryContactForOrg))
           )
 
           val jsonPayload = jsonPayloadForOrg(JsString(organisationName), JsString(primaryEmail), JsString(phoneNumber))
@@ -96,7 +89,6 @@ class SubscriptionForDACRequestSpec extends SpecBase with Generators with ScalaC
 
       forAll(validPersonalName, validPersonalName, validBusinessName, validEmailAddress, validEmailAddress, validPhoneNumber) {
         (firstName, lastName, organisationName, primaryEmail, secondaryEmail, phoneNumber) =>
-
           val primaryContactForInd: PrimaryContact = PrimaryContact(
             ContactInformationForIndividual(IndividualDetails(firstName, None, lastName), primaryEmail, None, None)
           )
@@ -108,11 +100,17 @@ class SubscriptionForDACRequestSpec extends SpecBase with Generators with ScalaC
           val indWithSecondaryContact: CreateSubscriptionForDACRequest = CreateSubscriptionForDACRequest(
             SubscriptionForDACRequest(
               requestCommon = requestCommon.copy(requestParameters = None),
-              requestDetail = requestDetail(primaryContact = primaryContactForInd, secondaryContact = Some(secondaryContactForInd)))
+              requestDetail = requestDetail(primaryContact = primaryContactForInd, secondaryContact = Some(secondaryContactForInd))
+            )
           )
 
-          val jsonPayload = jsonPayloadForIndWithSecondaryContact(JsString(firstName), JsString(lastName), JsString(organisationName),
-            JsString(primaryEmail), JsString(secondaryEmail), JsString(phoneNumber))
+          val jsonPayload = jsonPayloadForIndWithSecondaryContact(JsString(firstName),
+                                                                  JsString(lastName),
+                                                                  JsString(organisationName),
+                                                                  JsString(primaryEmail),
+                                                                  JsString(secondaryEmail),
+                                                                  JsString(phoneNumber)
+          )
 
           Json.parse(jsonPayload).validate[CreateSubscriptionForDACRequest].get mustBe indWithSecondaryContact
       }
@@ -123,7 +121,6 @@ class SubscriptionForDACRequestSpec extends SpecBase with Generators with ScalaC
 
       forAll(validPersonalName, validPersonalName, validBusinessName, validEmailAddress, validEmailAddress, validPhoneNumber) {
         (firstName, lastName, organisationName, primaryEmail, secondaryEmail, phoneNumber) =>
-
           val primaryContactForOrg: PrimaryContact = PrimaryContact(
             ContactInformationForOrganisation(OrganisationDetails(organisationName), primaryEmail, Some(phoneNumber), Some(phoneNumber))
           )
@@ -135,11 +132,17 @@ class SubscriptionForDACRequestSpec extends SpecBase with Generators with ScalaC
           val orgWithSecondaryContact: CreateSubscriptionForDACRequest = CreateSubscriptionForDACRequest(
             SubscriptionForDACRequest(
               requestCommon = requestCommon.copy(requestParameters = None),
-              requestDetail = requestDetail(primaryContact = primaryContactForOrg, secondaryContact = Some(secondaryContactForOrg)))
+              requestDetail = requestDetail(primaryContact = primaryContactForOrg, secondaryContact = Some(secondaryContactForOrg))
+            )
           )
 
-          val jsonPayload = jsonPayloadForOrgWithSecondaryContact(JsString(firstName), JsString(lastName), JsString(organisationName),
-            JsString(primaryEmail), JsString(secondaryEmail), JsString(phoneNumber))
+          val jsonPayload = jsonPayloadForOrgWithSecondaryContact(JsString(firstName),
+                                                                  JsString(lastName),
+                                                                  JsString(organisationName),
+                                                                  JsString(primaryEmail),
+                                                                  JsString(secondaryEmail),
+                                                                  JsString(phoneNumber)
+          )
 
           Json.parse(jsonPayload).validate[CreateSubscriptionForDACRequest].get mustBe orgWithSecondaryContact
       }
@@ -149,15 +152,12 @@ class SubscriptionForDACRequestSpec extends SpecBase with Generators with ScalaC
 
       forAll(validPersonalName, validPersonalName, validEmailAddress) {
         (firstName, lastName, primaryEmail) =>
-
           val primaryContactForInd: PrimaryContact = PrimaryContact(
             ContactInformationForIndividual(IndividualDetails(firstName, None, lastName), primaryEmail, None, None)
           )
 
           val indRequest: CreateSubscriptionForDACRequest = CreateSubscriptionForDACRequest(
-            SubscriptionForDACRequest(
-              requestCommon = requestCommon,
-              requestDetail = requestDetail(primaryContact = primaryContactForInd))
+            SubscriptionForDACRequest(requestCommon = requestCommon, requestDetail = requestDetail(primaryContact = primaryContactForInd))
           )
 
           Json.toJson(indRequest) mustBe indRequestJson(firstName, lastName, primaryEmail)
@@ -168,15 +168,12 @@ class SubscriptionForDACRequestSpec extends SpecBase with Generators with ScalaC
 
       forAll(validBusinessName, validEmailAddress, validPhoneNumber) {
         (organisationName, primaryEmail, phoneNumber) =>
-
           val primaryContactForOrg: PrimaryContact = PrimaryContact(
             ContactInformationForOrganisation(OrganisationDetails(organisationName), primaryEmail, Some(phoneNumber), Some(phoneNumber))
           )
 
           val orgRequest: CreateSubscriptionForDACRequest = CreateSubscriptionForDACRequest(
-            SubscriptionForDACRequest(
-              requestCommon = requestCommon,
-              requestDetail = requestDetail(primaryContact = primaryContactForOrg))
+            SubscriptionForDACRequest(requestCommon = requestCommon, requestDetail = requestDetail(primaryContact = primaryContactForOrg))
           )
 
           Json.toJson(orgRequest) mustBe orgRequestJson(organisationName, primaryEmail, phoneNumber)
@@ -187,7 +184,6 @@ class SubscriptionForDACRequestSpec extends SpecBase with Generators with ScalaC
 
       forAll(validPersonalName, validPersonalName, validBusinessName, validEmailAddress, validEmailAddress, validPhoneNumber) {
         (firstName, lastName, organisationName, primaryEmail, secondaryEmail, phoneNumber) =>
-
           val primaryContactForInd: PrimaryContact = PrimaryContact(
             ContactInformationForIndividual(IndividualDetails(firstName, None, lastName), primaryEmail, None, None)
           )
@@ -199,7 +195,8 @@ class SubscriptionForDACRequestSpec extends SpecBase with Generators with ScalaC
           val indWithSecondaryContact: CreateSubscriptionForDACRequest = CreateSubscriptionForDACRequest(
             SubscriptionForDACRequest(
               requestCommon = requestCommon.copy(requestParameters = None),
-              requestDetail = requestDetail(primaryContact = primaryContactForInd, secondaryContact = Some(secondaryContactForInd)))
+              requestDetail = requestDetail(primaryContact = primaryContactForInd, secondaryContact = Some(secondaryContactForInd))
+            )
           )
 
           Json.toJson(indWithSecondaryContact) mustBe
@@ -211,7 +208,6 @@ class SubscriptionForDACRequestSpec extends SpecBase with Generators with ScalaC
 
       forAll(validPersonalName, validPersonalName, validBusinessName, validEmailAddress, validEmailAddress, validPhoneNumber) {
         (firstName, lastName, organisationName, primaryEmail, secondaryEmail, phoneNumber) =>
-
           val primaryContactForOrg: PrimaryContact = PrimaryContact(
             ContactInformationForOrganisation(OrganisationDetails(organisationName), primaryEmail, Some(phoneNumber), Some(phoneNumber))
           )
@@ -220,18 +216,18 @@ class SubscriptionForDACRequestSpec extends SpecBase with Generators with ScalaC
             ContactInformationForIndividual(IndividualDetails(firstName, None, lastName), secondaryEmail, None, None)
           )
 
-          val requestDetail: RequestDetail = RequestDetail(
-            IDType = "idType",
-            IDNumber = "idNumber",
-            tradingName = None,
-            isGBUser = true,
-            primaryContact = primaryContactForOrg,
-            secondaryContact = None)
+          val requestDetail: RequestDetail = RequestDetail(IDType = "idType",
+                                                           IDNumber = "idNumber",
+                                                           tradingName = None,
+                                                           isGBUser = true,
+                                                           primaryContact = primaryContactForOrg,
+                                                           secondaryContact = None
+          )
 
           val orgWithSecondaryContact: CreateSubscriptionForDACRequest = CreateSubscriptionForDACRequest(
-            SubscriptionForDACRequest(
-              requestCommon = requestCommon.copy(requestParameters = None),
-              requestDetail = requestDetail.copy(secondaryContact = Some(secondaryContactForOrg)))
+            SubscriptionForDACRequest(requestCommon = requestCommon.copy(requestParameters = None),
+                                      requestDetail = requestDetail.copy(secondaryContact = Some(secondaryContactForOrg))
+            )
           )
 
           Json.toJson(orgWithSecondaryContact) mustBe
@@ -242,13 +238,13 @@ class SubscriptionForDACRequestSpec extends SpecBase with Generators with ScalaC
     "must serialise RequestCommon" in {
 
       val json = Json.obj(
-        "regime" -> "DAC",
-        "receiptDate" -> "2020-09-23T16:12:11Z",
+        "regime"                   -> "DAC",
+        "receiptDate"              -> "2020-09-23T16:12:11Z",
         "acknowledgementReference" -> "AB123c",
-        "originatingSystem" -> "MDTP",
+        "originatingSystem"        -> "MDTP",
         "requestParameters" -> Json.arr(
           Json.obj(
-            "paramName" -> "Name",
+            "paramName"  -> "Name",
             "paramValue" -> "Value"
           )
         )
@@ -260,12 +256,18 @@ class SubscriptionForDACRequestSpec extends SpecBase with Generators with ScalaC
     "must have a request common per spec" in {
       val userAnswers = UserAnswers("")
       val updatedUserAnswers = userAnswers
-        .set(SafeIDPage, "a").success.value
-        .set(ContactEmailAddressPage, "hello").success.value
-        .set(ContactNamePage, "Name Name").success.value
+        .set(SafeIDPage, "a")
+        .success
+        .value
+        .set(ContactEmailAddressPage, "hello")
+        .success
+        .value
+        .set(ContactNamePage, "Name Name")
+        .success
+        .value
 
       val requestCommon = SubscriptionForDACRequest.createSubscription(updatedUserAnswers).requestCommon
-      val ackRefLength = requestCommon.acknowledgementReference.length
+      val ackRefLength  = requestCommon.acknowledgementReference.length
       ackRefLength >= 1 && ackRefLength <= 32 mustBe true
 
       requestCommon.regime mustBe "DAC"
@@ -283,15 +285,15 @@ class SubscriptionForDACRequestSpec extends SpecBase with Generators with ScalaC
       )
 
       val json = Json.obj(
-        "IDType" -> "idType",
+        "IDType"   -> "idType",
         "IDNumber" -> "idNumber",
         "isGBUser" -> true,
         "primaryContact" -> Json.obj(
           "organisation" -> Json.obj(
             "organisationName" -> "Pizza for you"
           ),
-          "email" -> "email@email.com",
-          "phone" -> "0191 111 2222",
+          "email"  -> "email@email.com",
+          "phone"  -> "0191 111 2222",
           "mobile" -> "07111111111"
         )
       )
@@ -300,29 +302,53 @@ class SubscriptionForDACRequestSpec extends SpecBase with Generators with ScalaC
     }
 
     "must create a request with the isGBUser flag set to true by UTR" in {
-        val userAnswers = UserAnswers("")
-        val updatedUserAnswers = userAnswers
-          .set(SafeIDPage, "a").success.value
-          .set(DoYouHaveUTRPage, true).success.value
-          .set(NonUkNamePage, Name("fred", "smith")).success.value
-          .set(ContactEmailAddressPage, "test@test.com").success.value
-          .set(ContactNamePage, "Name Name").success.value
+      val userAnswers = UserAnswers("")
+      val updatedUserAnswers = userAnswers
+        .set(SafeIDPage, "a")
+        .success
+        .value
+        .set(DoYouHaveUTRPage, true)
+        .success
+        .value
+        .set(NonUkNamePage, Name("fred", "smith"))
+        .success
+        .value
+        .set(ContactEmailAddressPage, "test@test.com")
+        .success
+        .value
+        .set(ContactNamePage, "Name Name")
+        .success
+        .value
 
-        val request = SubscriptionForDACRequest.createSubscription(updatedUserAnswers).requestDetail
+      val request = SubscriptionForDACRequest.createSubscription(updatedUserAnswers).requestDetail
 
-        request.isGBUser mustBe true
-      }
+      request.isGBUser mustBe true
+    }
 
     "must create a request with the isGBUser flag set to true by Individual and has a NINO" in {
       val userAnswers = UserAnswers("")
       val updatedUserAnswers = userAnswers
-        .set(SafeIDPage, "a").success.value
-        .set(DoYouHaveUTRPage, false).success.value
-        .set(RegistrationTypePage, RegistrationType.Individual).success.value
-        .set(DoYouHaveANationalInsuranceNumberPage, true).success.value
-        .set(NamePage, Name("a","b")).success.value
-        .set(ContactEmailAddressPage, "hello").success.value
-        .set(ContactNamePage, "Name Name").success.value
+        .set(SafeIDPage, "a")
+        .success
+        .value
+        .set(DoYouHaveUTRPage, false)
+        .success
+        .value
+        .set(RegistrationTypePage, RegistrationType.Individual)
+        .success
+        .value
+        .set(DoYouHaveANationalInsuranceNumberPage, true)
+        .success
+        .value
+        .set(NamePage, Name("a", "b"))
+        .success
+        .value
+        .set(ContactEmailAddressPage, "hello")
+        .success
+        .value
+        .set(ContactNamePage, "Name Name")
+        .success
+        .value
 
       val request = SubscriptionForDACRequest.createSubscription(updatedUserAnswers).requestDetail
 
@@ -330,15 +356,27 @@ class SubscriptionForDACRequestSpec extends SpecBase with Generators with ScalaC
     }
 
     "must create a request with the isGBUser flag set to true by business without UTR and based in the UK" in {
-      val businessAddress = Address("", None,"",None,None,Country("valid","GB","United Kingdom"))
-      val userAnswers = UserAnswers("")
+      val businessAddress = Address("", None, "", None, None, Country("valid", "GB", "United Kingdom"))
+      val userAnswers     = UserAnswers("")
       val updatedUserAnswers = userAnswers
-        .set(SafeIDPage, "a").success.value
-        .set(DoYouHaveUTRPage, false).success.value
-        .set(RegistrationTypePage, RegistrationType.Business).success.value
-        .set(ContactEmailAddressPage, "hello").success.value
-        .set(ContactNamePage, "Name Name").success.value
-        .set(BusinessAddressPage, businessAddress).success.value
+        .set(SafeIDPage, "a")
+        .success
+        .value
+        .set(DoYouHaveUTRPage, false)
+        .success
+        .value
+        .set(RegistrationTypePage, RegistrationType.Business)
+        .success
+        .value
+        .set(ContactEmailAddressPage, "hello")
+        .success
+        .value
+        .set(ContactNamePage, "Name Name")
+        .success
+        .value
+        .set(BusinessAddressPage, businessAddress)
+        .success
+        .value
 
       val request = SubscriptionForDACRequest.createSubscription(updatedUserAnswers).requestDetail
 
@@ -346,34 +384,61 @@ class SubscriptionForDACRequestSpec extends SpecBase with Generators with ScalaC
     }
 
     "must create a request with the isGBUser flag set to false by business without UTR not based in the UK" in {
-      val businessAddress = Address("", None,"",None,None,Country("valid","DE","Germany"))
-      val userAnswers = UserAnswers("")
+      val businessAddress = Address("", None, "", None, None, Country("valid", "DE", "Germany"))
+      val userAnswers     = UserAnswers("")
       val updatedUserAnswers = userAnswers
-        .set(SafeIDPage, "a").success.value
-        .set(DoYouHaveUTRPage, false).success.value
-        .set(RegistrationTypePage, RegistrationType.Business).success.value
-        .set(ContactEmailAddressPage, "hello").success.value
-        .set(ContactNamePage, "Name Name").success.value
-        .set(BusinessAddressPage, businessAddress).success.value
+        .set(SafeIDPage, "a")
+        .success
+        .value
+        .set(DoYouHaveUTRPage, false)
+        .success
+        .value
+        .set(RegistrationTypePage, RegistrationType.Business)
+        .success
+        .value
+        .set(ContactEmailAddressPage, "hello")
+        .success
+        .value
+        .set(ContactNamePage, "Name Name")
+        .success
+        .value
+        .set(BusinessAddressPage, businessAddress)
+        .success
+        .value
 
       val request = SubscriptionForDACRequest.createSubscription(updatedUserAnswers).requestDetail
 
       request.isGBUser mustBe false
     }
 
-
     "must create a request with the isGBUser flag set to false by Individual without NINO" in {
       val userAnswers = UserAnswers("")
-      val address = Address("", None,"",None,None,Country("valid","GB","United Kingdom"))
+      val address     = Address("", None, "", None, None, Country("valid", "GB", "United Kingdom"))
       val updatedUserAnswers = userAnswers
-        .set(SafeIDPage, "a").success.value
-        .set(DoYouHaveUTRPage, false).success.value
-        .set(RegistrationTypePage, RegistrationType.Individual).success.value
-        .set(DoYouHaveANationalInsuranceNumberPage, false).success.value
-        .set(NamePage, Name("a","b")).success.value
-        .set(ContactEmailAddressPage, "hello").success.value
-        .set(ContactNamePage, "Name Name").success.value
-        .set(WhatIsYourAddressPage, address).success.value
+        .set(SafeIDPage, "a")
+        .success
+        .value
+        .set(DoYouHaveUTRPage, false)
+        .success
+        .value
+        .set(RegistrationTypePage, RegistrationType.Individual)
+        .success
+        .value
+        .set(DoYouHaveANationalInsuranceNumberPage, false)
+        .success
+        .value
+        .set(NamePage, Name("a", "b"))
+        .success
+        .value
+        .set(ContactEmailAddressPage, "hello")
+        .success
+        .value
+        .set(ContactNamePage, "Name Name")
+        .success
+        .value
+        .set(WhatIsYourAddressPage, address)
+        .success
+        .value
 
       val request = SubscriptionForDACRequest.createSubscription(updatedUserAnswers).requestDetail
 
@@ -383,9 +448,15 @@ class SubscriptionForDACRequestSpec extends SpecBase with Generators with ScalaC
     "must create a request with the isGBUser flag set to false when criteria is missing" in {
       val userAnswers = UserAnswers("")
       val updatedUserAnswers = userAnswers
-        .set(SafeIDPage, "a").success.value
-        .set(ContactEmailAddressPage, "hello").success.value
-        .set(ContactNamePage, "Name Name").success.value
+        .set(SafeIDPage, "a")
+        .success
+        .value
+        .set(ContactEmailAddressPage, "hello")
+        .success
+        .value
+        .set(ContactNamePage, "Name Name")
+        .success
+        .value
 
       val request = SubscriptionForDACRequest.createSubscription(updatedUserAnswers).requestDetail
 

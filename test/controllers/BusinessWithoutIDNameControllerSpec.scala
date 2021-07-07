@@ -39,19 +39,21 @@ import scala.concurrent.Future
 
 class BusinessWithoutIDNameControllerSpec extends SpecBase with NunjucksSupport with JsonMatchers {
 
-  def onwardRoute: Call = Call("GET", "/foo")
+  def onwardRoute: Call                        = Call("GET", "/foo")
   val mockSessionRepository: SessionRepository = mock[SessionRepository]
   val mockFrontendAppConfig: FrontendAppConfig = mock[FrontendAppConfig]
 
-  val formProvider = new BusinessWithoutIDNameFormProvider()
+  val formProvider       = new BusinessWithoutIDNameFormProvider()
   val form: Form[String] = formProvider()
 
   lazy val businessNameRoute: String = routes.BusinessWithoutIDNameController.onPageLoad(NormalMode).url
-  val validBusinessName = """Business name 10&\\\/'"""
-  val invalidBusinessName = "++ invalid name ++"
+  val validBusinessName              = """Business name 10&\\\/'"""
+  val invalidBusinessName            = "++ invalid name ++"
 
   val userAnswers: UserAnswers = UserAnswers(userAnswersId)
-    .set(BusinessWithoutIDNamePage, validBusinessName).success.value
+    .set(BusinessWithoutIDNamePage, validBusinessName)
+    .success
+    .value
 
   "BusinessWithoutIDName Controller" - {
 
@@ -60,10 +62,10 @@ class BusinessWithoutIDNameControllerSpec extends SpecBase with NunjucksSupport 
       when(mockRenderer.render(any(), any())(any()))
         .thenReturn(Future.successful(Html("")))
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
-      val request = FakeRequest(GET, businessNameRoute)
+      val application    = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val request        = FakeRequest(GET, businessNameRoute)
       val templateCaptor = ArgumentCaptor.forClass(classOf[String])
-      val jsonCaptor = ArgumentCaptor.forClass(classOf[JsObject])
+      val jsonCaptor     = ArgumentCaptor.forClass(classOf[JsObject])
 
       val result = route(application, request).value
 
@@ -87,10 +89,10 @@ class BusinessWithoutIDNameControllerSpec extends SpecBase with NunjucksSupport 
       when(mockRenderer.render(any(), any())(any()))
         .thenReturn(Future.successful(Html("")))
 
-      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
-      val request = FakeRequest(GET, businessNameRoute)
+      val application    = applicationBuilder(userAnswers = Some(userAnswers)).build()
+      val request        = FakeRequest(GET, businessNameRoute)
       val templateCaptor = ArgumentCaptor.forClass(classOf[String])
-      val jsonCaptor = ArgumentCaptor.forClass(classOf[JsObject])
+      val jsonCaptor     = ArgumentCaptor.forClass(classOf[JsObject])
 
       val result = route(application, request).value
 
@@ -127,7 +129,6 @@ class BusinessWithoutIDNameControllerSpec extends SpecBase with NunjucksSupport 
           )
           .build()
 
-
       val request =
         FakeRequest(POST, businessNameRoute)
           .withFormUrlEncodedBody(("businessWithoutIDName", validBusinessName))
@@ -146,11 +147,11 @@ class BusinessWithoutIDNameControllerSpec extends SpecBase with NunjucksSupport 
       when(mockRenderer.render(any(), any())(any()))
         .thenReturn(Future.successful(Html("")))
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
-      val request = FakeRequest(POST, businessNameRoute).withFormUrlEncodedBody(("value", invalidBusinessName))
-      val boundForm = form.bind(Map("value" -> invalidBusinessName))
+      val application    = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val request        = FakeRequest(POST, businessNameRoute).withFormUrlEncodedBody(("value", invalidBusinessName))
+      val boundForm      = form.bind(Map("value" -> invalidBusinessName))
       val templateCaptor = ArgumentCaptor.forClass(classOf[String])
-      val jsonCaptor = ArgumentCaptor.forClass(classOf[JsObject])
+      val jsonCaptor     = ArgumentCaptor.forClass(classOf[JsObject])
 
       val result = route(application, request).value
 
@@ -159,14 +160,14 @@ class BusinessWithoutIDNameControllerSpec extends SpecBase with NunjucksSupport 
       verify(mockRenderer, times(1)).render(templateCaptor.capture(), jsonCaptor.capture())(any())
 
       val expectedJson = Json.obj(
-        "form"   -> boundForm,
-        "mode"   -> NormalMode
+        "form" -> boundForm,
+        "mode" -> NormalMode
       )
 
       templateCaptor.getValue mustEqual "businessWithoutIDName.njk"
       jsonCaptor.getValue must containJson(expectedJson)
 
-       application.stop()
+      application.stop()
     }
 
     "must redirect to the Check your answers page when user doesn't change their answer" in {
@@ -182,7 +183,6 @@ class BusinessWithoutIDNameControllerSpec extends SpecBase with NunjucksSupport 
             bind[SessionRepository].toInstance(mockSessionRepository)
           )
           .build()
-
 
       val request =
         FakeRequest(POST, businessNameRoute)

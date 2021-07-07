@@ -19,7 +19,7 @@ package pages
 import models.AddressLookup
 import play.api.libs.json.JsPath
 
-object SelectedAddressLookupPage  extends QuestionPage[AddressLookup] {
+object SelectedAddressLookupPage extends QuestionPage[AddressLookup] {
   override def path: JsPath = JsPath \ toString
 
   override def toString: String = "selectedAddressLookup"

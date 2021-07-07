@@ -27,27 +27,41 @@ class WhatIsYourAddressFormProvider @Inject() extends Mappings with RegexConstan
 
   val addressLineLength = 35
 
-   def apply(countryList: Seq[Country]): Form[Address] = Form(
-     mapping(
-      "addressLine1" -> validatedText("whatIsYourAddress.error.addressLine1.required",
+  def apply(countryList: Seq[Country]): Form[Address] = Form(
+    mapping(
+      "addressLine1" -> validatedText(
+        "whatIsYourAddress.error.addressLine1.required",
         "whatIsYourAddress.error.addressLine1.invalid",
-       "whatIsYourAddress.error.addressLine1.length", apiAddressRegex, addressLineLength),
+        "whatIsYourAddress.error.addressLine1.length",
+        apiAddressRegex,
+        addressLineLength
+      ),
       "addressLine2" -> validatedOptionalText("whatIsYourAddress.error.addressLine2.invalid",
-       "whatIsYourAddress.error.addressLine2.length", apiAddressRegex, addressLineLength),
-       "addressLine3" -> validatedText("whatIsYourAddress.error.addressLine3.required",
-         "whatIsYourAddress.error.addressLine3.invalid",
-        "whatIsYourAddress.error.addressLine3.length",apiAddressRegex,addressLineLength),
-       "addressLine4" -> validatedOptionalText("whatIsYourAddress.error.addressLine4.invalid",
-        "whatIsYourAddress.error.addressLine4.length",apiAddressRegex,addressLineLength),
-       "postCode" ->  optionalPostcode(
-         requiredKey = "whatIsYourAddress.error.postcode.required",
-         lengthKey = "whatIsYourAddress.error.postcode.length",
-         countryFieldName = "country"
-       ),
-       "country" -> text("whatIsYourAddress.error.country.required")
-         .verifying("whatIsYourAddress.error.country.required", value => countryList.exists(_.code == value))
-         .transform[Country](value => countryList.find(_.code == value).get, _.code)
-     )(Address.apply)(Address.unapply)
-   )
+                                              "whatIsYourAddress.error.addressLine2.length",
+                                              apiAddressRegex,
+                                              addressLineLength
+      ),
+      "addressLine3" -> validatedText(
+        "whatIsYourAddress.error.addressLine3.required",
+        "whatIsYourAddress.error.addressLine3.invalid",
+        "whatIsYourAddress.error.addressLine3.length",
+        apiAddressRegex,
+        addressLineLength
+      ),
+      "addressLine4" -> validatedOptionalText("whatIsYourAddress.error.addressLine4.invalid",
+                                              "whatIsYourAddress.error.addressLine4.length",
+                                              apiAddressRegex,
+                                              addressLineLength
+      ),
+      "postCode" -> optionalPostcode(
+        requiredKey = "whatIsYourAddress.error.postcode.required",
+        lengthKey = "whatIsYourAddress.error.postcode.length",
+        countryFieldName = "country"
+      ),
+      "country" -> text("whatIsYourAddress.error.country.required")
+        .verifying("whatIsYourAddress.error.country.required", value => countryList.exists(_.code == value))
+        .transform[Country](value => countryList.find(_.code == value).get, _.code)
+    )(Address.apply)(Address.unapply)
+  )
 
- }
+}

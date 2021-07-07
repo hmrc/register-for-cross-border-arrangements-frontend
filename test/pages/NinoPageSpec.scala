@@ -24,10 +24,10 @@ import uk.gov.hmrc.domain.Nino
 class NinoPageSpec extends PageBehaviours with ModelGenerators {
 
   "NinoPage" - {
-      beRetrievable[Nino](NinoPage)(arbitraryNino, Json.format[Nino])
+    beRetrievable[Nino](NinoPage)(arbitraryNino, Json.format[Nino])
 
-      beSettable[Nino](NinoPage)(arbitraryNino, Json.format[Nino])
+    beSettable[Nino](NinoPage)(arbitraryNino, Json.format[Nino])
 
-      beRemovable[Nino](NinoPage)(arbitraryNino, Json.format[Nino])
+    beRemovable[Nino](NinoPage)(arbitraryNino, Json.format[Nino])
   }
 }

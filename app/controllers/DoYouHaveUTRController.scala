@@ -33,26 +33,28 @@ import uk.gov.hmrc.viewmodels.{NunjucksSupport, Radios}
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 
-class DoYouHaveUTRController @Inject()(
-    override val messagesApi: MessagesApi,
-    sessionRepository: SessionRepository,
-    navigator: Navigator,
-    identify: IdentifierAction,
-    notEnrolled: NotEnrolledForDAC6Action,
-    getData: DataRetrievalAction,
-    requireData: DataRequiredAction,
-    formProvider: DoYouHaveUTRFormProvider,
-    val controllerComponents: MessagesControllerComponents,
-    renderer: Renderer
-)(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with NunjucksSupport {
+class DoYouHaveUTRController @Inject() (
+  override val messagesApi: MessagesApi,
+  sessionRepository: SessionRepository,
+  navigator: Navigator,
+  identify: IdentifierAction,
+  notEnrolled: NotEnrolledForDAC6Action,
+  getData: DataRetrievalAction,
+  requireData: DataRequiredAction,
+  formProvider: DoYouHaveUTRFormProvider,
+  val controllerComponents: MessagesControllerComponents,
+  renderer: Renderer
+)(implicit ec: ExecutionContext)
+    extends FrontendBaseController
+    with I18nSupport
+    with NunjucksSupport {
 
   private val form = formProvider()
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen notEnrolled andThen getData).async {
     implicit request =>
-
       val preparedForm = request.userAnswers.flatMap(_.get(DoYouHaveUTRPage)) match {
-        case None => form
+        case None        => form
         case Some(value) => form.fill(value)
       }
 
@@ -67,35 +69,37 @@ class DoYouHaveUTRController @Inject()(
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen notEnrolled andThen getData).async {
     implicit request =>
+      form
+        .bindFromRequest()
+        .fold(
+          formWithErrors => {
 
-      form.bindFromRequest().fold(
-        formWithErrors => {
+            val json = Json.obj(
+              "form"   -> formWithErrors,
+              "mode"   -> mode,
+              "radios" -> Radios.yesNo(formWithErrors("confirm"))
+            )
 
-          val json = Json.obj(
-            "form"   -> formWithErrors,
-            "mode"   -> mode,
-            "radios" -> Radios.yesNo(formWithErrors("confirm"))
-          )
+            renderer.render("doYouHaveUTR.njk", json).map(BadRequest(_))
+          },
+          value => {
+            val initialUserAnswers = UserAnswers(request.internalId)
+            val userAnswers = request.userAnswers.fold(initialUserAnswers)(
+              ua => ua
+            )
 
-          renderer.render("doYouHaveUTR.njk", json).map(BadRequest(_))
-        },
-        value => {
-          val initialUserAnswers = UserAnswers(request.internalId)
-          val userAnswers = request.userAnswers.fold(initialUserAnswers)(ua => ua)
+            val redirectUsers = redirectToSummary(value, DoYouHaveUTRPage, mode, userAnswers)
 
-          val redirectUsers = redirectToSummary(value, DoYouHaveUTRPage, mode, userAnswers)
-
-          for {
-            updatedAnswers <- UserAnswersHelper.updateUserAnswersIfValueChanged(userAnswers, DoYouHaveUTRPage, value)
-            _              <- sessionRepository.set(updatedAnswers)
-          } yield {
-            if (redirectUsers) {
-              Redirect(routes.CheckYourAnswersController.onPageLoad())
-            } else {
-              Redirect(navigator.nextPage(DoYouHaveUTRPage, mode, updatedAnswers))
-            }
+            for {
+              updatedAnswers <- UserAnswersHelper.updateUserAnswersIfValueChanged(userAnswers, DoYouHaveUTRPage, value)
+              _              <- sessionRepository.set(updatedAnswers)
+            } yield
+              if (redirectUsers) {
+                Redirect(routes.CheckYourAnswersController.onPageLoad())
+              } else {
+                Redirect(navigator.nextPage(DoYouHaveUTRPage, mode, updatedAnswers))
+              }
           }
-        }
-      )
+        )
   }
 }

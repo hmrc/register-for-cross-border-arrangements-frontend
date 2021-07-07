@@ -24,17 +24,13 @@ import play.api.libs.json.Json
 class BusinessMatchingSubmissionSpec extends SpecBase with ScalaCheckPropertyChecks with Generators {
   "BusinessMatchingSubmission" - {
     "must serialise" in {
-      val businessMatchingSubmission = BusinessMatchingSubmission(
-        "DACSIX",
-        requiresNameMatch = true,
-        isAnAgent = false,
-        Organisation("AAAA", BusinessType.CorporateBody))
+      val businessMatchingSubmission =
+        BusinessMatchingSubmission("DACSIX", requiresNameMatch = true, isAnAgent = false, Organisation("AAAA", BusinessType.CorporateBody))
 
       val jsonPayload =
         """{"regime":"DACSIX","requiresNameMatch":true,"isAnAgent":false,"organisation":{"organisationName":"AAAA","organisationType":"Corporate Body"}}"""
       Json.toJson(businessMatchingSubmission) mustBe Json.parse(jsonPayload)
     }
   }
-
 
 }

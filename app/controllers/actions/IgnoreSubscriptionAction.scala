@@ -22,8 +22,8 @@ import play.api.mvc.{ActionRefiner, Result}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class IgnoreSubscriptionAction @Inject()()(implicit val executionContext: ExecutionContext)
-  extends ActionRefiner[UserRequest, IdentifierRequest] {
+class IgnoreSubscriptionAction @Inject() ()(implicit val executionContext: ExecutionContext) extends ActionRefiner[UserRequest, IdentifierRequest] {
+
   override protected def refine[A](request: UserRequest[A]): Future[Either[Result, IdentifierRequest[A]]] =
     Future.successful(Right(IdentifierRequest(request.request, request.identifier)))
 }

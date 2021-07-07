@@ -30,10 +30,20 @@ class SoleTraderNameFormProvider @Inject() extends Mappings with RegexConstants 
   def apply(): Form[Name] =
     Form(
       mapping(
-      "firstName" -> validatedText("soleTraderName.error.firstName.required",
-            "soleTraderName.error.firstName.invalid", "soleTraderName.error.firstName.length", soleTraderNameRegex, maxLength),
-      "secondName" -> validatedText("soleTraderName.error.secondName.required",
-        "soleTraderName.error.secondName.invalid","soleTraderName.error.secondName.length", soleTraderNameRegex, maxLength)
+        "firstName" -> validatedText(
+          "soleTraderName.error.firstName.required",
+          "soleTraderName.error.firstName.invalid",
+          "soleTraderName.error.firstName.length",
+          soleTraderNameRegex,
+          maxLength
+        ),
+        "secondName" -> validatedText(
+          "soleTraderName.error.secondName.required",
+          "soleTraderName.error.secondName.invalid",
+          "soleTraderName.error.secondName.length",
+          soleTraderNameRegex,
+          maxLength
+        )
       )(Name.apply)(Name.unapply)
     )
 }

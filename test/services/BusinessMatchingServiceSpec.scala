@@ -21,7 +21,22 @@ import connectors.{RegistrationConnector, SubscriptionConnector}
 import generators.Generators
 import models.BusinessType._
 import models.readSubscription._
-import models.{AddressResponse, BusinessAddress, BusinessDetails, BusinessType, ContactDetails, IndividualResponse, Name, OrganisationResponse, PayloadRegistrationWithIDResponse, RegisterWithIDResponse, ResponseCommon, ResponseDetail, UniqueTaxpayerReference, UserAnswers}
+import models.{
+  AddressResponse,
+  BusinessAddress,
+  BusinessDetails,
+  BusinessType,
+  ContactDetails,
+  IndividualResponse,
+  Name,
+  OrganisationResponse,
+  PayloadRegistrationWithIDResponse,
+  RegisterWithIDResponse,
+  ResponseCommon,
+  ResponseDetail,
+  UniqueTaxpayerReference,
+  UserAnswers
+}
 import org.scalacheck.Arbitrary.arbitrary
 import org.mockito.ArgumentMatchers.any
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
@@ -53,13 +68,12 @@ class BusinessMatchingServiceSpec extends SpecBase with Generators with ScalaChe
 
   val businessTypesNoSoleTrader = Seq(Partnership, LimitedLiability, CorporateBody, UnIncorporatedBody)
 
-  def utrPage(businessType: BusinessType): QuestionPage[UniqueTaxpayerReference] = {
+  def utrPage(businessType: BusinessType): QuestionPage[UniqueTaxpayerReference] =
     if (businessType == BusinessType.UnIncorporatedBody | businessType == BusinessType.CorporateBody) {
       CorporationTaxUTRPage
     } else {
       SelfAssessmentUTRPage
     }
-  }
 
   override def beforeEach: Unit =
     reset(
@@ -67,36 +81,40 @@ class BusinessMatchingServiceSpec extends SpecBase with Generators with ScalaChe
       mockSubscriptionConnector
     )
 
+  val primaryContact: PrimaryContact = PrimaryContact(
+    Seq(
+      ContactInformationForIndividual(
+        individual = IndividualDetails(firstName = "FirstName", lastName = "LastName", middleName = None),
+        email = "email@email.com",
+        phone = Some("07111222333"),
+        mobile = Some("07111222333")
+      )
+    )
+  )
 
-  val primaryContact: PrimaryContact = PrimaryContact(Seq(
-    ContactInformationForIndividual(
-      individual = IndividualDetails(firstName = "FirstName", lastName = "LastName", middleName = None),
-      email = "email@email.com", phone = Some("07111222333"), mobile = Some("07111222333"))
-  ))
-  val secondaryContact: SecondaryContact = SecondaryContact(Seq(
-    ContactInformationForOrganisation(
-      organisation = OrganisationDetails(organisationName = "Organisation Name"),
-      email = "email@email.com", phone = None, mobile = None)
-  ))
+  val secondaryContact: SecondaryContact = SecondaryContact(
+    Seq(
+      ContactInformationForOrganisation(organisation = OrganisationDetails(organisationName = "Organisation Name"),
+                                        email = "email@email.com",
+                                        phone = None,
+                                        mobile = None
+      )
+    )
+  )
 
+  val responseDetail: ResponseDetailForReadSubscription = ResponseDetailForReadSubscription(subscriptionID = "XE0001234567890",
+                                                                                            tradingName = Some("Trading Name"),
+                                                                                            isGBUser = true,
+                                                                                            primaryContact = primaryContact,
+                                                                                            secondaryContact = Some(secondaryContact)
+  )
 
-  val responseDetail: ResponseDetailForReadSubscription = ResponseDetailForReadSubscription(
-    subscriptionID = "XE0001234567890",
-    tradingName = Some("Trading Name"),
-    isGBUser = true,
-    primaryContact = primaryContact,
-    secondaryContact = Some(secondaryContact))
-
-  val responseCommon: ResponseCommon = ResponseCommon(
-    status = "OK",
-    statusText = None,
-    processingDate = "2020-08-09T11:23:45Z",
-    returnParameters = None)
+  val responseCommon: ResponseCommon = ResponseCommon(status = "OK", statusText = None, processingDate = "2020-08-09T11:23:45Z", returnParameters = None)
 
   "Business Matching Service" - {
     "when able to construct an individual matching submission" - {
       "should send a request to the business matching connector for an individual" in {
-        forAll(arbitrary[UserAnswers], arbitrary[Name], arbitrary[LocalDate], arbitrary[Nino], arbitrary[PayloadRegistrationWithIDResponse]){
+        forAll(arbitrary[UserAnswers], arbitrary[Name], arbitrary[LocalDate], arbitrary[Nino], arbitrary[PayloadRegistrationWithIDResponse]) {
           (userAnswers, name, dob, nino, response) =>
             val answers = userAnswers
               .set(NamePage, name)
@@ -111,10 +129,18 @@ class BusinessMatchingServiceSpec extends SpecBase with Generators with ScalaChe
 
             val registerWithSafeId = response.registerWithIDResponse.copy(
               responseDetail = Some(
-                ResponseDetail("XE0001234567890", None, isEditable = false, isAnAgent = false, None, isAnIndividual = false,
+                ResponseDetail(
+                  "XE0001234567890",
+                  None,
+                  isEditable = false,
+                  isAnAgent = false,
+                  None,
+                  isAnIndividual = false,
                   IndividualResponse("Bobby", None, "Bob", None),
                   AddressResponse("1 TestStreet", Some("Test"), None, None, Some("AA11BB"), "GB"),
-                  ContactDetails(None, None, None, None)))
+                  ContactDetails(None, None, None, None)
+                )
+              )
             )
             val responseWithSafeId = response.copy(registerWithSafeId)
 
@@ -130,7 +156,7 @@ class BusinessMatchingServiceSpec extends SpecBase with Generators with ScalaChe
 
             val result = businessMatchingService.sendIndividualMatchingInformation(answers)
 
-            whenReady(result){
+            whenReady(result) {
               res =>
                 res.map(_._1.get) mustBe Right(responseWithSafeId)
                 res.map(_._2.get) mustBe Right("XE0001234567890")
@@ -140,73 +166,86 @@ class BusinessMatchingServiceSpec extends SpecBase with Generators with ScalaChe
 
       "should send a request to the business matching connector for an individual and return " +
         "subscription info if this already exists" in {
-        forAll(arbitrary[UserAnswers], arbitrary[Name], arbitrary[LocalDate],
-            arbitrary[Nino], arbitrary[PayloadRegistrationWithIDResponse], validSubscriptionID){
-          (userAnswers, name, dob, nino, response, existingSubscriptionID) =>
-            val answers = userAnswers
-              .set(NamePage, name)
-              .success
-              .value
-              .set(DateOfBirthPage, dob)
-              .success
-              .value
-              .set(NinoPage, nino)
-              .success
-              .value
+          forAll(arbitrary[UserAnswers],
+                 arbitrary[Name],
+                 arbitrary[LocalDate],
+                 arbitrary[Nino],
+                 arbitrary[PayloadRegistrationWithIDResponse],
+                 validSubscriptionID
+          ) {
+            (userAnswers, name, dob, nino, response, existingSubscriptionID) =>
+              val answers = userAnswers
+                .set(NamePage, name)
+                .success
+                .value
+                .set(DateOfBirthPage, dob)
+                .success
+                .value
+                .set(NinoPage, nino)
+                .success
+                .value
 
-            val registerWithSafeId = response.registerWithIDResponse.copy(
-              responseDetail = Some(
-                ResponseDetail("XE0001234567890", None, isEditable = false, isAnAgent = false, None, isAnIndividual = false,
-                  IndividualResponse("Bobby", None, "Bob", None),
-                  AddressResponse("1 TestStreet", Some("Test"), None, None, Some("AA11BB"), "GB"),
-                  ContactDetails(None, None, None, None)))
-            )
-            val responseWithSafeId = response.copy(registerWithSafeId)
-
-            val responseDetailRead: ResponseDetailForReadSubscription = responseDetail.copy(subscriptionID = existingSubscriptionID)
-
-            val displaySubscriptionForDACResponse: DisplaySubscriptionForDACResponse =
-              DisplaySubscriptionForDACResponse(
-                ReadSubscriptionForDACResponse(responseCommon = responseCommon, responseDetail = responseDetailRead)
+              val registerWithSafeId = response.registerWithIDResponse.copy(
+                responseDetail = Some(
+                  ResponseDetail(
+                    "XE0001234567890",
+                    None,
+                    isEditable = false,
+                    isAnAgent = false,
+                    None,
+                    isAnIndividual = false,
+                    IndividualResponse("Bobby", None, "Bob", None),
+                    AddressResponse("1 TestStreet", Some("Test"), None, None, Some("AA11BB"), "GB"),
+                    ContactDetails(None, None, None, None)
+                  )
+                )
               )
+              val responseWithSafeId = response.copy(registerWithSafeId)
 
-            when(mockRegistrationConnector.registerWithID(any())(any(), any()))
-              .thenReturn(
-                Future.successful(Some(responseWithSafeId))
-              )
+              val responseDetailRead: ResponseDetailForReadSubscription = responseDetail.copy(subscriptionID = existingSubscriptionID)
 
-            when(mockSubscriptionConnector.readSubscriptionDetails(any())(any(), any()))
-              .thenReturn(
-                Future.successful(Some(displaySubscriptionForDACResponse))
-              )
+              val displaySubscriptionForDACResponse: DisplaySubscriptionForDACResponse =
+                DisplaySubscriptionForDACResponse(
+                  ReadSubscriptionForDACResponse(responseCommon = responseCommon, responseDetail = responseDetailRead)
+                )
 
-            val result = businessMatchingService.sendIndividualMatchingInformation(answers)
+              when(mockRegistrationConnector.registerWithID(any())(any(), any()))
+                .thenReturn(
+                  Future.successful(Some(responseWithSafeId))
+                )
 
-            whenReady(result){
-              res =>
-                res.map(_._1.get) mustBe Right(responseWithSafeId)
-                res.map(_._2.get) mustBe Right("XE0001234567890")
-                res.map(_._3.get) mustBe Right(displaySubscriptionForDACResponse)
+              when(mockSubscriptionConnector.readSubscriptionDetails(any())(any(), any()))
+                .thenReturn(
+                  Future.successful(Some(displaySubscriptionForDACResponse))
+                )
 
-            }
+              val result = businessMatchingService.sendIndividualMatchingInformation(answers)
+
+              whenReady(result) {
+                res =>
+                  res.map(_._1.get) mustBe Right(responseWithSafeId)
+                  res.map(_._2.get) mustBe Right("XE0001234567890")
+                  res.map(_._3.get) mustBe Right(displaySubscriptionForDACResponse)
+
+              }
+          }
         }
-      }
-   }
+    }
 
     "when unable to construct an individual matching submission" - {
       "should return a future with no value" in {
-        forAll(arbitrary[UserAnswers]){
+        forAll(arbitrary[UserAnswers]) {
           userAnswers =>
             val answers = userAnswers
-                .remove(NamePage)
-                .success
-                .value
-                .remove(DateOfBirthPage)
-                .success
-                .value
+              .remove(NamePage)
+              .success
+              .value
+              .remove(DateOfBirthPage)
+              .success
+              .value
             val result = businessMatchingService.sendIndividualMatchingInformation(answers)
 
-            whenReady(result){
+            whenReady(result) {
               _.isLeft mustBe true //ie Exception thrown
             }
         }
@@ -220,10 +259,10 @@ class BusinessMatchingServiceSpec extends SpecBase with Generators with ScalaChe
           arbitrary[UniqueTaxpayerReference],
           RegexpGen.from("^[a-zA-Z0-9 '&\\/]{1,105}$"),
           for {
-            firstName <- RegexpGen.from("^[a-zA-Z0-9 '&\\/]{1,35}$")
+            firstName  <- RegexpGen.from("^[a-zA-Z0-9 '&\\/]{1,35}$")
             secondName <- RegexpGen.from("^[a-zA-Z0-9 '&\\/]{1,35}$")
           } yield Name(firstName, secondName)
-        ){
+        ) {
           (userAnswers, utr, businessName, soleTraderName) =>
             val getRandomBusinessTypeNoSoleTrader = Random.shuffle(businessTypesNoSoleTrader).head
 
@@ -244,17 +283,31 @@ class BusinessMatchingServiceSpec extends SpecBase with Generators with ScalaChe
             val payload = PayloadRegistrationWithIDResponse(
               RegisterWithIDResponse(
                 ResponseCommon("", None, "", None),
-                Some(ResponseDetail("XE0001234567890", None, isEditable = false, isAnAgent = false, None, isAnIndividual = false,
-                OrganisationResponse(businessName, isAGroup = false, None, None),
-                AddressResponse("1 TestStreet", Some("Test"), Some("Test"), None, Some("AA11BB"), "GB"),
-                ContactDetails(None, None, None, None)))
+                Some(
+                  ResponseDetail(
+                    "XE0001234567890",
+                    None,
+                    isEditable = false,
+                    isAnAgent = false,
+                    None,
+                    isAnIndividual = false,
+                    OrganisationResponse(businessName, isAGroup = false, None, None),
+                    AddressResponse("1 TestStreet", Some("Test"), Some("Test"), None, Some("AA11BB"), "GB"),
+                    ContactDetails(None, None, None, None)
+                  )
+                )
               )
             )
 
-            val businessDetailsWithSafeID = (Some(BusinessDetails(
-              businessName,
-              BusinessAddress("1 TestStreet", Some("Test"), Some("Test"), None, "AA11BB", "GB")
-            )), Some("XE0001234567890"), None)
+            val businessDetailsWithSafeID = (Some(
+                                               BusinessDetails(
+                                                 businessName,
+                                                 BusinessAddress("1 TestStreet", Some("Test"), Some("Test"), None, "AA11BB", "GB")
+                                               )
+                                             ),
+                                             Some("XE0001234567890"),
+                                             None
+            )
 
             when(mockRegistrationConnector.registerWithID(any())(any(), any()))
               .thenReturn(
@@ -267,8 +320,9 @@ class BusinessMatchingServiceSpec extends SpecBase with Generators with ScalaChe
               )
             val result = businessMatchingService.sendBusinessMatchingInformation(answers)
 
-            whenReady(result){ result =>
-              result mustBe businessDetailsWithSafeID
+            whenReady(result) {
+              result =>
+                result mustBe businessDetailsWithSafeID
             }
         }
       }
@@ -279,12 +333,12 @@ class BusinessMatchingServiceSpec extends SpecBase with Generators with ScalaChe
           arbitrary[UniqueTaxpayerReference],
           RegexpGen.from("^[a-zA-Z0-9 '&\\/]{1,105}$"),
           for {
-            firstName <- RegexpGen.from("^[a-zA-Z0-9 '&\\/]{1,35}$")
+            firstName  <- RegexpGen.from("^[a-zA-Z0-9 '&\\/]{1,35}$")
             secondName <- RegexpGen.from("^[a-zA-Z0-9 '&\\/]{1,35}$")
           } yield Name(firstName, secondName),
           validSafeID,
           validSubscriptionID
-        ){
+        ) {
           (userAnswers, utr, businessName, soleTraderName, safeID, existingSubscriptionID) =>
             val getRandomBusinessTypeNoSoleTrader = Random.shuffle(businessTypesNoSoleTrader).head
 
@@ -305,13 +359,21 @@ class BusinessMatchingServiceSpec extends SpecBase with Generators with ScalaChe
             val payload = PayloadRegistrationWithIDResponse(
               RegisterWithIDResponse(
                 ResponseCommon("", None, "", None),
-                Some(ResponseDetail("XE0001234567890", None, isEditable = false, isAnAgent = false, None, isAnIndividual = false,
-                OrganisationResponse(businessName, isAGroup = false, None, None),
-                AddressResponse("1 TestStreet", Some("Test"), Some("Test"), None, Some("AA11BB"), "GB"),
-                ContactDetails(None, None, None, None)))
+                Some(
+                  ResponseDetail(
+                    "XE0001234567890",
+                    None,
+                    isEditable = false,
+                    isAnAgent = false,
+                    None,
+                    isAnIndividual = false,
+                    OrganisationResponse(businessName, isAGroup = false, None, None),
+                    AddressResponse("1 TestStreet", Some("Test"), Some("Test"), None, Some("AA11BB"), "GB"),
+                    ContactDetails(None, None, None, None)
+                  )
+                )
               )
             )
-
 
             val responseDetailRead: ResponseDetailForReadSubscription = responseDetail.copy(subscriptionID = existingSubscriptionID)
 
@@ -320,14 +382,15 @@ class BusinessMatchingServiceSpec extends SpecBase with Generators with ScalaChe
                 ReadSubscriptionForDACResponse(responseCommon = responseCommon, responseDetail = responseDetailRead)
               )
 
-
-            val businessDetailsWithSafeID = (Some(BusinessDetails(
-              businessName,
-              BusinessAddress("1 TestStreet", Some("Test"), Some("Test"), None, "AA11BB", "GB")
-            )), Some("XE0001234567890"), Some(displaySubscriptionForDACResponse))
-
-
-
+            val businessDetailsWithSafeID = (Some(
+                                               BusinessDetails(
+                                                 businessName,
+                                                 BusinessAddress("1 TestStreet", Some("Test"), Some("Test"), None, "AA11BB", "GB")
+                                               )
+                                             ),
+                                             Some("XE0001234567890"),
+                                             Some(displaySubscriptionForDACResponse)
+            )
 
             when(mockRegistrationConnector.registerWithID(any())(any(), any()))
               .thenReturn(
@@ -341,14 +404,15 @@ class BusinessMatchingServiceSpec extends SpecBase with Generators with ScalaChe
 
             val result = businessMatchingService.sendBusinessMatchingInformation(answers)
 
-            whenReady(result){ result =>
-              result mustBe businessDetailsWithSafeID
+            whenReady(result) {
+              result =>
+                result mustBe businessDetailsWithSafeID
             }
         }
       }
 
       "should send a request to the business matching connector for a sole proprietor" in {
-        forAll(arbitrary[UniqueTaxpayerReference]){
+        forAll(arbitrary[UniqueTaxpayerReference]) {
           utr =>
             val answers = UserAnswers(userAnswersId)
               .set(BusinessTypePage, NotSpecified)
@@ -367,17 +431,31 @@ class BusinessMatchingServiceSpec extends SpecBase with Generators with ScalaChe
             val payload = PayloadRegistrationWithIDResponse(
               RegisterWithIDResponse(
                 ResponseCommon("", None, "", None),
-                Some(ResponseDetail("XE0001234567890", None, isEditable = false, isAnAgent = false, None, isAnIndividual = false,
-                  IndividualResponse("Bobby", None, "Bob", None),
-                  AddressResponse("1 TestStreet", Some("Test"), None, None, Some("AA11BB"), "GB"),
-                  ContactDetails(None, None, None, None)))
+                Some(
+                  ResponseDetail(
+                    "XE0001234567890",
+                    None,
+                    isEditable = false,
+                    isAnAgent = false,
+                    None,
+                    isAnIndividual = false,
+                    IndividualResponse("Bobby", None, "Bob", None),
+                    AddressResponse("1 TestStreet", Some("Test"), None, None, Some("AA11BB"), "GB"),
+                    ContactDetails(None, None, None, None)
+                  )
+                )
               )
             )
 
-            val businessDetailsWithSafeID = (Some(BusinessDetails(
-              "Bobby Bob",
-              BusinessAddress("1 TestStreet", Some("Test"), None, None, "AA11BB", "GB")
-            )), Some("XE0001234567890"), None)
+            val businessDetailsWithSafeID = (Some(
+                                               BusinessDetails(
+                                                 "Bobby Bob",
+                                                 BusinessAddress("1 TestStreet", Some("Test"), None, None, "AA11BB", "GB")
+                                               )
+                                             ),
+                                             Some("XE0001234567890"),
+                                             None
+            )
 
             when(mockRegistrationConnector.registerWithID(any())(any(), any()))
               .thenReturn(
@@ -390,14 +468,15 @@ class BusinessMatchingServiceSpec extends SpecBase with Generators with ScalaChe
 
             val result = businessMatchingService.sendBusinessMatchingInformation(answers)
 
-            whenReady(result){ result =>
-              result mustBe businessDetailsWithSafeID
+            whenReady(result) {
+              result =>
+                result mustBe businessDetailsWithSafeID
             }
         }
       }
 
       "should return (None,None) for retrieval of SafeID if business can't be found" in {
-        forAll(arbitrary[UserAnswers], arbitrary[UniqueTaxpayerReference], arbitrary[String], arbitrary[Name]){
+        forAll(arbitrary[UserAnswers], arbitrary[UniqueTaxpayerReference], arbitrary[String], arbitrary[Name]) {
           (userAnswers, utr, businessName, soleTraderName) =>
             val getRandomBusinessTypeNoSoleTrader = Random.shuffle(businessTypesNoSoleTrader).head
 
@@ -431,10 +510,19 @@ class BusinessMatchingServiceSpec extends SpecBase with Generators with ScalaChe
         val payload = PayloadRegistrationWithIDResponse(
           RegisterWithIDResponse(
             ResponseCommon("", None, "", None),
-            Some(ResponseDetail("XE0001234567890", None, isEditable = false, isAnAgent = false, None, isAnIndividual = false,
-              IndividualResponse("Bobby", None, "Bob", None),
-              AddressResponse("1 TestStreet", Some("Test"), None, None, Some("AA11BB"), "GB"),
-              ContactDetails(None, None, None, None)))
+            Some(
+              ResponseDetail(
+                "XE0001234567890",
+                None,
+                isEditable = false,
+                isAnAgent = false,
+                None,
+                isAnIndividual = false,
+                IndividualResponse("Bobby", None, "Bob", None),
+                AddressResponse("1 TestStreet", Some("Test"), None, None, Some("AA11BB"), "GB"),
+                ContactDetails(None, None, None, None)
+              )
+            )
           )
         )
         businessMatchingService.retrieveSafeID(Some(payload)) mustBe Some("XE0001234567890")

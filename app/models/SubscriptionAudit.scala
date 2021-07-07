@@ -22,9 +22,11 @@ case class SubscriptionAudit(SAFEID: String,
                              tradingName: Option[String],
                              isGBUser: Boolean,
                              primaryContact: PrimaryContact,
-                             secondaryContact: Option[SecondaryContact])
+                             secondaryContact: Option[SecondaryContact]
+)
 
 object SubscriptionAudit {
+
   def fromRequestDetail(details: RequestDetail): SubscriptionAudit =
     SubscriptionAudit(
       details.IDNumber,

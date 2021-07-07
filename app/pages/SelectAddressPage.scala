@@ -30,6 +30,6 @@ case object SelectAddressPage extends QuestionPage[String] {
   override def cleanup(value: Option[String], userAnswers: UserAnswers): Try[UserAnswers] =
     value match {
       case Some(_) => userAnswers.remove(WhatIsYourAddressUkPage)
-      case None => super.cleanup(value, userAnswers)
+      case None    => super.cleanup(value, userAnswers)
     }
 }

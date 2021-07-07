@@ -20,7 +20,14 @@ import config.FrontendAppConfig
 import models.error.RegisterError
 import models.error.RegisterError.{DuplicateSubmissionError, UnableToCreateEMTPSubscriptionError}
 import models.readSubscription.{DisplaySubscriptionDetails, DisplaySubscriptionForDACRequest, DisplaySubscriptionForDACResponse}
-import models.{CacheCreateSubscriptionForDACRequest, CreateSubscriptionForDACRequest, CreateSubscriptionForDACResponse, SubscriptionForDACRequest, SubscriptionInfo, UserAnswers}
+import models.{
+  CacheCreateSubscriptionForDACRequest,
+  CreateSubscriptionForDACRequest,
+  CreateSubscriptionForDACResponse,
+  SubscriptionForDACRequest,
+  SubscriptionInfo,
+  UserAnswers
+}
 import org.slf4j.LoggerFactory
 import play.api.http.Status.{CONFLICT, OK}
 import play.api.libs.json.{JsError, JsSuccess}
@@ -30,74 +37,76 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
 
-class SubscriptionConnector @Inject()(val config: FrontendAppConfig, val http: HttpClient) {
+class SubscriptionConnector @Inject() (val config: FrontendAppConfig, val http: HttpClient) {
 
   private val logger = LoggerFactory.getLogger(getClass)
 
- val submissionUrl = s"${config.crossBorderArrangementsUrl}/disclose-cross-border-arrangements/subscription/display-subscription"
+  val submissionUrl = s"${config.crossBorderArrangementsUrl}/disclose-cross-border-arrangements/subscription/display-subscription"
 
-  def createEnrolment(userAnswers: UserAnswers)
-                     (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] = {
+  def createEnrolment(userAnswers: UserAnswers)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] = {
 
     val submissionUrl = s"${config.businessMatchingUrl}/enrolment/create-enrolment"
     http.PUT[SubscriptionInfo, HttpResponse](submissionUrl, SubscriptionInfo.createSubscriptionInfo(userAnswers))
   }
 
-  def createSubscription(userAnswers: UserAnswers)
-                        (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[RegisterError, String]] = {
+  def createSubscription(userAnswers: UserAnswers)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[RegisterError, String]] = {
 
     val submissionUrl = s"${config.businessMatchingUrl}/subscription/create-dac-subscription"
-    try {
-      http.POST[CreateSubscriptionForDACRequest, HttpResponse](
+    try http
+      .POST[CreateSubscriptionForDACRequest, HttpResponse](
         submissionUrl,
         CreateSubscriptionForDACRequest(SubscriptionForDACRequest.createSubscription(userAnswers))
-      ).flatMap {
-        case response if response.status equals OK => {
-          Future.successful{
-            Try(response.json.as[CreateSubscriptionForDACResponse].createSubscriptionForDACResponse).map { subscription =>
-              subscription.responseDetail.subscriptionID
-            }.toOption.toRight(UnableToCreateEMTPSubscriptionError)
+      )
+      .flatMap {
+        case response if response.status equals OK =>
+          Future.successful {
+            Try(response.json.as[CreateSubscriptionForDACResponse].createSubscriptionForDACResponse)
+              .map {
+                subscription =>
+                  subscription.responseDetail.subscriptionID
+              }
+              .toOption
+              .toRight(UnableToCreateEMTPSubscriptionError)
           }
-        }
         case response if response.status equals CONFLICT =>
           Future.successful(Left(DuplicateSubmissionError))
         case response =>
           logger.warn(s"Unable to create a subscription to ETMP. ${response.status} response status")
           Future.successful(Left(UnableToCreateEMTPSubscriptionError))
-      }
-    } catch {
+      } catch {
       case e: Exception =>
         logger.warn("Unable to create an ETMP subscription", e)
         Future.successful(Left(UnableToCreateEMTPSubscriptionError))
     }
   }
 
-  def readSubscriptionDetails(safeID: String)
-                             (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[DisplaySubscriptionForDACResponse]] = {
+  def readSubscriptionDetails(safeID: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[DisplaySubscriptionForDACResponse]] = {
 
     val submissionUrl = s"${config.crossBorderArrangementsUrl}/disclose-cross-border-arrangements/subscription/display-subscription"
 
-    http.POST[DisplaySubscriptionForDACRequest, HttpResponse](
-      submissionUrl,
-      DisplaySubscriptionForDACRequest(DisplaySubscriptionDetails.createRequest(safeID))
-    ).map {
-      response =>
-        response.status match {
-          case OK => response.json.validate[DisplaySubscriptionForDACResponse] match {
-            case JsSuccess(response, _) => Some(response)
-            case JsError(errors) =>
-              logger.warn("Validation of display subscription payload failed", errors)
+    http
+      .POST[DisplaySubscriptionForDACRequest, HttpResponse](
+        submissionUrl,
+        DisplaySubscriptionForDACRequest(DisplaySubscriptionDetails.createRequest(safeID))
+      )
+      .map {
+        response =>
+          response.status match {
+            case OK =>
+              response.json.validate[DisplaySubscriptionForDACResponse] match {
+                case JsSuccess(response, _) => Some(response)
+                case JsError(errors) =>
+                  logger.warn("Validation of display subscription payload failed", errors)
+                  None
+              }
+            case errorStatus: Int =>
+              logger.warn(s"Status $errorStatus has been thrown when display subscription was called")
               None
           }
-          case errorStatus: Int =>
-            logger.warn(s"Status $errorStatus has been thrown when display subscription was called")
-            None
-        }
-    }
+      }
   }
 
-  def cacheSubscription(userAnswers: UserAnswers, subscriptionID: String)
-           (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] = {
+  def cacheSubscription(userAnswers: UserAnswers, subscriptionID: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] = {
     val submissionUrl = s"${config.crossBorderArrangementsUrl}/disclose-cross-border-arrangements/subscription/cache-subscription"
 
     http.POST[CacheCreateSubscriptionForDACRequest, HttpResponse](

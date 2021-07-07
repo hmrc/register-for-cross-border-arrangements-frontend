@@ -34,52 +34,52 @@ object RegisterError {
   }
 
   case object BadRequestError extends RegisterError {
-    val errorCode: String = "400"
+    val errorCode: String    = "400"
     val errorMessage: String = "Invalid ID"
   }
 
   case object RecordNotFoundError extends RegisterError {
-    val errorCode: String = "404"
+    val errorCode: String    = "404"
     val errorMessage: String = "Record not Found"
   }
 
   case object DuplicateSubmissionError extends RegisterError {
-    val errorCode: String = "409"
+    val errorCode: String    = "409"
     val errorMessage: String = "Duplicate submission"
   }
 
   case object InternalServerError extends RegisterError {
-    val errorCode: String = "500"
+    val errorCode: String    = "500"
     val errorMessage: String = "InternalError"
   }
 
   case object RequestCouldNotBeProcessedError extends RegisterError {
-    val errorCode: String = "503"
+    val errorCode: String    = "503"
     val errorMessage: String = "Request could not be processed"
   }
 
   case object ServiceUnavailableError extends RegisterError {
-    val errorCode: String = "503"
+    val errorCode: String    = "503"
     val errorMessage: String = "Send timeout"
   }
 
   case object UnableToParseError extends RegisterError {
-    val errorCode: String = ""
+    val errorCode: String    = ""
     val errorMessage: String = "There has been an error"
   }
 
   case object UnableToCreateRegistrationError extends RegisterError {
-    val errorCode: String = ""
+    val errorCode: String    = ""
     val errorMessage: String = "Couldn't Create Payload for Register With ID"
   }
 
   case object MissingNinoAnswerError extends RegisterError {
-    val errorCode: String = ""
+    val errorCode: String    = ""
     val errorMessage: String = "Missing Nino Answer"
   }
 
   case object UnableToCreateEMTPSubscriptionError extends RegisterError {
-    val errorCode: String = ""
+    val errorCode: String    = ""
     val errorMessage: String = "Unable to create an ETMP subscription"
   }
 }

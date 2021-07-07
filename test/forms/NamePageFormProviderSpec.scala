@@ -22,12 +22,12 @@ import play.api.data.FormError
 class NamePageFormProviderSpec extends StringFieldBehaviours {
 
   val maxLength = 35
-  val form = new NamePageFormProvider()()
+  val form      = new NamePageFormProvider()()
 
   ".firstName" - {
     val requiredKey = "name.error.firstName.required"
-    val invalidKey = "name.error.firstName.invalid"
-    val lengthKey = "name.error.firstName.length"
+    val invalidKey  = "name.error.firstName.invalid"
+    val lengthKey   = "name.error.firstName.length"
 
     val fieldName = "firstName"
 
@@ -60,8 +60,8 @@ class NamePageFormProviderSpec extends StringFieldBehaviours {
 
   ".secondName" - {
     val requiredKey = "name.error.secondName.required"
-    val invalidKey = "name.error.secondName.invalid"
-    val lengthKey = "name.error.secondName.length"
+    val invalidKey  = "name.error.secondName.invalid"
+    val lengthKey   = "name.error.secondName.length"
 
     val fieldName = "secondName"
 

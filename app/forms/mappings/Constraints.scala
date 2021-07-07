@@ -34,7 +34,6 @@ trait Constraints {
   protected def minimumValue[A](minimum: A, errorKey: String)(implicit ev: Ordering[A]): Constraint[A] =
     Constraint {
       input =>
-
         import ev._
 
         if (input >= minimum) {
@@ -47,7 +46,6 @@ trait Constraints {
   protected def maximumValue[A](maximum: A, errorKey: String)(implicit ev: Ordering[A]): Constraint[A] =
     Constraint {
       input =>
-
         import ev._
 
         if (input <= maximum) {
@@ -60,7 +58,6 @@ trait Constraints {
   protected def inRange[A](minimum: A, maximum: A, errorKey: String)(implicit ev: Ordering[A]): Constraint[A] =
     Constraint {
       input =>
-
         import ev._
 
         if (input >= minimum && input <= maximum) {
@@ -95,9 +92,9 @@ trait Constraints {
     }
 
   protected def isCorrectLength(length: Int, errorKey: String): Constraint[String] =
-    Constraint{
+    Constraint {
       case str if str.length == length => Valid
-      case _ => Invalid(errorKey, length)
+      case _                           => Invalid(errorKey, length)
     }
 
   protected def maxDate(maximum: LocalDate, errorKey: String, args: Any*): Constraint[LocalDate] =
@@ -127,6 +124,6 @@ trait Constraints {
   implicit def convertToOptionalConstraint[T](constraint: Constraint[T]): Constraint[Option[T]] =
     Constraint {
       case Some(t) => constraint.apply(t)
-      case _ => Valid
+      case _       => Valid
     }
 }

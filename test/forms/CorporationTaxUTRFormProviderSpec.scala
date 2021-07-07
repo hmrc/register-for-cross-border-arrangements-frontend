@@ -25,10 +25,10 @@ class CorporationTaxUTRFormProviderSpec extends StringFieldBehaviours {
 
   ".corporationTaxUTRReference" - {
 
-    val fieldName = "corporationTaxUTR"
+    val fieldName   = "corporationTaxUTR"
     val requiredKey = "corporationTaxUTR.error.required"
-    val lengthKey = "corporationTaxUTR.error.length"
-    val invalidKey = "corporationTaxUTR.error.invalid"
+    val lengthKey   = "corporationTaxUTR.error.length"
+    val invalidKey  = "corporationTaxUTR.error.invalid"
 
     val length = 10
 

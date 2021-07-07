@@ -26,15 +26,16 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 
-class UnauthorisedAssistantController @Inject()(
-    val controllerComponents: MessagesControllerComponents,
-    frontendAppConfig: FrontendAppConfig,
-    renderer: Renderer
-)(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+class UnauthorisedAssistantController @Inject() (
+  val controllerComponents: MessagesControllerComponents,
+  frontendAppConfig: FrontendAppConfig,
+  renderer: Renderer
+)(implicit ec: ExecutionContext)
+    extends FrontendBaseController
+    with I18nSupport {
 
   def onPageLoad: Action[AnyContent] = Action.async {
     implicit request =>
-
       val json = Json.obj(
         "loginUrl" -> frontendAppConfig.loginUrl
       )

@@ -25,10 +25,10 @@ class BusinessWithoutIDNameFormProviderSpec extends StringFieldBehaviours {
 
   ".businessWithoutIDName" - {
 
-    val fieldName = "businessWithoutIDName"
+    val fieldName   = "businessWithoutIDName"
     val requiredKey = "businessWithoutIDName.error.businessName.required"
-    val lengthKey = "businessWithoutIDName.error.businessName.length"
-    val maxLength = 105
+    val lengthKey   = "businessWithoutIDName.error.businessName.length"
+    val maxLength   = 105
 
     behave like fieldWithMaxLengthAlpha(
       form,

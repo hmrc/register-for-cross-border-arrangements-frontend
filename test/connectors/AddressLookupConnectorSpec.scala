@@ -29,19 +29,17 @@ import play.api.inject.guice.GuiceApplicationBuilder
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class AddressLookupConnectorSpec extends SpecBase
-  with WireMockServerHandler
-  with Generators
-  with ScalaCheckPropertyChecks {
+class AddressLookupConnectorSpec extends SpecBase with WireMockServerHandler with Generators with ScalaCheckPropertyChecks {
 
   override lazy val app: Application = new GuiceApplicationBuilder()
     .configure(
       conf = "microservice.services.address-lookup.port" -> server.port()
-    ).build()
+    )
+    .build()
 
   lazy val connector: AddressLookupConnector = app.injector.instanceOf[AddressLookupConnector]
-  val addressLookupUrl = "/v2/uk/addresses?postcode=ZZ1+1ZZ"
-  val postcode: String = "ZZ1 1ZZ"
+  val addressLookupUrl                       = "/v2/uk/addresses?postcode=ZZ1+1ZZ"
+  val postcode: String                       = "ZZ1 1ZZ"
 
   def addressJson: String =
     s"""[{

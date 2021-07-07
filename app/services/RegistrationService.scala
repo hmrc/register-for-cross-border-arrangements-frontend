@@ -23,20 +23,13 @@ import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class RegistrationService @Inject()(registrationConnector: RegistrationConnector){
+class RegistrationService @Inject() (registrationConnector: RegistrationConnector) {
 
-  def sendRegistration(userAnswers: UserAnswers)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[HttpResponse]] = {
-
+  def sendRegistration(userAnswers: UserAnswers)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[HttpResponse]] =
     Registration(userAnswers) match {
       case Some(registration) =>
-
-        val subscribe = Register(RegisterWithoutIDRequest(
-          RequestCommon.forService,
-          registration)
-        )
+        val subscribe = Register(RegisterWithoutIDRequest(RequestCommon.forService, registration))
         registrationConnector.sendWithoutIDInformation(subscribe).map(Some(_))
       case _ => Future.successful(None)
     }
-  }
 }
-

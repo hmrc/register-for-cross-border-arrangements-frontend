@@ -38,45 +38,49 @@ import utils.CheckYourAnswersHelper
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class CheckYourAnswersController @Inject()(
-                                            override val messagesApi: MessagesApi,
-                                            sessionRepository: SessionRepository,
-                                            identify: IdentifierAction,
-                                            notEnrolled: NotEnrolledForDAC6Action,
-                                            getData: DataRetrievalAction,
-                                            requireData: DataRequiredAction,
-                                            val controllerComponents: MessagesControllerComponents,
-                                            emailService: EmailService,
-                                            registrationService: RegistrationService,
-                                            subscriptionConnector: SubscriptionConnector,
-                                            auditService: AuditService,
-                                            renderer: Renderer
-                                          )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with NunjucksSupport {
+class CheckYourAnswersController @Inject() (
+  override val messagesApi: MessagesApi,
+  sessionRepository: SessionRepository,
+  identify: IdentifierAction,
+  notEnrolled: NotEnrolledForDAC6Action,
+  getData: DataRetrievalAction,
+  requireData: DataRequiredAction,
+  val controllerComponents: MessagesControllerComponents,
+  emailService: EmailService,
+  registrationService: RegistrationService,
+  subscriptionConnector: SubscriptionConnector,
+  auditService: AuditService,
+  renderer: Renderer
+)(implicit ec: ExecutionContext)
+    extends FrontendBaseController
+    with I18nSupport
+    with NunjucksSupport {
 
   private val logger = LoggerFactory.getLogger(getClass)
 
   def onPageLoad(): Action[AnyContent] = (identify andThen notEnrolled andThen getData andThen requireData).async {
     implicit request =>
-
-      val helper = new CheckYourAnswersHelper(request.userAnswers)
+      val helper                                = new CheckYourAnswersHelper(request.userAnswers)
       val businessDetails: Seq[SummaryList.Row] = buildDetails(helper)
-      val contactDetails: Seq[SummaryList.Row] = buildContactDetails(helper)
+      val contactDetails: Seq[SummaryList.Row]  = buildContactDetails(helper)
 
       val header: String =
         (request.userAnswers.get(BusinessTypePage), request.userAnswers.get(RegistrationTypePage)) match {
-          case (Some(_), _) => "checkYourAnswers.businessDetails.h2"
+          case (Some(_), _)                         => "checkYourAnswers.businessDetails.h2"
           case (_, Some(RegistrationType.Business)) => "checkYourAnswers.businessDetails.h2"
-          case _ => "checkYourAnswers.individualDetails.h2"
+          case _                                    => "checkYourAnswers.individualDetails.h2"
         }
 
-      renderer.render(
-        "check-your-answers.njk",
-        Json.obj(
-          "header" -> header,
-          "businessDetailsList" -> businessDetails,
-          "contactDetailsList" -> contactDetails,
+      renderer
+        .render(
+          "check-your-answers.njk",
+          Json.obj(
+            "header"              -> header,
+            "businessDetailsList" -> businessDetails,
+            "contactDetailsList"  -> contactDetails
+          )
         )
-      ).map(Ok(_))
+        .map(Ok(_))
   }
 
   private def buildDetails(helper: CheckYourAnswersHelper): Seq[SummaryList.Row] = {
@@ -146,7 +150,7 @@ class CheckYourAnswersController @Inject()(
     }
   }
 
-  private def buildContactDetails(helper: CheckYourAnswersHelper): Seq[SummaryList.Row] = {
+  private def buildContactDetails(helper: CheckYourAnswersHelper): Seq[SummaryList.Row] =
     Seq(
       helper.contactName,
       helper.contactEmailAddress,
@@ -158,36 +162,35 @@ class CheckYourAnswersController @Inject()(
       helper.secondaryContactTelephoneQuestion,
       helper.secondaryContactTelephoneNumber
     ).flatten
-  }
-  
+
   def onSubmit(): Action[AnyContent] = (identify andThen notEnrolled andThen getData andThen requireData).async {
     implicit request =>
+      (request.userAnswers.get(DoYouHaveUTRPage),
+       request.userAnswers.get(RegistrationTypePage),
+       request.userAnswers.get(DoYouHaveANationalInsuranceNumberPage)
+      ) match {
 
-      (request.userAnswers.get(DoYouHaveUTRPage), request.userAnswers.get(RegistrationTypePage),
-        request.userAnswers.get(DoYouHaveANationalInsuranceNumberPage)) match {
-
-        case (Some(true), None, None) => subscribeAndEnrol(request.userAnswers)
+        case (Some(true), None, None)                    => subscribeAndEnrol(request.userAnswers)
         case (Some(false), Some(Individual), Some(true)) => subscribeAndEnrol(request.userAnswers)
 
-        case (Some(false), _, Some(false) | None) => registrationService.sendRegistration(request.userAnswers) flatMap {
-          case Some(response) => response.status match {
-            case OK => subscribeAndEnrol(request.userAnswers, Some(response))
+        case (Some(false), _, Some(false) | None) =>
+          registrationService.sendRegistration(request.userAnswers) flatMap {
+            case Some(response) =>
+              response.status match {
+                case OK => subscribeAndEnrol(request.userAnswers, Some(response))
+                case _  => Future.successful(Redirect(routes.ProblemWithServiceController.onPageLoad()))
+              }
             case _ => Future.successful(Redirect(routes.ProblemWithServiceController.onPageLoad()))
           }
-          case _ => Future.successful(Redirect(routes.ProblemWithServiceController.onPageLoad()))
-        }
         case _ => Future.successful(Redirect(routes.ProblemWithServiceController.onPageLoad()))
       }
   }
 
-  private def subscribeAndEnrol(userAnswers: UserAnswers,
-                                response: Option[HttpResponse] = None)
-                               (implicit request: Request[_]): Future[Result] = {
-
+  private def subscribeAndEnrol(userAnswers: UserAnswers, response: Option[HttpResponse] = None)(implicit request: Request[_]): Future[Result] =
     response.map(_.json.validate[PayloadRegistrationWithoutIDResponse]) match {
       case Some(JsSuccess(registerWithoutIDResponse, _)) if registerWithoutIDResponse.registerWithoutIDResponse.responseDetail.isDefined =>
         //Without id journeys
-        updateUserAnswersWithSafeID(userAnswers, registerWithoutIDResponse).flatMap (createSubscriptionThenEnrolment)
+        updateUserAnswersWithSafeID(userAnswers, registerWithoutIDResponse).flatMap(createSubscriptionThenEnrolment)
       case Some(JsSuccess(_, _)) =>
         logger.warn("Response detail is missing from PayloadRegistrationWithoutIDResponse")
         Future.successful(Redirect(routes.ProblemWithServiceController.onPageLoad()))
@@ -196,21 +199,19 @@ class CheckYourAnswersController @Inject()(
         Future.successful(Redirect(routes.ProblemWithServiceController.onPageLoad()))
       case None => createSubscriptionThenEnrolment(userAnswers)
     }
-  }
 
-  private def updateUserAnswersWithSafeID(userAnswers: UserAnswers,
-                                          registerWithoutIDResponse: PayloadRegistrationWithoutIDResponse): Future[UserAnswers] = {
+  private def updateUserAnswersWithSafeID(userAnswers: UserAnswers, registerWithoutIDResponse: PayloadRegistrationWithoutIDResponse): Future[UserAnswers] = {
     val safeID = registerWithoutIDResponse.registerWithoutIDResponse.responseDetail.get.SAFEID
 
-      for {
-        updatedUserAnswers <- Future.fromTry(userAnswers.set(SafeIDPage, safeID))
-        _ <- sessionRepository.set(updatedUserAnswers)
-      } yield updatedUserAnswers
+    for {
+      updatedUserAnswers <- Future.fromTry(userAnswers.set(SafeIDPage, safeID))
+      _                  <- sessionRepository.set(updatedUserAnswers)
+    } yield updatedUserAnswers
   }
 
   private def createSubscriptionThenEnrolment(userAnswers: UserAnswers)(implicit request: Request[_]): Future[Result] =
     createEISSubscription(userAnswers).flatMap {
-      either => {
+      either =>
         either.fold(
           error => {
             logger.warn("Unable to create subscription", error)
@@ -224,19 +225,18 @@ class CheckYourAnswersController @Inject()(
               enrolment <- createEnrolment(userAnswers)
             } yield enrolment
         )
-      }
     }
 
   private def createEISSubscription(userAnswers: UserAnswers)(implicit request: Request[_]): Future[Either[RegisterError, UserAnswers]] =
     subscriptionConnector.createSubscription(userAnswers).flatMap {
       either =>
         either.fold(
-          error          => Future.successful(Left(error)),
+          error => Future.successful(Left(error)),
           subscriptionID =>
             for {
-              _ <- subscriptionConnector.cacheSubscription(userAnswers, subscriptionID)
+              _                  <- subscriptionConnector.cacheSubscription(userAnswers, subscriptionID)
               updatedUserAnswers <- Future.fromTry(userAnswers.set(SubscriptionIDPage, subscriptionID))
-              _ <- sessionRepository.set(updatedUserAnswers)
+              _                  <- sessionRepository.set(updatedUserAnswers)
               _ <- auditService.sendAuditEvent(
                 "SubscriptionSubmission",
                 Json.toJson(SubscriptionAudit.fromRequestDetail(SubscriptionForDACRequest.createSubscription(userAnswers).requestDetail)),
@@ -247,29 +247,30 @@ class CheckYourAnswersController @Inject()(
         )
     }
 
-  private def logEmailResponse(emailResponse: Option[HttpResponse]): Unit = {
+  private def logEmailResponse(emailResponse: Option[HttpResponse]): Unit =
     emailResponse match {
-      case Some(HttpResponse(NOT_FOUND, _, _)) => logger.warn("The template cannot be found within the email service")
+      case Some(HttpResponse(NOT_FOUND, _, _))   => logger.warn("The template cannot be found within the email service")
       case Some(HttpResponse(BAD_REQUEST, _, _)) => logger.warn("Missing email or name parameter")
-      case _ => Unit
+      case _                                     => Unit
     }
-  }
 
-  def createEnrolment(userAnswers: UserAnswers)(implicit hc: HeaderCarrier): Future[Result] = {
+  def createEnrolment(userAnswers: UserAnswers)(implicit hc: HeaderCarrier): Future[Result] =
     subscriptionConnector.createEnrolment(userAnswers).flatMap {
       subscriptionResponse =>
         if (subscriptionResponse.status.equals(NO_CONTENT)) {
-          emailService.sendEmail(userAnswers).map {
-            emailResponse =>
-              logEmailResponse(emailResponse)
-              Redirect(routes.RegistrationSuccessfulController.onPageLoad())
-          }.recover {
-            case e: Exception => Redirect(routes.RegistrationSuccessfulController.onPageLoad())
-          }
+          emailService
+            .sendEmail(userAnswers)
+            .map {
+              emailResponse =>
+                logEmailResponse(emailResponse)
+                Redirect(routes.RegistrationSuccessfulController.onPageLoad())
+            }
+            .recover {
+              case e: Exception => Redirect(routes.RegistrationSuccessfulController.onPageLoad())
+            }
         } else {
           Future(Redirect(routes.ProblemWithServiceController.onPageLoad()))
         }
     }
 
-  }
 }

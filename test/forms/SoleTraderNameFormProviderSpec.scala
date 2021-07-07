@@ -22,16 +22,16 @@ import play.api.data.FormError
 class SoleTraderNameFormProviderSpec extends StringFieldBehaviours {
 
   val requiredFirstNameKey = "soleTraderName.error.firstName.required"
-  val lengthFirstNameKey = "soleTraderName.error.firstName.length"
-  val invalidFirstNameKey = "soleTraderName.error.firstName.invalid"
+  val lengthFirstNameKey   = "soleTraderName.error.firstName.length"
+  val invalidFirstNameKey  = "soleTraderName.error.firstName.invalid"
 
   val requiredSecondNameKey = "soleTraderName.error.secondName.required"
-  val lengthSecondNameKey = "soleTraderName.error.secondName.length"
-  val invalidSecondNameKey = "soleTraderName.error.secondName.invalid"
+  val lengthSecondNameKey   = "soleTraderName.error.secondName.length"
+  val invalidSecondNameKey  = "soleTraderName.error.secondName.invalid"
 
   val form = new SoleTraderNameFormProvider()()
 
-  val firstNameMaxLength = 35
+  val firstNameMaxLength  = 35
   val secondNameMaxLength = 35
 
   ".firstName" - {

@@ -22,7 +22,7 @@ import play.api.data.FormError
 class ConfirmBusinessFormProviderSpec extends BooleanFieldBehaviours {
 
   val requiredKey = "confirmBusiness.error.required"
-  val invalidKey = "error.boolean"
+  val invalidKey  = "error.boolean"
 
   val form = new ConfirmBusinessFormProvider()()
 

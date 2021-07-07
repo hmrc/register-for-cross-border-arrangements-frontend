@@ -30,35 +30,36 @@ import uk.gov.hmrc.viewmodels.Html
 
 import scala.concurrent.ExecutionContext
 
-class RegistrationSuccessfulController @Inject()(
-    override val messagesApi: MessagesApi,
-    appConfig: FrontendAppConfig,
-    identify: IdentifierAction,
-    ignoreSubscription: IgnoreSubscriptionAction,
-    getData: DataRetrievalAction,
-    requireData: DataRequiredAction,
-    errorHandler: ErrorHandler,
-    val controllerComponents: MessagesControllerComponents,
-    renderer: Renderer
-)(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+class RegistrationSuccessfulController @Inject() (
+  override val messagesApi: MessagesApi,
+  appConfig: FrontendAppConfig,
+  identify: IdentifierAction,
+  ignoreSubscription: IgnoreSubscriptionAction,
+  getData: DataRetrievalAction,
+  requireData: DataRequiredAction,
+  errorHandler: ErrorHandler,
+  val controllerComponents: MessagesControllerComponents,
+  renderer: Renderer
+)(implicit ec: ExecutionContext)
+    extends FrontendBaseController
+    with I18nSupport {
 
   def onPageLoad: Action[AnyContent] = (identify andThen ignoreSubscription andThen getData andThen requireData).async {
     implicit request =>
       request.userAnswers.get(SubscriptionIDPage) match {
         case Some(id) =>
           val json = Json.obj(
-            "subscriptionID" -> confirmationPanelText(id),
-            "submissionUrl" -> appConfig.dacSubmissionsUrl,
+            "subscriptionID"          -> confirmationPanelText(id),
+            "submissionUrl"           -> appConfig.dacSubmissionsUrl,
             "recruitmentBannerToggle" -> appConfig.recruitmentBannerToggle,
-            "betaFeedbackSurvey" -> appConfig.betaFeedbackUrl
-        )
+            "betaFeedbackSurvey"      -> appConfig.betaFeedbackUrl
+          )
           renderer.render("registrationSuccessful.njk", json).map(Ok(_))
         case None =>
           errorHandler.onServerError(request, throw new RuntimeException("Subscription ID missing"))
       }
   }
 
-  private def confirmationPanelText(id: String)(implicit messages: Messages): Html = {
-    Html(s"${{ messages("registrationSuccessful.panel.html") }}<div id='userid'><strong>$id</strong></div>")
-  }
+  private def confirmationPanelText(id: String)(implicit messages: Messages): Html =
+    Html(s"${messages("registrationSuccessful.panel.html")}<div id='userid'><strong>$id</strong></div>")
 }

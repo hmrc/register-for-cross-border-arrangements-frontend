@@ -23,13 +23,11 @@ import scala.util.Try
 
 case object RegistrationTypePage extends QuestionPage[RegistrationType] {
 
-
-
   override def path: JsPath = JsPath \ toString
 
   override def toString: String = "registrationType"
 
   override def cleanup(value: Option[RegistrationType], userAnswers: UserAnswers): Try[UserAnswers] =
-      PageLists.allAfterRegistrationTypePages.foldLeft(Try(userAnswers))(PageLists.removePage)
+    PageLists.allAfterRegistrationTypePages.foldLeft(Try(userAnswers))(PageLists.removePage)
 
 }

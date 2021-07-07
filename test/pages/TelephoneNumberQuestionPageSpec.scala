@@ -20,7 +20,6 @@ import models.UserAnswers
 import org.scalacheck.Arbitrary.arbitrary
 import pages.behaviours.PageBehaviours
 
-
 class TelephoneNumberQuestionPageSpec extends PageBehaviours {
 
   "TelephoneNumberQuestionPage" - {

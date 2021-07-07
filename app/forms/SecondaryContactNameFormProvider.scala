@@ -28,7 +28,10 @@ class SecondaryContactNameFormProvider @Inject() extends Mappings with RegexCons
   def apply(): Form[String] =
     Form(
       "secondaryContactName" -> validatedText("secondaryContactName.error.required",
-        "secondaryContactName.error.invalid",
-        "secondaryContactName.error.length", nonApiNameRegex, maxLength)
+                                              "secondaryContactName.error.invalid",
+                                              "secondaryContactName.error.length",
+                                              nonApiNameRegex,
+                                              maxLength
+      )
     )
 }

@@ -20,7 +20,6 @@ import models.{BusinessType, Name, UserAnswers}
 import org.scalacheck.Arbitrary.arbitrary
 import pages.behaviours.PageBehaviours
 
-
 class BusinessTypePageSpec extends PageBehaviours {
 
   "BusinessTypePage" - {
