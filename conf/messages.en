@@ -516,3 +516,8 @@ thisOrganisationHasAlreadyBeenRegistered.heading = This organisation has already
 thisOrganisationHasAlreadyBeenRegistered.p1 = You need to check with your organisation which Government Gateway sign-in details have been used to disclose cross-border arrangements for DAC6.
 thisOrganisationHasAlreadyBeenRegistered.link = Contact the cross-border arrangements helpline if you need to speak to someone about your disclosures (opens in new tab).
 
+someInformationIsMissing.title = Some information is missing
+someInformationIsMissing.heading = Some information is missing
+someInformationIsMissing.informationMissing = You must provide this information to register.
+someInformationIsMissing.continue = Continue
+

@@ -59,6 +59,7 @@ class Navigator @Inject() (appConfig: FrontendAppConfig) {
     case SecondaryContactEmailAddressPage      => _ => Some(routes.SecondaryContactTelephoneQuestionController.onPageLoad(NormalMode))
     case SecondaryContactTelephoneQuestionPage => secondaryContactTelephoneQuestionRoute(NormalMode)
     case SecondaryContactTelephoneNumberPage   => _ => Some(routes.CheckYourAnswersController.onPageLoad())
+    case SomeInformationIsMissingPage          => _ => Some(routes.DoYouHaveUTRController.onPageLoad(NormalMode))
     case _                                     => _ => Some(routes.IndexController.onPageLoad())
   }
 
@@ -93,6 +94,7 @@ class Navigator @Inject() (appConfig: FrontendAppConfig) {
     case SecondaryContactTelephoneQuestionPage => secondaryContactTelephoneQuestionRoute(CheckMode)
     case SecondaryContactTelephoneNumberPage   => _ => Some(routes.CheckYourAnswersController.onPageLoad())
     case _                                     => _ => Some(routes.CheckYourAnswersController.onPageLoad())
+
   }
 
   private def businessTypeRoutes(mode: Mode)(ua: UserAnswers): Option[Call] =

@@ -16,10 +16,11 @@
 
 package models
 
+import controllers.exceptions.SomeInformationIsMissingException
+
 import java.time.format.DateTimeFormatter
 import java.time.{ZoneId, ZonedDateTime}
 import java.util.UUID
-
 import models.RegistrationType.Business
 import pages._
 import play.api.libs.json._
@@ -86,6 +87,23 @@ case class ContactDetails(
   emailAddress: Option[String]
 )
 
+object ContactBuilder {
+
+  def buildContacts(userAnswers: UserAnswers): ContactDetails =
+    userAnswers.get(TelephoneNumberQuestionPage) match {
+      case Some(hasTelephoneNumber) =>
+        hasTelephoneNumber match {
+          case true =>
+            userAnswers.get(ContactTelephoneNumberPage) match {
+              case Some(telephoneNumber) => ContactDetails(Some(telephoneNumber), None, None, userAnswers.get(ContactEmailAddressPage))
+              case None                  => throw new SomeInformationIsMissingException("User has answered yes to do you have a telephone number? but has failed to provide one")
+            }
+          case false => ContactDetails(None, None, None, userAnswers.get(ContactEmailAddressPage))
+        }
+      case None => throw new SomeInformationIsMissingException("Do you have a telephone number? question is missing")
+    }
+}
+
 object ContactDetails {
   implicit val formats = Json.format[ContactDetails]
 }
@@ -139,7 +157,7 @@ object Registration {
   def apply(userAnswers: UserAnswers): Option[RequestDetails] = userAnswers.get(RegistrationTypePage) match {
     case Some(models.RegistrationType.Individual) => IndRegistration(userAnswers)
     case Some(Business)                           => OrgRegistration(userAnswers)
-    case _                                        => throw new Exception("Cannot retrieve registration type")
+    case _                                        => throw new SomeInformationIsMissingException("Cannot retrieve registration type")
   }
 }
 
@@ -154,7 +172,7 @@ object OrgRegistration {
       Some(NoIdOrganisation(organisationName)),
       None,
       address,
-      ContactDetails(userAnswers.get(ContactTelephoneNumberPage), None, None, userAnswers.get(ContactEmailAddressPage)),
+      ContactBuilder.buildContacts(userAnswers),
       None
     )
 
@@ -179,7 +197,7 @@ object IndRegistration {
     None,
     Some(Individual(name, dob)),
     address,
-    ContactDetails(userAnswers.get(ContactTelephoneNumberPage), None, None, userAnswers.get(ContactEmailAddressPage)),
+    ContactBuilder.buildContacts(userAnswers),
     None
   )
 
@@ -187,7 +205,7 @@ object IndRegistration {
     userAnswers.get(DoYouLiveInTheUKPage) match {
       case Some(true)  => userAnswers.get(WhatIsYourAddressUkPage).orElse(toAddress(userAnswers))
       case Some(false) => userAnswers.get(WhatIsYourAddressPage)
-      case _           => throw new Exception("Cannot get address")
+      case _           => throw new SomeInformationIsMissingException("Cannot get address")
     }
 
   private def toAddress(userAnswers: UserAnswers) =

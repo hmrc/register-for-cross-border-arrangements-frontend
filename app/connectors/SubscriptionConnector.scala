@@ -17,8 +17,9 @@
 package connectors
 
 import config.FrontendAppConfig
+import controllers.exceptions.SomeInformationIsMissingException
 import models.error.RegisterError
-import models.error.RegisterError.{DuplicateSubmissionError, UnableToCreateEMTPSubscriptionError}
+import models.error.RegisterError.{DuplicateSubmissionError, SomeInformationIsMissingError, UnableToCreateEMTPSubscriptionError}
 import models.readSubscription.{DisplaySubscriptionDetails, DisplaySubscriptionForDACRequest, DisplaySubscriptionForDACResponse}
 import models.{
   CacheCreateSubscriptionForDACRequest,
@@ -74,6 +75,9 @@ class SubscriptionConnector @Inject() (val config: FrontendAppConfig, val http: 
           logger.warn(s"Unable to create a subscription to ETMP. ${response.status} response status")
           Future.successful(Left(UnableToCreateEMTPSubscriptionError))
       } catch {
+      case se: SomeInformationIsMissingException =>
+        logger.warn("Unable to create an ETMP subscription", se)
+        Future.successful(Left(SomeInformationIsMissingError))
       case e: Exception =>
         logger.warn("Unable to create an ETMP subscription", e)
         Future.successful(Left(UnableToCreateEMTPSubscriptionError))

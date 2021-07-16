@@ -82,4 +82,9 @@ object RegisterError {
     val errorCode: String    = ""
     val errorMessage: String = "Unable to create an ETMP subscription"
   }
+
+  case object SomeInformationIsMissingError extends RegisterError {
+    val errorCode: String    = ""
+    val errorMessage: String = "Some information is missing"
+  }
 }

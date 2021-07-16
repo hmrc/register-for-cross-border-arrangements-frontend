@@ -22,7 +22,7 @@ import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import generators.Generators
 import helpers.WireMockServerHandler
 import models.error.RegisterError
-import models.error.RegisterError.UnableToCreateEMTPSubscriptionError
+import models.error.RegisterError.{SomeInformationIsMissingError, UnableToCreateEMTPSubscriptionError}
 import models.readSubscription._
 import models.{Name, RegistrationType, ResponseCommon, UserAnswers}
 import org.scalacheck.Arbitrary.arbitrary
@@ -133,6 +133,9 @@ class SubscriptionConnectorSpec extends SpecBase with WireMockServerHandler with
               .set(ContactEmailAddressPage, email)
               .success
               .value
+              .set(TelephoneNumberQuestionPage, false)
+              .success
+              .value
               .set(HaveSecondContactPage, false)
               .success
               .value
@@ -173,6 +176,9 @@ class SubscriptionConnectorSpec extends SpecBase with WireMockServerHandler with
               .success
               .value
               .set(ContactEmailAddressPage, email)
+              .success
+              .value
+              .set(TelephoneNumberQuestionPage, false)
               .success
               .value
               .set(HaveSecondContactPage, false)
@@ -217,6 +223,9 @@ class SubscriptionConnectorSpec extends SpecBase with WireMockServerHandler with
               .set(ContactEmailAddressPage, email)
               .success
               .value
+              .set(TelephoneNumberQuestionPage, false)
+              .success
+              .value
               .set(HaveSecondContactPage, true)
               .success
               .value
@@ -227,28 +236,31 @@ class SubscriptionConnectorSpec extends SpecBase with WireMockServerHandler with
             stubPostResponse("/register-for-cross-border-arrangements/subscription/create-dac-subscription", OK, "")
 
             val result: Future[Either[RegisterError, String]] = connector.createSubscription(updatedUserAnswers)
-            result.futureValue mustBe (Left(UnableToCreateEMTPSubscriptionError))
+            result.futureValue mustBe (Left(SomeInformationIsMissingError))
         }
       }
 
       "must return an error if status is not OK and subscription fails" in {
 
-        forAll(arbitrary[UserAnswers], validPersonalName, validEmailAddress, validSafeID) {
-          (userAnswers, name, email, safeID) =>
-            val updatedUserAnswers = userAnswers
-              .set(RegistrationTypePage, RegistrationType.Individual)
+        forAll(validPersonalName, validEmailAddress, validSafeID, validSubscriptionID) {
+          (name, email, safeID, subscriptionID) =>
+            val updatedUserAnswers = UserAnswers("internalId")
+              .remove(RegistrationTypePage)
               .success
               .value
-              .set(NamePage, Name(name, name))
+              .set(ContactNamePage, name)
               .success
               .value
               .set(ContactEmailAddressPage, email)
               .success
               .value
-              .set(SafeIDPage, safeID)
+              .set(TelephoneNumberQuestionPage, false)
               .success
               .value
-              .remove(HaveSecondContactPage)
+              .set(HaveSecondContactPage, false)
+              .success
+              .value
+              .set(SafeIDPage, safeID)
               .success
               .value
 

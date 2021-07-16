@@ -265,6 +265,9 @@ class SubscriptionForDACRequestSpec extends SpecBase with Generators with ScalaC
         .set(ContactNamePage, "Name Name")
         .success
         .value
+        .set(TelephoneNumberQuestionPage, false)
+        .success
+        .value
 
       val requestCommon = SubscriptionForDACRequest.createSubscription(updatedUserAnswers).requestCommon
       val ackRefLength  = requestCommon.acknowledgementReference.length
@@ -319,6 +322,9 @@ class SubscriptionForDACRequestSpec extends SpecBase with Generators with ScalaC
         .set(ContactNamePage, "Name Name")
         .success
         .value
+        .set(TelephoneNumberQuestionPage, false)
+        .success
+        .value
 
       val request = SubscriptionForDACRequest.createSubscription(updatedUserAnswers).requestDetail
 
@@ -349,6 +355,9 @@ class SubscriptionForDACRequestSpec extends SpecBase with Generators with ScalaC
         .set(ContactNamePage, "Name Name")
         .success
         .value
+        .set(TelephoneNumberQuestionPage, false)
+        .success
+        .value
 
       val request = SubscriptionForDACRequest.createSubscription(updatedUserAnswers).requestDetail
 
@@ -377,6 +386,9 @@ class SubscriptionForDACRequestSpec extends SpecBase with Generators with ScalaC
         .set(BusinessAddressPage, businessAddress)
         .success
         .value
+        .set(TelephoneNumberQuestionPage, false)
+        .success
+        .value
 
       val request = SubscriptionForDACRequest.createSubscription(updatedUserAnswers).requestDetail
 
@@ -400,6 +412,9 @@ class SubscriptionForDACRequestSpec extends SpecBase with Generators with ScalaC
         .success
         .value
         .set(ContactNamePage, "Name Name")
+        .success
+        .value
+        .set(TelephoneNumberQuestionPage, false)
         .success
         .value
         .set(BusinessAddressPage, businessAddress)
@@ -436,6 +451,9 @@ class SubscriptionForDACRequestSpec extends SpecBase with Generators with ScalaC
         .set(ContactNamePage, "Name Name")
         .success
         .value
+        .set(TelephoneNumberQuestionPage, false)
+        .success
+        .value
         .set(WhatIsYourAddressPage, address)
         .success
         .value
@@ -455,6 +473,9 @@ class SubscriptionForDACRequestSpec extends SpecBase with Generators with ScalaC
         .success
         .value
         .set(ContactNamePage, "Name Name")
+        .success
+        .value
+        .set(TelephoneNumberQuestionPage, false)
         .success
         .value
 

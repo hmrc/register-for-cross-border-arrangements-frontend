@@ -428,6 +428,12 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach wi
           .set(NamePage, Name("", ""))
           .success
           .value
+          .set(TelephoneNumberQuestionPage, false)
+          .success
+          .value
+          .set(HaveSecondContactPage, false)
+          .success
+          .value
 
         val application = applicationBuilder(userAnswers = Some(userAnswers))
           .overrides(
@@ -482,6 +488,12 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach wi
             .success
             .value
             .set(NamePage, Name("", ""))
+            .success
+            .value
+            .set(TelephoneNumberQuestionPage, false)
+            .success
+            .value
+            .set(HaveSecondContactPage, false)
             .success
             .value
 
@@ -678,6 +690,12 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach wi
           .set(ContactNamePage, "")
           .success
           .value
+          .set(TelephoneNumberQuestionPage, false)
+          .success
+          .value
+          .set(HaveSecondContactPage, false)
+          .success
+          .value
 
         val application = applicationBuilder(userAnswers = Some(userAnswers))
           .overrides(
@@ -728,6 +746,12 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach wi
             .success
             .value
             .set(ContactNamePage, "")
+            .success
+            .value
+            .set(TelephoneNumberQuestionPage, false)
+            .success
+            .value
+            .set(HaveSecondContactPage, false)
             .success
             .value
 
