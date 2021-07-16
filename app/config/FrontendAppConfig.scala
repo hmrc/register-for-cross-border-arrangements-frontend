@@ -60,6 +60,5 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   lazy val countdownSeconds: String = configuration.get[String]("session.countdownSeconds")
 
   //Toggles
-  lazy val addressLookupToggle: Boolean     = configuration.get[String]("addressLookupToggle").toBoolean
-  lazy val recruitmentBannerToggle: Boolean = configuration.get[Boolean]("recruitmentBannerToggle")
+  lazy val addressLookupToggle: Boolean = configuration.get[String]("addressLookupToggle").toBoolean
 }

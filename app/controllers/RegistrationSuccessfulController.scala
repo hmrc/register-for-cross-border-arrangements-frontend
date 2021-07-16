@@ -49,10 +49,9 @@ class RegistrationSuccessfulController @Inject() (
       request.userAnswers.get(SubscriptionIDPage) match {
         case Some(id) =>
           val json = Json.obj(
-            "subscriptionID"          -> confirmationPanelText(id),
-            "submissionUrl"           -> appConfig.dacSubmissionsUrl,
-            "recruitmentBannerToggle" -> appConfig.recruitmentBannerToggle,
-            "betaFeedbackSurvey"      -> appConfig.betaFeedbackUrl
+            "subscriptionID"     -> confirmationPanelText(id),
+            "submissionUrl"      -> appConfig.dacSubmissionsUrl,
+            "betaFeedbackSurvey" -> appConfig.betaFeedbackUrl
           )
           renderer.render("registrationSuccessful.njk", json).map(Ok(_))
         case None =>
