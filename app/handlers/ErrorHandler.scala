@@ -58,7 +58,6 @@ class ErrorHandler @Inject() (
 
     implicit val rh: RequestHeader = request
 
-    println(s"\n\n\n\n\n\n\n\nERROR ${exception.getMessage}")
     logError(request, exception)
     exception match {
       case e: SomeInformationIsMissingException =>
