@@ -154,11 +154,12 @@ object RequestDetails {
 
 object Registration {
 
-  def apply(userAnswers: UserAnswers): Option[RequestDetails] = userAnswers.get(RegistrationTypePage) match {
-    case Some(models.RegistrationType.Individual) => IndRegistration(userAnswers)
-    case Some(Business)                           => OrgRegistration(userAnswers)
-    case _                                        => throw new SomeInformationIsMissingException("Cannot retrieve registration type")
-  }
+  def apply(userAnswers: UserAnswers): Option[RequestDetails] =
+    userAnswers.get(RegistrationTypePage) match {
+      case Some(models.RegistrationType.Individual) => IndRegistration(userAnswers)
+      case Some(Business)                           => OrgRegistration(userAnswers)
+      case _                                        => throw new SomeInformationIsMissingException("Cannot retrieve registration type")
+    }
 }
 
 object OrgRegistration {

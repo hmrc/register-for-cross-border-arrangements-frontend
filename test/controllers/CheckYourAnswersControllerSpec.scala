@@ -791,9 +791,38 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach wi
           application.stop()
         }
 
+      val userAnswersValid: UserAnswers = UserAnswers(userAnswersId)
+        .set(DoYouHaveUTRPage, false)
+        .success
+        .value
+        .set(RegistrationTypePage, RegistrationType.values.head)
+        .success
+        .value
+        .set(BusinessWithoutIDNamePage, "Business name")
+        .success
+        .value
+        .set(BusinessAddressPage, address)
+        .success
+        .value
+        .set(ContactNamePage, singleName)
+        .success
+        .value
+        .set(ContactEmailAddressPage, email)
+        .success
+        .value
+        .set(TelephoneNumberQuestionPage, true)
+        .success
+        .value
+        .set(ContactTelephoneNumberPage, "07111111111")
+        .success
+        .value
+        .set(HaveSecondContactPage, false)
+        .success
+        .value
+
       "must redirect to problem with service when NOT_FOUND response received from registration for organisation" in {
 
-        val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        val application = applicationBuilder(userAnswers = Some(userAnswersValid))
           .overrides(
             bind[RegistrationService].toInstance(mockRegistrationService),
             bind[SessionRepository].toInstance(mockSessionRepository)
@@ -813,7 +842,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach wi
 
       "must redirect to problem with service when BAD_REQUEST response received from registration for organisation" in {
 
-        val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        val application = applicationBuilder(userAnswers = Some(userAnswersValid))
           .overrides(
             bind[SubscriptionConnector].toInstance(mockSubscriptionConnector),
             bind[RegistrationService].toInstance(mockRegistrationService),
@@ -837,7 +866,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach wi
 
       "must redirect to problem with service when None response received from registration for organisation" in {
 
-        val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        val application = applicationBuilder(userAnswers = Some(userAnswersValid))
           .overrides(
             bind[EmailService].toInstance(mockEmailService),
             bind[SubscriptionConnector].toInstance(mockSubscriptionConnector),
@@ -856,12 +885,12 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach wi
         val result  = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result) mustBe Some("/register-for-cross-border-arrangements/register/problem-with-service")
+        redirectLocation(result) mustBe Some("/register-for-cross-border-arrangements/register/some-information-is-missing")
       }
 
       "must redirect the user to the index page when send email call fails" in {
 
-        val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        val application = applicationBuilder(userAnswers = Some(userAnswersValid))
           .overrides(
             bind[EmailService].toInstance(mockEmailService),
             bind[SubscriptionConnector].toInstance(mockSubscriptionConnector),
@@ -885,7 +914,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach wi
 
       "must redirect to problem with service when NOT_FOUND response received from registration for individual" in {
 
-        val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        val application = applicationBuilder(userAnswers = Some(userAnswersValid))
           .overrides(bind[RegistrationService].toInstance(mockRegistrationService), bind[SessionRepository].toInstance(mockSessionRepository))
           .build()
 
@@ -902,7 +931,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach wi
 
       "must redirect to problem with service when BAD_REQUEST response received from registration for individual" in {
 
-        val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        val application = applicationBuilder(userAnswers = Some(userAnswersValid))
           .overrides(
             bind[RegistrationService].toInstance(mockRegistrationService),
             bind[SessionRepository].toInstance(mockSessionRepository)
@@ -922,7 +951,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach wi
 
       "must redirect to problem with service when None response received from registration for individual" in {
 
-        val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        val application = applicationBuilder(userAnswers = Some(userAnswersValid))
           .overrides(
             bind[RegistrationService].toInstance(mockRegistrationService),
             bind[SessionRepository].toInstance(mockSessionRepository)
@@ -936,8 +965,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach wi
         val result  = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result) mustBe Some("/register-for-cross-border-arrangements/register/problem-with-service")
-        application.stop()
+        redirectLocation(result) mustBe Some("/register-for-cross-border-arrangements/register/some-information-is-missing")
       }
     }
   }
