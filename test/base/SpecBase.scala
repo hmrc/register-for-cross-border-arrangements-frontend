@@ -20,6 +20,7 @@ import config.FrontendAppConfig
 import controllers.actions._
 import models.UserAnswers
 import org.mockito.{Mockito, MockitoSugar}
+import org.scalatest.matchers.must.Matchers
 import org.scalatest._
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
@@ -36,7 +37,7 @@ import uk.gov.hmrc.nunjucks.NunjucksRenderer
 
 trait SpecBase
     extends AnyFreeSpec
-    with MustMatchers
+    with Matchers
     with MockitoSugar
     with GuiceOneAppPerSuite
     with OptionValues
