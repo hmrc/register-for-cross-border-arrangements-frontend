@@ -241,7 +241,7 @@ object SubscriptionForDACRequest {
   private def getNumber(userAnswers: UserAnswers): String =
     userAnswers.get(SafeIDPage) match {
       case Some(id) => id
-      case None     => throw new Exception("Error retrieving ID number")
+      case None     => throw new SomeInformationIsMissingException("Error retrieving ID number")
     }
 
   private def createPrimaryContact(userAnswers: UserAnswers): PrimaryContact = PrimaryContact(createContactInformation(userAnswers))
