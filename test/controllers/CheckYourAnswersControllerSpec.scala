@@ -459,6 +459,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach wi
         status(result) mustEqual SEE_OTHER
         redirectLocation(result) mustBe Some("/register-for-cross-border-arrangements/register/confirm-registration")
         verify(mockEmailService, times(1)).sendEmail(any())(any())
+        application.stop()
       }
 
       "must send email and redirect to the confirmation page when OK response received for individual (no nino) and " +
@@ -518,6 +519,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach wi
           status(result) mustEqual SEE_OTHER
           redirectLocation(result) mustBe Some("/register-for-cross-border-arrangements/register/confirm-registration")
           verify(mockEmailService, times(1)).sendEmail(any())(any())
+          application.stop()
         }
 
       "must redirect to the problem with service page if registration response doesn't have a responseDetail" in {
@@ -556,6 +558,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach wi
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result) mustBe Some("/register-for-cross-border-arrangements/register/problem-with-service")
+        application.stop()
       }
 
       "must redirect to the problem with service page if registration response throws a JsError" in {
@@ -594,6 +597,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach wi
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result) mustBe Some("/register-for-cross-border-arrangements/register/problem-with-service")
+        application.stop()
       }
 
       "must redirect to the problem with service if EIS subscription throws an error" in {
@@ -624,6 +628,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach wi
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result) mustBe Some("/register-for-cross-border-arrangements/register/problem-with-service")
+        application.stop()
       }
 
       "must redirect to the problem with service and not send email when error response received from subscription connector" in {
@@ -654,6 +659,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach wi
         redirectLocation(result) mustBe Some("/register-for-cross-border-arrangements/register/problem-with-service")
 
         verify(mockEmailService, times(0)).sendEmail(any())(any())
+        application.stop()
 
       }
 
@@ -702,6 +708,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach wi
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result) mustBe Some("/register-for-cross-border-arrangements/register/confirm-registration")
+        application.stop()
       }
 
       "must send email and redirect to the confirmation page when OK response received for organisation (no utr) and " +
@@ -757,6 +764,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach wi
 
           status(result) mustEqual SEE_OTHER
           redirectLocation(result) mustBe Some("/register-for-cross-border-arrangements/register/confirm-registration")
+          application.stop()
         }
 
       "must redirect to problem with service when NOT_FOUND response received from registration for organisation" in {
@@ -776,6 +784,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach wi
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result) mustBe Some("/register-for-cross-border-arrangements/register/problem-with-service")
+        application.stop()
       }
 
       "must redirect to problem with service when BAD_REQUEST response received from registration for organisation" in {
@@ -799,6 +808,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach wi
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result) mustBe Some("/register-for-cross-border-arrangements/register/problem-with-service")
+        application.stop()
       }
 
       "must redirect to problem with service when None response received from registration for organisation" in {
@@ -846,6 +856,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach wi
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result) mustBe Some("/register-for-cross-border-arrangements/register/problem-with-service")
+        application.stop()
       }
 
       "must redirect to problem with service when NOT_FOUND response received from registration for individual" in {
@@ -862,6 +873,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach wi
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result) mustBe Some("/register-for-cross-border-arrangements/register/problem-with-service")
+        application.stop()
       }
 
       "must redirect to problem with service when BAD_REQUEST response received from registration for individual" in {
@@ -881,6 +893,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach wi
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result) mustBe Some("/register-for-cross-border-arrangements/register/problem-with-service")
+        application.stop()
       }
 
       "must redirect to problem with service when None response received from registration for individual" in {
@@ -900,6 +913,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach wi
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result) mustBe Some("/register-for-cross-border-arrangements/register/problem-with-service")
+        application.stop()
       }
     }
   }

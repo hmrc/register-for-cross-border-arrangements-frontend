@@ -6,12 +6,12 @@ object AppDependencies {
   val compile = Seq(
     play.sbt.PlayImport.ws,
     "uk.gov.hmrc.mongo" %% "hmrc-mongo-play-27"            % "0.50.0",
-    "uk.gov.hmrc"       %% "domain"                        % "5.11.0-play-27",
+    "uk.gov.hmrc"       %% "domain"                        % "6.1.0-play-28",
     "uk.gov.hmrc"       %% "play-conditional-form-mapping" % "1.9.0-play-28",
     "uk.gov.hmrc"       %% "bootstrap-health-play-28"      % "5.3.0",
     "uk.gov.hmrc"       %% "bootstrap-frontend-play-28"    % "5.3.0",
-    "uk.gov.hmrc"       %% "play-nunjucks"                 % "0.23.0-play-26",
-    "uk.gov.hmrc"       %% "play-nunjucks-viewmodel"       % "0.9.0-play-26",
+    "uk.gov.hmrc"       %% "play-nunjucks"                 % "0.29.0-play-27",
+    "uk.gov.hmrc"       %% "play-nunjucks-viewmodel"       % "0.14.0-play-27",
     "uk.gov.hmrc"       %% "play-frontend-hmrc"            % "0.71.0-play-28",
     "uk.gov.hmrc"       %% "emailaddress"                  % "3.5.0",
     "org.webjars.npm"   %  "govuk-frontend"                % "3.12.0",
@@ -26,7 +26,6 @@ object AppDependencies {
     "com.typesafe.play"           %% "play-test"                 % PlayVersion.current,
     "org.mockito"                 %% "mockito-scala"             % "1.10.6" ,
     "com.github.tomakehurst"      %  "wiremock-standalone"       % "2.25.0",
-    "uk.gov.hmrc"                 %% "reactivemongo-test"        % "4.16.0-play-26",
     "org.scalatestplus"           %% "scalatestplus-scalacheck"  % "3.1.0.0-RC2",
     "wolfendale"                  %% "scalacheck-gen-regexp"     % "0.1.2",
     "com.vladsch.flexmark"        %  "flexmark-all"              % "0.35.10"
