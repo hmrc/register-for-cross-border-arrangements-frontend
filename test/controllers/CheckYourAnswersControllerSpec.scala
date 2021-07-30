@@ -996,6 +996,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach wi
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result) mustBe Some("/register-for-cross-border-arrangements/register/some-information-is-missing")
+        application.stop()
       }
     }
   }
