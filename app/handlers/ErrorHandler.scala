@@ -16,6 +16,7 @@
 
 package handlers
 
+import controllers.exceptions.SomeInformationIsMissingException
 import play.api.http.HttpErrorHandler
 import play.api.http.Status._
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -59,6 +60,8 @@ class ErrorHandler @Inject() (
 
     logError(request, exception)
     exception match {
+      case e: SomeInformationIsMissingException =>
+        Future.successful(Redirect(controllers.routes.SomeInformationIsMissingController.onPageLoad()))
       case ApplicationException(result, _) =>
         Future.successful(result)
       case _ =>

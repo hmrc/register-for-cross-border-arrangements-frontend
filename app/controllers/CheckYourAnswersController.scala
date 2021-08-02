@@ -19,9 +19,10 @@ package controllers
 import com.google.inject.Inject
 import connectors.SubscriptionConnector
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction, NotEnrolledForDAC6Action}
+import controllers.exceptions.SomeInformationIsMissingException
 import models.RegistrationType.Individual
 import models.error.RegisterError
-import models.error.RegisterError.DuplicateSubmissionError
+import models.error.RegisterError.{DuplicateSubmissionError, SomeInformationIsMissingError}
 import models.{PayloadRegistrationWithoutIDResponse, RegistrationType, SubscriptionAudit, SubscriptionForDACRequest, UserAnswers}
 import org.slf4j.LoggerFactory
 import pages._
@@ -170,9 +171,11 @@ class CheckYourAnswersController @Inject() (
        request.userAnswers.get(DoYouHaveANationalInsuranceNumberPage)
       ) match {
 
-        case (Some(true), None, None)                    => subscribeAndEnrol(request.userAnswers)
-        case (Some(false), Some(Individual), Some(true)) => subscribeAndEnrol(request.userAnswers)
-
+        case (Some(true), None, None) => subscribeAndEnrol(request.userAnswers)
+        case (Some(false), Some(Individual), Some(true)) =>
+          subscribeAndEnrol(request.userAnswers)
+        case (Some(false), Some(Individual), None) =>
+          throw new SomeInformationIsMissingException("Individual without UTR must have DoYouHaveANationalInsurance Question")
         case (Some(false), _, Some(false) | None) =>
           registrationService.sendRegistration(request.userAnswers) flatMap {
             case Some(response) =>
@@ -180,9 +183,9 @@ class CheckYourAnswersController @Inject() (
                 case OK => subscribeAndEnrol(request.userAnswers, Some(response))
                 case _  => Future.successful(Redirect(routes.ProblemWithServiceController.onPageLoad()))
               }
-            case _ => Future.successful(Redirect(routes.ProblemWithServiceController.onPageLoad()))
+            case _ => Future.successful(Redirect(routes.SomeInformationIsMissingController.onPageLoad()))
           }
-        case _ => Future.successful(Redirect(routes.ProblemWithServiceController.onPageLoad()))
+        case _ => Future.successful(Redirect(routes.SomeInformationIsMissingController.onPageLoad()))
       }
   }
 
@@ -216,8 +219,9 @@ class CheckYourAnswersController @Inject() (
           error => {
             logger.warn("Unable to create subscription", error)
             error match {
-              case DuplicateSubmissionError => Future.successful(Redirect(routes.ThisOrganisationHasAlreadyBeenRegisteredController.onPageLoad()))
-              case _                        => Future.successful(Redirect(routes.ProblemWithServiceController.onPageLoad()))
+              case DuplicateSubmissionError      => Future.successful(Redirect(routes.ThisOrganisationHasAlreadyBeenRegisteredController.onPageLoad()))
+              case SomeInformationIsMissingError => Future.successful(Redirect(routes.SomeInformationIsMissingController.onPageLoad()))
+              case _                             => Future.successful(Redirect(routes.ProblemWithServiceController.onPageLoad()))
             }
           },
           userAnswers =>

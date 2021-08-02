@@ -63,4 +63,5 @@ object PageLists {
                                   SoleTraderNamePage
   ) ++ allAfterRegistrationTypePages
 
+  val allPages = List(DoYouHaveUTRPage) ++ allAfterHaveUTRPages
 }

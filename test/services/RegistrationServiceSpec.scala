@@ -69,6 +69,9 @@ class RegistrationServiceSpec extends SpecBase with Generators with ScalaCheckPr
               .set(WhatIsYourAddressPage, validNoIdAddress)
               .success
               .value
+              .set(TelephoneNumberQuestionPage, true)
+              .success
+              .value
               .set(ContactTelephoneNumberPage, "07000000000")
               .success
               .value

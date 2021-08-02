@@ -16,10 +16,11 @@
 
 package models
 
+import controllers.exceptions.SomeInformationIsMissingException
+
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.util.UUID
-
 import pages._
 import play.api.libs.json._
 
@@ -30,13 +31,13 @@ object OrganisationDetails {
   def buildPrimaryContact(userAnswers: UserAnswers): OrganisationDetails =
     userAnswers.get(ContactNamePage) match {
       case Some(name) => new OrganisationDetails(name)
-      case _          => throw new Exception("Contact name page is empty when creating a subscription for organisation")
+      case _          => throw new SomeInformationIsMissingException("Contact name page is empty when creating a subscription for organisation")
     }
 
   def buildSecondaryContact(userAnswers: UserAnswers): OrganisationDetails =
     userAnswers.get(SecondaryContactNamePage) match {
       case Some(name) => new OrganisationDetails(name)
-      case None       => throw new Exception("Secondary contact name page is empty after user answered 'Yes' to second contact")
+      case None       => throw new SomeInformationIsMissingException("Secondary contact name page is empty after user answered 'Yes' to second contact")
     }
 
   implicit val format: OFormat[OrganisationDetails] = Json.format[OrganisationDetails]
@@ -51,7 +52,7 @@ object IndividualDetails {
       case (Some(name), _, _)           => new IndividualDetails(name.firstName, None, name.secondName)
       case (_, Some(nonUKName), _)      => new IndividualDetails(nonUKName.firstName, None, nonUKName.secondName)
       case (_, _, Some(soleTraderName)) => new IndividualDetails(soleTraderName.firstName, None, soleTraderName.secondName)
-      case _                            => throw new Exception("Individual or sole trader name can't be empty when creating a subscription")
+      case _                            => throw new SomeInformationIsMissingException("Individual or sole trader name can't be empty when creating a subscription")
     }
 
   implicit val format: OFormat[IndividualDetails] = Json.format[IndividualDetails]
@@ -88,10 +89,10 @@ object PrimaryContact {
     )(
       (organisation, individual, email, phone, mobile) =>
         (organisation, individual) match {
-          case (Some(_), Some(_)) => throw new Exception("PrimaryContact cannot have both and organisation or individual element")
+          case (Some(_), Some(_)) => throw new SomeInformationIsMissingException("PrimaryContact cannot have both and organisation or individual element")
           case (Some(org), _)     => PrimaryContact(ContactInformationForOrganisation(org, email, phone, mobile))
           case (_, Some(ind))     => PrimaryContact(ContactInformationForIndividual(ind, email, phone, mobile))
-          case (None, None)       => throw new Exception("PrimaryContact must have either an organisation or individual element")
+          case (None, None)       => throw new SomeInformationIsMissingException("PrimaryContact must have either an organisation or individual element")
         }
     )
   }
@@ -119,10 +120,10 @@ object SecondaryContact {
     )(
       (organisation, individual, email, phone, mobile) =>
         (organisation, individual) match {
-          case (Some(_), Some(_)) => throw new Exception("SecondaryContact cannot have both and organisation or individual element")
+          case (Some(_), Some(_)) => throw new SomeInformationIsMissingException("SecondaryContact cannot have both and organisation or individual element")
           case (Some(org), _)     => SecondaryContact(ContactInformationForOrganisation(org, email, phone, mobile))
           case (_, Some(ind))     => SecondaryContact(ContactInformationForIndividual(ind, email, phone, mobile))
-          case (None, None)       => throw new Exception("SecondaryContact must have either an organisation or individual element")
+          case (None, None)       => throw new SomeInformationIsMissingException("SecondaryContact must have either an organisation or individual element")
         }
     )
   }
@@ -240,7 +241,7 @@ object SubscriptionForDACRequest {
   private def getNumber(userAnswers: UserAnswers): String =
     userAnswers.get(SafeIDPage) match {
       case Some(id) => id
-      case None     => throw new Exception("Error retrieving ID number")
+      case None     => throw new SomeInformationIsMissingException("Error retrieving ID number")
     }
 
   private def createPrimaryContact(userAnswers: UserAnswers): PrimaryContact = PrimaryContact(createContactInformation(userAnswers))
@@ -253,12 +254,29 @@ object SubscriptionForDACRequest {
 
   private def createContactInformation(userAnswers: UserAnswers, secondaryContact: Boolean = false): ContactInformation =
     if (secondaryContact) {
+
       val secondaryEmail = userAnswers.get(SecondaryContactEmailAddressPage) match {
         case Some(email) => email
-        case None        => ""
+        case None        => throw new SomeInformationIsMissingException("Secondary contact email address is missing")
       }
 
-      val secondaryContactNumber = userAnswers.get(SecondaryContactTelephoneNumberPage)
+      val secondaryContactNumber = userAnswers.get(SecondaryContactTelephoneQuestionPage) match {
+        case Some(hasTelephoneNumber) =>
+          hasTelephoneNumber match {
+            case true =>
+              userAnswers.get(SecondaryContactTelephoneNumberPage) match {
+                case Some(telephoneNumber) => Some(telephoneNumber)
+                case None =>
+                  throw new SomeInformationIsMissingException(
+                    "User has answered yes to do you have a telephone number for secondary? but has failed to provide one"
+                  )
+              }
+            case false => None
+          }
+        case None => throw new SomeInformationIsMissingException("Do you have a telephone number for the secondary contact?  is missing")
+      }
+
+      userAnswers.get(SecondaryContactTelephoneNumberPage)
 
       ContactInformationForOrganisation(organisation = OrganisationDetails.buildSecondaryContact(userAnswers),
                                         email = secondaryEmail,
@@ -266,12 +284,25 @@ object SubscriptionForDACRequest {
                                         mobile = None
       )
     } else {
+
       val email = userAnswers.get(ContactEmailAddressPage) match {
         case Some(email) => email
-        case None        => throw new Exception("Email can't be empty when creating a subscription")
+        case None        => throw new SomeInformationIsMissingException("Email can't be empty when creating a subscription")
       }
 
-      val contactNumber = userAnswers.get(ContactTelephoneNumberPage)
+      val contactNumber = userAnswers.get(TelephoneNumberQuestionPage) match {
+        case Some(hasTelephoneNumber) =>
+          hasTelephoneNumber match {
+            case true =>
+              userAnswers.get(ContactTelephoneNumberPage) match {
+                case Some(telephoneNumber) => Some(telephoneNumber)
+                case None =>
+                  throw new SomeInformationIsMissingException("User has answered yes to do you have a telephone number? but has failed to provide one")
+              }
+            case false => None
+          }
+        case None => throw new SomeInformationIsMissingException("Do you have a telephone number? question is missing")
+      }
 
       val individualOrSoleTrader =
         (userAnswers.get(RegistrationTypePage), userAnswers.get(BusinessTypePage)) match {

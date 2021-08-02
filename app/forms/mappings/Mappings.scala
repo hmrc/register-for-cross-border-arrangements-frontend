@@ -24,6 +24,8 @@ import java.time.LocalDate
 
 trait Mappings extends Formatters with Constraints {
 
+  protected def continue(): FieldMapping[String] = of(continueFormatter())
+
   protected def text(errorKey: String = "error.required"): FieldMapping[String] =
     of(stringFormatter(errorKey))
 
