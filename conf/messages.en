@@ -191,7 +191,7 @@ nino.error.invalid = Enter your National Insurance number in the correct format
 
 dateOfBirth.title = What is your date of birth?
 dateOfBirth.heading = What is your date of birth?
-dateOfBirth.hint = For example, 12 11 2007
+dateOfBirth.hint = For example, 31 3 1980.
 dateOfBirth.checkYourAnswersLabel = Your date of birth
 dateOfBirth.error.required.all = Enter your date of birth
 dateOfBirth.error.required.two = Date of birth must include {0} and {1}
@@ -294,8 +294,8 @@ whatIsYourAddress.countryCode = Country
 
 whatIsYourAddress.checkYourAnswersLabel = Your home address
 whatIsYourAddress.error.addressLine1.required = Enter address line 1
-whatIsYourAddress.error.addressLine3.required = Enter City
-whatIsYourAddress.error.country.required = Enter Country
+whatIsYourAddress.error.addressLine3.required = Enter a city or a town
+whatIsYourAddress.error.country.required = Choose a country
 whatIsYourAddress.error.addressLine1.length = Address line 1 must be 35 characters or less
 whatIsYourAddress.error.addressLine2.length = Address line 2 must be 35 characters or less
 whatIsYourAddress.error.addressLine3.length = City must be must be 35 characters or less
@@ -318,7 +318,7 @@ businessAddress.countryCode = Country
 
 businessAddress.checkYourAnswersLabel = Main business address
 businessAddress.error.addressLine1.required = Enter address line 1
-businessAddress.error.addressLine3.required = Enter City
+businessAddress.error.addressLine3.required = Enter a city or a town
 businessAddress.error.country.required = Enter a country
 businessAddress.error.addressLine1.length = Address line 1 must be 35 characters or less
 businessAddress.error.addressLine2.length = Address line 2 must be 35 characters or less
@@ -405,7 +405,7 @@ whatIsYourUkAddress.countryCode = Country
 
 whatIsYourUkAddress.checkYourAnswersLabel = Your home address
 whatIsYourUkAddress.error.addressLine1.required = Enter address line 1
-whatIsYourUkAddress.error.addressLine3.required = Enter City
+whatIsYourUkAddress.error.addressLine3.required = Enter a city or a town
 whatIsYourUkAddress.error.country.required = Select country
 whatIsYourUkAddress.error.addressLine1.length = Address line 1 must be 35 characters or less
 whatIsYourUkAddress.error.addressLine2.length = Address line 2 must be 35 characters or less
