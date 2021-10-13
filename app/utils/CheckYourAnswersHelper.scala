@@ -29,6 +29,21 @@ import utils.CheckYourAnswersHelper._
 
 class CheckYourAnswersHelper(userAnswers: UserAnswers) {
 
+  def doYouHaveBusinessTradingName: Option[Row] = userAnswers.get(DoYouHaveBusinessTradingNamePage) map {
+    answer =>
+      Row(
+        key = Key(msg"doYouHaveBusinessTradingName.checkYourAnswersLabel", classes = Seq("govuk-!-width-one-half")),
+        value = Value(yesOrNo(answer)),
+        actions = List(
+          Action(
+            content = msg"site.edit",
+            href = routes.DoYouHaveBusinessTradingNameController.onPageLoad(CheckMode).url,
+            visuallyHiddenText = Some(msg"site.edit.hidden".withArgs(msg"doYouHaveBusinessTradingName.checkYourAnswersLabel"))
+          )
+        )
+      )
+  }
+
   def secondaryContactTelephoneQuestion: Option[Row] = userAnswers.get(SecondaryContactTelephoneQuestionPage) map {
     answer =>
       Row(

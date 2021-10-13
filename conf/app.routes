@@ -208,3 +208,8 @@ GET        /register/org-already-registered                controllers.ThisOrgan
 GET        /register/some-information-is-missing                        controllers.SomeInformationIsMissingController.onPageLoad()
 POST       /register/some-information-is-missing                        controllers.SomeInformationIsMissingController.onSubmit()
 
+
+GET        /doYouHaveBusinessTradingName                        controllers.DoYouHaveBusinessTradingNameController.onPageLoad(mode: Mode = NormalMode)
+POST       /doYouHaveBusinessTradingName                        controllers.DoYouHaveBusinessTradingNameController.onSubmit(mode: Mode = NormalMode)
+GET        /changeDoYouHaveBusinessTradingName                  controllers.DoYouHaveBusinessTradingNameController.onPageLoad(mode: Mode = CheckMode)
+POST       /changeDoYouHaveBusinessTradingName                  controllers.DoYouHaveBusinessTradingNameController.onSubmit(mode: Mode = CheckMode)

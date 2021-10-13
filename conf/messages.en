@@ -521,3 +521,8 @@ someInformationIsMissing.heading = Some information is missing
 someInformationIsMissing.informationMissing = You must provide this information to register.
 someInformationIsMissing.continue = Continue
 
+
+doYouHaveBusinessTradingName.title = doYouHaveBusinessTradingName
+doYouHaveBusinessTradingName.heading = doYouHaveBusinessTradingName
+doYouHaveBusinessTradingName.checkYourAnswersLabel = doYouHaveBusinessTradingName
+doYouHaveBusinessTradingName.error.required = Select yes if doYouHaveBusinessTradingName
