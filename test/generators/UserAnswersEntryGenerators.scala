@@ -29,6 +29,14 @@ import wolfendale.scalacheck.regexp.RegexpGen
 trait UserAnswersEntryGenerators extends PageGenerators with ModelGenerators {
   self: Generators =>
 
+  implicit lazy val arbitraryBusinessTradingNameUserAnswersEntry: Arbitrary[(BusinessTradingNamePage.type, JsValue)] =
+    Arbitrary {
+      for {
+        page  <- arbitrary[BusinessTradingNamePage.type]
+        value <- arbitrary[BusinessTradingName].map(Json.toJson(_))
+      } yield (page, value)
+    }
+
   implicit lazy val arbitraryDoYouHaveBusinessTradingNameUserAnswersEntry: Arbitrary[(DoYouHaveBusinessTradingNamePage.type, JsValue)] =
     Arbitrary {
       for {

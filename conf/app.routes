@@ -203,13 +203,15 @@ POST       /register/change-second-contact-have-phone                   controll
 
 GET        /register/org-already-registered                controllers.ThisOrganisationHasAlreadyBeenRegisteredController.onPageLoad()
 
-
-
 GET        /register/some-information-is-missing                        controllers.SomeInformationIsMissingController.onPageLoad()
 POST       /register/some-information-is-missing                        controllers.SomeInformationIsMissingController.onSubmit()
 
+GET        /register/without-id/have-trading-name                        controllers.DoYouHaveBusinessTradingNameController.onPageLoad(mode: Mode = NormalMode)
+POST       /register/without-id/have-trading-name                        controllers.DoYouHaveBusinessTradingNameController.onSubmit(mode: Mode = NormalMode)
+GET        /register/without-id/change-have-trading-name                  controllers.DoYouHaveBusinessTradingNameController.onPageLoad(mode: Mode = CheckMode)
+POST       /register/without-id/change-have-trading-name                  controllers.DoYouHaveBusinessTradingNameController.onSubmit(mode: Mode = CheckMode)
 
-GET        /doYouHaveBusinessTradingName                        controllers.DoYouHaveBusinessTradingNameController.onPageLoad(mode: Mode = NormalMode)
-POST       /doYouHaveBusinessTradingName                        controllers.DoYouHaveBusinessTradingNameController.onSubmit(mode: Mode = NormalMode)
-GET        /changeDoYouHaveBusinessTradingName                  controllers.DoYouHaveBusinessTradingNameController.onPageLoad(mode: Mode = CheckMode)
-POST       /changeDoYouHaveBusinessTradingName                  controllers.DoYouHaveBusinessTradingNameController.onSubmit(mode: Mode = CheckMode)
+GET        /register/without-id/trading-name                        controllers.BusinessTradingNameController.onPageLoad(mode: Mode = NormalMode)
+POST       /register/without-id/trading-name                        controllers.BusinessTradingNameController.onSubmit(mode: Mode = NormalMode)
+GET        /register/without-id/change-trading-name                  controllers.BusinessTradingNameController.onPageLoad(mode: Mode = CheckMode)
+POST       /register/without-id/change-trading-name                  controllers.BusinessTradingNameController.onSubmit(mode: Mode = CheckMode)

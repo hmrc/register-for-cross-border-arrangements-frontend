@@ -24,6 +24,9 @@ import pages._
 trait PageGenerators {
   self: Generators =>
 
+  implicit lazy val arbitraryBusinessTradingNamePage: Arbitrary[BusinessTradingNamePage.type] =
+    Arbitrary(BusinessTradingNamePage)
+
   implicit lazy val arbitraryDoYouHaveBusinessTradingNamePage: Arbitrary[DoYouHaveBusinessTradingNamePage.type] =
     Arbitrary(DoYouHaveBusinessTradingNamePage)
 

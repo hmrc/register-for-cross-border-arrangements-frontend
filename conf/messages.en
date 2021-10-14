@@ -521,8 +521,14 @@ someInformationIsMissing.heading = Some information is missing
 someInformationIsMissing.informationMissing = You must provide this information to register.
 someInformationIsMissing.continue = Continue
 
+doYouHaveBusinessTradingName.title = Does your business trade under a different name?
+doYouHaveBusinessTradingName.heading = Does your business trade under a different name?
+doYouHaveBusinessTradingName.checkYourAnswersLabel = Trading name
+doYouHaveBusinessTradingName.error.required = Select yes if your business trades under a different name
 
-doYouHaveBusinessTradingName.title = doYouHaveBusinessTradingName
-doYouHaveBusinessTradingName.heading = doYouHaveBusinessTradingName
-doYouHaveBusinessTradingName.checkYourAnswersLabel = doYouHaveBusinessTradingName
-doYouHaveBusinessTradingName.error.required = Select yes if doYouHaveBusinessTradingName
+businessTradingName.title = What is the trading name of your business?
+businessTradingName.heading = What is the trading name of your business?
+businessTradingName.checkYourAnswersLabel = businessTradingName
+businessTradingName.error.name.required = Enter the trading name of your business
+businessTradingName.error.name.invalid = Trading name must only include letters a to z, numbers 0-9, apostrophes, slashes, ampersands and spaces
+businessTradingName.error.name.length = Trading name must be 105 characters or less

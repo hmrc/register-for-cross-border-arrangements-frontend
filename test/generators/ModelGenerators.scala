@@ -29,6 +29,13 @@ trait ModelGenerators {
 
   val regime = "DACSIX"
 
+  implicit lazy val arbitraryBusinessTradingName: Arbitrary[BusinessTradingName] =
+    Arbitrary {
+      for {
+        name <- arbitrary[String]
+      } yield BusinessTradingName(name)
+    }
+
   implicit lazy val arbitraryCountry: Arbitrary[Country] =
     Arbitrary {
       for {

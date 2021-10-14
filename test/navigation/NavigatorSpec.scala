@@ -460,7 +460,7 @@ class NavigatorSpec extends SpecBase with ScalaCheckPropertyChecks with Generato
         }
       }
 
-      "must go from the What is your business name page (without-id) to the What is your business address page" in {
+      "must go from the What is your business name page (without-id) to Does your business trade under a different name? page" in {
         forAll(arbitrary[UserAnswers]) {
           answers =>
             val updatedAnswers =
@@ -471,9 +471,41 @@ class NavigatorSpec extends SpecBase with ScalaCheckPropertyChecks with Generato
 
             navigator
               .nextPage(BusinessWithoutIDNamePage, NormalMode, updatedAnswers)
-              .mustBe(routes.BusinessAddressController.onPageLoad(NormalMode))
+              .mustBe(routes.DoYouHaveBusinessTradingNameController.onPageLoad(NormalMode))
         }
       }
+
+      "must go from 'Does your business trade under a different name?' page to 'What is the trading name of your business?' page" +
+        "when YES is selected" in {
+          forAll(arbitrary[UserAnswers]) {
+            answers =>
+              val updatedAnswers =
+                answers
+                  .set(DoYouHaveBusinessTradingNamePage, true)
+                  .success
+                  .value
+
+              navigator
+                .nextPage(DoYouHaveBusinessTradingNamePage, NormalMode, updatedAnswers)
+                .mustBe(routes.BusinessTradingNameController.onPageLoad(NormalMode))
+          }
+        }
+
+      "must go from 'Does your business trade under a different name?' page to 'What is your business address?' page" +
+        "when NO is selected" in {
+          forAll(arbitrary[UserAnswers]) {
+            answers =>
+              val updatedAnswers =
+                answers
+                  .set(DoYouHaveBusinessTradingNamePage, false)
+                  .success
+                  .value
+
+              navigator
+                .nextPage(DoYouHaveBusinessTradingNamePage, NormalMode, updatedAnswers)
+                .mustBe(routes.BusinessAddressController.onPageLoad(NormalMode))
+          }
+        }
 
       "must go from what is your address uk page to enter your email page" in {
         forAll(arbitrary[UserAnswers]) {
