@@ -366,7 +366,7 @@ class CheckModeNavigatorSpec extends SpecBase with ScalaCheckPropertyChecks with
     }
 
     "must go from What is the name of your business? page to" - {
-      "What is the main address of your business? page when answer is a new business name" in {
+      "Do you trade under a different business name? page when answer is a new business name" in {
         forAll(arbitrary[UserAnswers]) {
           answers =>
             val updatedAnswers =
@@ -377,6 +377,57 @@ class CheckModeNavigatorSpec extends SpecBase with ScalaCheckPropertyChecks with
 
             navigator
               .nextPage(BusinessWithoutIDNamePage, CheckMode, updatedAnswers)
+              .mustBe(routes.DoYouHaveBusinessTradingNameController.onPageLoad(CheckMode))
+        }
+      }
+    }
+
+    "must go from Do you trade under a different business name? page to" - {
+      "what is the trading name of your business? page when answer is yes" in {
+        forAll(arbitrary[UserAnswers]) {
+          answers =>
+            val updatedAnswers =
+              answers
+                .set(DoYouHaveBusinessTradingNamePage, true)
+                .success
+                .value
+
+            navigator
+              .nextPage(DoYouHaveBusinessTradingNamePage, CheckMode, updatedAnswers)
+              .mustBe(routes.BusinessTradingNameController.onPageLoad(CheckMode))
+        }
+      }
+    }
+
+    "must go from Do you trade under a different business name? page to" - {
+      "What is your business address? page when answer is no" in {
+        forAll(arbitrary[UserAnswers]) {
+          answers =>
+            val updatedAnswers =
+              answers
+                .set(DoYouHaveBusinessTradingNamePage, false)
+                .success
+                .value
+
+            navigator
+              .nextPage(DoYouHaveBusinessTradingNamePage, CheckMode, updatedAnswers)
+              .mustBe(routes.BusinessAddressController.onPageLoad(CheckMode))
+        }
+      }
+    }
+
+    "must go from what is the trading name of your business? page to" - {
+      "What is your business address? page when trading name entered" in {
+        forAll(arbitrary[UserAnswers]) {
+          answers =>
+            val updatedAnswers =
+              answers
+                .set(BusinessTradingNamePage, "tradeName")
+                .success
+                .value
+
+            navigator
+              .nextPage(BusinessTradingNamePage, CheckMode, updatedAnswers)
               .mustBe(routes.BusinessAddressController.onPageLoad(CheckMode))
         }
       }

@@ -20,7 +20,7 @@ import base.SpecBase
 import config.FrontendAppConfig
 import forms.BusinessTradingNameFormProvider
 import matchers.JsonMatchers
-import models.{BusinessTradingName, NormalMode, UserAnswers}
+import models.{NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
@@ -82,7 +82,7 @@ class BusinessTradingNameControllerSpec extends SpecBase with NunjucksSupport wi
         .thenReturn(Future.successful(Html("")))
 
       val userAnswers = UserAnswers(userAnswersId)
-        .set(BusinessTradingNamePage, BusinessTradingName("tradeName"))
+        .set(BusinessTradingNamePage, "tradeName")
         .success
         .value
       val application    = applicationBuilder(userAnswers = Some(userAnswers)).build()

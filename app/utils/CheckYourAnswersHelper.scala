@@ -33,7 +33,7 @@ class CheckYourAnswersHelper(userAnswers: UserAnswers) {
     answer =>
       Row(
         key = Key(msg"businessTradingName.checkYourAnswersLabel", classes = Seq("govuk-!-width-one-half")),
-        value = Value(lit"${answer.tradingName} ${answer.tradingName}"),
+        value = Value(lit"$answer"),
         actions = List(
           Action(
             content = msg"site.edit",

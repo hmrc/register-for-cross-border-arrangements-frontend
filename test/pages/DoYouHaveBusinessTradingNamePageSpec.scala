@@ -16,6 +16,8 @@
 
 package pages
 
+import models.UserAnswers
+import org.scalacheck.Arbitrary.arbitrary
 import pages.behaviours.PageBehaviours
 
 class DoYouHaveBusinessTradingNamePageSpec extends PageBehaviours {
@@ -27,5 +29,20 @@ class DoYouHaveBusinessTradingNamePageSpec extends PageBehaviours {
     beSettable[Boolean](DoYouHaveBusinessTradingNamePage)
 
     beRemovable[Boolean](DoYouHaveBusinessTradingNamePage)
+  }
+
+  "must remove trading name when user changes answer to 'No'" in {
+    forAll(arbitrary[UserAnswers]) {
+      answers =>
+        val result = answers
+          .set(BusinessTradingNamePage, "name")
+          .success
+          .value
+          .set(DoYouHaveBusinessTradingNamePage, false)
+          .success
+          .value
+
+        result.get(BusinessTradingNamePage) must not be defined
+    }
   }
 }

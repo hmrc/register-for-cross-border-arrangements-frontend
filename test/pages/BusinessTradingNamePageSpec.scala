@@ -16,17 +16,16 @@
 
 package pages
 
-import models.BusinessTradingName
 import pages.behaviours.PageBehaviours
 
 class BusinessTradingNamePageSpec extends PageBehaviours {
 
   "BusinessTradingNamePage" - {
 
-    beRetrievable[BusinessTradingName](BusinessTradingNamePage)
+    beRetrievable[String](BusinessTradingNamePage)
 
-    beSettable[BusinessTradingName](BusinessTradingNamePage)
+    beSettable[String](BusinessTradingNamePage)
 
-    beRemovable[BusinessTradingName](BusinessTradingNamePage)
+    beRemovable[String](BusinessTradingNamePage)
   }
 }
