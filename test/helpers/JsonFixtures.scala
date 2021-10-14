@@ -332,6 +332,38 @@ object JsonFixtures {
       |}
       |""".stripMargin
 
+  def jsonPayloadForOrgWithTradeName(organisationName: JsString, primaryEmail: JsString, phone: JsString): String =
+    s"""
+       |{
+       |  "createSubscriptionForDACRequest": {
+       |    "requestCommon": {
+       |      "regime": "DAC",
+       |      "receiptDate": "2020-09-23T16:12:11Z",
+       |      "acknowledgementReference": "AB123c",
+       |      "originatingSystem": "MDTP",
+       |      "requestParameters": [{
+       |        "paramName":"Name",
+       |        "paramValue":"Value"
+       |      }]
+       |    },
+       |    "requestDetail": {
+       |      "IDType": "idType",
+       |      "IDNumber": "idNumber",
+       |      "tradingName": "tradingName",
+       |      "isGBUser": true,
+       |      "primaryContact": {
+       |        "organisation": {
+       |          "organisationName": $organisationName
+       |        },
+       |        "email": $primaryEmail,
+       |        "phone": $phone,
+       |        "mobile": $phone
+       |      }
+       |    }
+       |  }
+       |}
+       |""".stripMargin
+
   def jsonPayloadForIndWithSecondaryContact(firstName: JsString,
                                             lastName: JsString,
                                             organisationName: JsString,
@@ -461,6 +493,38 @@ object JsonFixtures {
           "IDType"   -> "idType",
           "IDNumber" -> "idNumber",
           "isGBUser" -> true,
+          "primaryContact" -> Json.obj(
+            "organisation" -> Json.obj(
+              "organisationName" -> organisationName
+            ),
+            "email"  -> primaryEmail,
+            "phone"  -> phone,
+            "mobile" -> phone
+          )
+        )
+      )
+    )
+
+  def orgRequestJsonWithTradeName(organisationName: String, primaryEmail: String, phone: String): JsObject =
+    Json.obj(
+      "createSubscriptionForDACRequest" -> Json.obj(
+        "requestCommon" -> Json.obj(
+          "regime"                   -> "DAC",
+          "receiptDate"              -> "2020-09-23T16:12:11Z",
+          "acknowledgementReference" -> "AB123c",
+          "originatingSystem"        -> "MDTP",
+          "requestParameters" -> Json.arr(
+            Json.obj(
+              "paramName"  -> "Name",
+              "paramValue" -> "Value"
+            )
+          )
+        ),
+        "requestDetail" -> Json.obj(
+          "IDType"      -> "idType",
+          "IDNumber"    -> "idNumber",
+          "isGBUser"    -> true,
+          "tradingName" -> "tradingName",
           "primaryContact" -> Json.obj(
             "organisation" -> Json.obj(
               "organisationName" -> organisationName

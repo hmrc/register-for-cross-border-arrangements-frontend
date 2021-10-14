@@ -37,10 +37,13 @@ class SubscriptionForDACRequestSpec extends SpecBase with Generators with ScalaC
     requestParameters = Some(requestParameter)
   )
 
-  private def requestDetail(primaryContact: PrimaryContact, secondaryContact: Option[SecondaryContact] = None): RequestDetail =
+  private def requestDetail(primaryContact: PrimaryContact,
+                            secondaryContact: Option[SecondaryContact] = None,
+                            tradeName: Option[String] = None
+  ): RequestDetail =
     RequestDetail(IDType = "idType",
                   IDNumber = "idNumber",
-                  tradingName = None,
+                  tradingName = tradeName,
                   isGBUser = true,
                   primaryContact = primaryContact,
                   secondaryContact = secondaryContact
@@ -79,6 +82,27 @@ class SubscriptionForDACRequestSpec extends SpecBase with Generators with ScalaC
           )
 
           val jsonPayload = jsonPayloadForOrg(JsString(organisationName), JsString(primaryEmail), JsString(phoneNumber))
+
+          Json.parse(jsonPayload).validate[CreateSubscriptionForDACRequest].get mustBe orgRequest
+      }
+
+    }
+
+    "must deserialise CreateSubscriptionForDACRequest (with Request parameters) for an organisation with trading name" in {
+
+      forAll(validBusinessName, validEmailAddress, validPhoneNumber) {
+        (organisationName, primaryEmail, phoneNumber) =>
+          val primaryContactForOrg: PrimaryContact = PrimaryContact(
+            ContactInformationForOrganisation(OrganisationDetails(organisationName), primaryEmail, Some(phoneNumber), Some(phoneNumber))
+          )
+
+          val orgRequest: CreateSubscriptionForDACRequest = CreateSubscriptionForDACRequest(
+            SubscriptionForDACRequest(requestCommon = requestCommon,
+                                      requestDetail = requestDetail(primaryContact = primaryContactForOrg, tradeName = Some("tradingName"))
+            )
+          )
+
+          val jsonPayload = jsonPayloadForOrgWithTradeName(JsString(organisationName), JsString(primaryEmail), JsString(phoneNumber))
 
           Json.parse(jsonPayload).validate[CreateSubscriptionForDACRequest].get mustBe orgRequest
       }
@@ -177,6 +201,24 @@ class SubscriptionForDACRequestSpec extends SpecBase with Generators with ScalaC
           )
 
           Json.toJson(orgRequest) mustBe orgRequestJson(organisationName, primaryEmail, phoneNumber)
+      }
+    }
+
+    "must serialise subscription request for organisation with tradingName - exclude null fields for optional contact details" in {
+
+      forAll(validBusinessName, validEmailAddress, validPhoneNumber) {
+        (organisationName, primaryEmail, phoneNumber) =>
+          val primaryContactForOrg: PrimaryContact = PrimaryContact(
+            ContactInformationForOrganisation(OrganisationDetails(organisationName), primaryEmail, Some(phoneNumber), Some(phoneNumber))
+          )
+
+          val orgRequest: CreateSubscriptionForDACRequest = CreateSubscriptionForDACRequest(
+            SubscriptionForDACRequest(requestCommon = requestCommon,
+                                      requestDetail = requestDetail(primaryContact = primaryContactForOrg, tradeName = Some("tradingName"))
+            )
+          )
+
+          Json.toJson(orgRequest) mustBe orgRequestJsonWithTradeName(organisationName, primaryEmail, phoneNumber)
       }
     }
 
