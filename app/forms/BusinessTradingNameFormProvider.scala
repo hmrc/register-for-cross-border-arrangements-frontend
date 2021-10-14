@@ -24,7 +24,7 @@ import javax.inject.Inject
 
 class BusinessTradingNameFormProvider @Inject() extends Mappings with RegexConstants {
 
-  private val maxLength = 105
+  private val maxLength = 80
 
   def apply(): Form[String] = Form(
     "name" -> validatedText(

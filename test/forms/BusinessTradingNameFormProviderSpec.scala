@@ -30,7 +30,7 @@ class BusinessTradingNameFormProviderSpec extends StringFieldBehaviours {
     val lengthKey   = "businessTradingName.error.name.length"
     val invalidKey  = "businessTradingName.error.name.invalid"
 
-    val maxLength = 105
+    val maxLength = 80
 
     behave like fieldThatBindsValidData(
       form,
