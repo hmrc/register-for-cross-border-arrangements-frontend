@@ -231,7 +231,7 @@ object SubscriptionForDACRequest {
     RequestDetail(
       IDType = "SAFE",
       IDNumber = getNumber(userAnswers),
-      tradingName = None,
+      tradingName = userAnswers.get(BusinessTradingNamePage).orElse(None),
       isGBUser = isGBUser,
       primaryContact = createPrimaryContact(userAnswers),
       secondaryContact = createSecondaryContact(userAnswers)

@@ -47,7 +47,9 @@ class Navigator @Inject() (appConfig: FrontendAppConfig) {
     case SelectAddressPage                     => _ => Some(routes.ContactEmailAddressController.onPageLoad(NormalMode))
     case NonUkNamePage                         => _ => Some(routes.DateOfBirthController.onPageLoad(NormalMode))
     case BusinessAddressPage                   => _ => Some(routes.ContactNameController.onPageLoad(NormalMode))
-    case BusinessWithoutIDNamePage             => _ => Some(routes.BusinessAddressController.onPageLoad(NormalMode))
+    case BusinessWithoutIDNamePage             => _ => Some(routes.DoYouHaveBusinessTradingNameController.onPageLoad(NormalMode))
+    case DoYouHaveBusinessTradingNamePage      => doYouHaveBusinessTradingNameRoutes(NormalMode)
+    case BusinessTradingNamePage               => _ => Some(routes.BusinessAddressController.onPageLoad(NormalMode))
     case WhatIsYourAddressUkPage               => _ => Some(routes.ContactEmailAddressController.onPageLoad(NormalMode))
     case WhatIsYourAddressPage                 => _ => Some(routes.ContactEmailAddressController.onPageLoad(NormalMode))
     case ContactNamePage                       => _ => Some(routes.ContactEmailAddressController.onPageLoad(NormalMode))
@@ -66,7 +68,9 @@ class Navigator @Inject() (appConfig: FrontendAppConfig) {
   private val checkRouteMap: Page => UserAnswers => Option[Call] = {
     case DoYouHaveUTRPage                      => doYouHaveUTRRoutes(CheckMode)
     case RegistrationTypePage                  => registrationTypeRoutes(CheckMode)
-    case BusinessWithoutIDNamePage             => _ => Some(routes.BusinessAddressController.onPageLoad(CheckMode))
+    case BusinessWithoutIDNamePage             => _ => Some(routes.DoYouHaveBusinessTradingNameController.onPageLoad(CheckMode))
+    case DoYouHaveBusinessTradingNamePage      => doYouHaveBusinessTradingNameRoutes(CheckMode)
+    case BusinessTradingNamePage               => _ => Some(routes.BusinessAddressController.onPageLoad(CheckMode))
     case DoYouHaveANationalInsuranceNumberPage => doYouHaveANationalInsuranceNumberRoutes(CheckMode)
     case NinoPage                              => _ => Some(routes.NameController.onPageLoad(CheckMode))
     case NonUkNamePage                         => _ => Some(routes.DateOfBirthController.onPageLoad(CheckMode))
@@ -96,6 +100,12 @@ class Navigator @Inject() (appConfig: FrontendAppConfig) {
     case _                                     => _ => Some(routes.CheckYourAnswersController.onPageLoad())
 
   }
+
+  private def doYouHaveBusinessTradingNameRoutes(mode: Mode)(ua: UserAnswers): Option[Call] =
+    ua.get(DoYouHaveBusinessTradingNamePage) map {
+      case true => routes.BusinessTradingNameController.onPageLoad(mode)
+      case _    => routes.BusinessAddressController.onPageLoad(mode)
+    }
 
   private def businessTypeRoutes(mode: Mode)(ua: UserAnswers): Option[Call] =
     ua.get(BusinessTypePage) map {

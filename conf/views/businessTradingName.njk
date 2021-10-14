@@ -7,7 +7,7 @@
 {% from "macros/title.njk"                         import title %}
 
 {% block pageTitle %}
-  {{ title(messages("businessWithoutIDName.title"), form.errors) }}
+  {{ title(messages("businessTradingName.title"), form.errors) }}
 {% endblock %}
 
 {% block beforeContent %}
@@ -23,29 +23,29 @@
 
         {% if form.errors.length > 0 %}
           {{ govukErrorSummary({
-            "titleText": messages('error.summary.title'),
+            "titleText": messages("error.summary.title"),
             "errorList": form.errors
           }) }}
         {% endif %}
 
-        <form action="{{ routes.controllers.BusinessWithoutIDNameController.onSubmit(mode).url }}" method="post">
+        <form action="{{ routes.controllers.BusinessTradingNameController.onSubmit(mode).url }}" method="post">
 
           {{ csrf() | safe }}
 
         <h1 class="govuk-heading-xl">
-          {{ messages("businessWithoutIDName.heading") }}
+          {{ messages("businessTradingName.heading") }}
         </h1>
 
           {{ govukInput({
             label: {
               classes: "govuk-label govuk-visually-hidden",
-              text: messages('businessWithoutIDName.heading')
+              text: messages('businessTradingName.heading')
             },
             classes: "govuk-!-width-three-quarters",
-            id: "businessName",
-            name: "businessWithoutIDName",
-            value: form.businessWithoutIDName.value,
-            errorMessage: form.businessWithoutIDName.error
+            id: "name",
+            name: "name",
+            value: form.name.value,
+            errorMessage: form.name.error
           }) }}
 
           {{ govukButton({

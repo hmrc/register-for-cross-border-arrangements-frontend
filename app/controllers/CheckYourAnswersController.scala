@@ -86,21 +86,22 @@ class CheckYourAnswersController @Inject() (
 
   private def buildDetails(helper: CheckYourAnswersHelper): Seq[SummaryList.Row] = {
 
-    val pagesToCheck = Tuple4(
+    val pagesToCheck = Tuple5(
       helper.businessType,
       helper.nino,
       helper.businessWithoutIDName,
+      helper.businessTradingName,
       helper.nonUkName
     )
 
     pagesToCheck match {
-      case (Some(_), None, None, None) =>
+      case (Some(_), None, None, None, None) =>
         //Business with ID (inc. Sole proprietor)
         Seq(
           helper.confirmBusiness
         ).flatten
 
-      case (None, Some(_), None, None) =>
+      case (None, Some(_), None, None, None) =>
         //Individual with ID
         Seq(
           helper.doYouHaveUTR,
@@ -110,15 +111,26 @@ class CheckYourAnswersController @Inject() (
           helper.namePage,
           helper.dateOfBirth
         ).flatten
-      case (None, None, Some(_), None) =>
-        //Business without ID
+      case (None, None, Some(_), Some(_), None) =>
+        //Business without ID - with trading name
         Seq(
           helper.doYouHaveUTR,
           helper.registrationType,
           helper.businessWithoutIDName,
+          helper.doYouHaveBusinessTradingName,
+          helper.businessTradingName,
           helper.businessAddress
         ).flatten
-      case (None, None, None, Some(_)) =>
+      case (None, None, Some(_), None, None) =>
+        //Business without ID - without trading name
+        Seq(
+          helper.doYouHaveUTR,
+          helper.registrationType,
+          helper.businessWithoutIDName,
+          helper.doYouHaveBusinessTradingName,
+          helper.businessAddress
+        ).flatten
+      case (None, None, None, None, Some(_)) =>
         //Individual without ID
         Seq(
           helper.doYouHaveUTR,
