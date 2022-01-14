@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 HM Revenue & Customs
+ * Copyright 2022 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,7 +52,7 @@ class BusinessMatchingControllerSpec extends SpecBase with NunjucksSupport with 
 
   lazy val individualMatchingRoute: String    = routes.BusinessMatchingController.matchIndividual(NormalMode).url
   lazy val businessMatchingRoute: String      = routes.BusinessMatchingController.matchBusiness().url
-  lazy val businessMatchNotFoundRoute: String = routes.BusinessNotConfirmedController.onPageLoad().url
+  lazy val businessMatchNotFoundRoute: String = routes.BusinessNotIdentifiedController.onPageLoad().url
   lazy val problemWithServiceRoute: String    = routes.ProblemWithServiceController.onPageLoad().url
   lazy val alreadyRegisteredRoute: String     = routes.ThisOrganisationHasAlreadyBeenRegisteredController.onPageLoad().url
 

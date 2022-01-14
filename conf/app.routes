@@ -83,7 +83,7 @@ POST       /postCode                        controllers.PostCodeController.onSub
 GET        /changePostCode                  controllers.PostCodeController.onPageLoad(mode: Mode = CheckMode)
 POST       /changePostCode                  controllers.PostCodeController.onSubmit(mode: Mode = CheckMode)
 
-GET        /register/identity-not-confirmed      controllers.BusinessNotConfirmedController.onPageLoad()
+GET        /register/business-not-identified      controllers.BusinessNotIdentifiedController.onPageLoad()
 GET        /register/could-not-confirm-identity    controllers.IndividualNotConfirmedController.onPageLoad()
 GET        /register/identity-confirmed                   controllers.IdentityConfirmedController.onPageLoad()
 

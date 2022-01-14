@@ -386,10 +386,21 @@ individualNotConfirmed.heading = We could not confirm your identity
 individualNotConfirmed.p = The information you have entered does not match our records.
 individualNotConfirmed.button = Try again
 
-businessNotConfirmed.title = We could not find your business
-businessNotConfirmed.heading = We could not find your business
-businessNotConfirmed.p = The information you have entered does not match our records.
-businessNotConfirmed.button = Try again
+businessNotIdentified.title = Your business could not be identified
+businessNotIdentified.heading = Your business could not be identified
+businessNotIdentified.p1 = This could be because of several reasons.
+businessNotIdentified.subheading1 = Try entering your business name again
+businessNotIdentified.p2 = Check if your business name uses:
+businessNotIdentified.bullet1 = capital letters
+businessNotIdentified.bullet2 = spaces
+businessNotIdentified.bullet3 = Limited or LTD
+businessNotIdentified.p3 = If you do not know your exact business name, you can
+businessNotIdentified.p3.link = contact HMRC (opens in new tab)
+businessNotIdentified.subheading2 = Try entering your Unique Taxpayer Reference again
+businessNotIdentified.p4 = This is 10 numbers, for example 1234567890. It will be on tax returns and other letters about Self Assessment or Corporation Tax. It may be called ‘reference’, ‘UTR’ or ‘official use’.
+businessNotIdentified.p5 = You can discover help for
+businessNotIdentified.p5.link = finding a lost UTR number (opens in new tab)
+businessNotIdentified.button = Try again
 
 identityConfirmed.title = We have confirmed your identity
 identityConfirmed.heading = We have confirmed your identity

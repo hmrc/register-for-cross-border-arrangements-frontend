@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 HM Revenue & Customs
+ * Copyright 2022 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -328,7 +328,7 @@ class CheckModeNavigatorSpec extends SpecBase with ScalaCheckPropertyChecks with
 
             navigator
               .nextPage(ConfirmBusinessPage, CheckMode, updatedAnswers)
-              .mustBe(routes.BusinessNotConfirmedController.onPageLoad())
+              .mustBe(routes.BusinessNotIdentifiedController.onPageLoad())
         }
       }
     }

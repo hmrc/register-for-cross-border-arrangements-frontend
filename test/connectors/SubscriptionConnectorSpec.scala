@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 HM Revenue & Customs
+ * Copyright 2022 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ import helpers.WireMockServerHandler
 import models.error.RegisterError
 import models.error.RegisterError.{SomeInformationIsMissingError, UnableToCreateEMTPSubscriptionError}
 import models.readSubscription._
-import models.{Name, RegistrationType, ResponseCommon, UserAnswers}
+import models.{ResponseCommon, UserAnswers}
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import pages._
