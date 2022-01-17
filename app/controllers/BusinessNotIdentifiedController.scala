@@ -16,8 +16,11 @@
 
 package controllers
 
-import javax.inject.Inject
+import config.FrontendAppConfig
+import controllers.actions._
+import models.BusinessType.{CorporateBody, UnIncorporatedBody}
 import models.NormalMode
+import pages.BusinessTypePage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -25,24 +28,37 @@ import renderer.Renderer
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.viewmodels.NunjucksSupport
 
+import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 
-class BusinessNotConfirmedController @Inject() (
+class BusinessNotIdentifiedController @Inject() (
   override val messagesApi: MessagesApi,
   val controllerComponents: MessagesControllerComponents,
+  identify: IdentifierAction,
+  notEnrolled: NotEnrolledForDAC6Action,
+  getData: DataRetrievalAction,
+  requireData: DataRequiredAction,
+  appConfig: FrontendAppConfig,
   renderer: Renderer
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport
     with NunjucksSupport {
 
-  def onPageLoad(): Action[AnyContent] = Action.async {
+  def onPageLoad(): Action[AnyContent] = (identify andThen notEnrolled andThen getData andThen requireData).async {
     implicit request =>
+      val contactLink: String = request.userAnswers.get(BusinessTypePage) match {
+        case Some(CorporateBody) | Some(UnIncorporatedBody) => appConfig.corporationTaxEnquiriesUrl
+        case _                                              => appConfig.selfAssessmentEnquiriesUrl
+      }
+
       val json = Json.obj(
+        "contactLink"  -> contactLink,
+        "lostUtrLink"  -> appConfig.lostUTRUrl,
         "tryAgainLink" -> routes.DoYouHaveUTRController.onSubmit(NormalMode).url
       )
 
-      renderer.render("businessNotConfirmed.njk", json).map(Ok(_))
+      renderer.render("businessNotIdentified.njk", json).map(Ok(_))
   }
 
 }

@@ -17,10 +17,7 @@
 package config
 
 import com.google.inject.{Inject, Singleton}
-import controllers.routes
 import play.api.Configuration
-import play.api.i18n.Lang
-import play.api.mvc.Call
 
 @Singleton
 class FrontendAppConfig @Inject() (configuration: Configuration) {
@@ -50,8 +47,10 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   lazy val addressLookUpUrl: String           = configuration.get[Service]("microservice.services.address-lookup").baseUrl
   lazy val sendEmailUrl: String               = configuration.get[Service]("microservice.services.email").baseUrl
 
-  lazy val dacSubmissionsUrl: String = s"${configuration.get[String]("urls.dac-submissions.host")}${configuration.get[String]("urls.dac-submissions.startUrl")}"
-  lazy val lostUTRUrl: String        = "https://www.gov.uk/find-lost-utr-number"
+  lazy val dacSubmissionsUrl: String          = s"${configuration.get[String]("urls.dac-submissions.host")}${configuration.get[String]("urls.dac-submissions.startUrl")}"
+  lazy val lostUTRUrl: String                 = configuration.get[String]("urls.lostUTR")
+  lazy val corporationTaxEnquiriesUrl: String = configuration.get[String]("urls.corporationTaxEnquiries")
+  lazy val selfAssessmentEnquiriesUrl: String = configuration.get[String]("urls.selfAssessmentEnquiries")
 
   lazy val languageTranslationEnabled: Boolean =
     configuration.get[Boolean]("microservice.services.features.welsh-translation")

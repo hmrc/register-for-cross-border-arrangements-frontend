@@ -23,7 +23,6 @@ import generators.Generators
 import models.BusinessType._
 import models.RegistrationType.Individual
 import models._
-import org.mockito.Mockito.when
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import pages._
@@ -828,7 +827,7 @@ class NavigatorSpec extends SpecBase with ScalaCheckPropertyChecks with Generato
 
               navigator
                 .nextPage(ConfirmBusinessPage, NormalMode, updatedAnswers)
-                .mustBe(routes.BusinessNotConfirmedController.onPageLoad())
+                .mustBe(routes.BusinessNotIdentifiedController.onPageLoad())
           }
         }
       }

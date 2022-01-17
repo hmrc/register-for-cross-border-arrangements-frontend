@@ -328,7 +328,7 @@ class CheckModeNavigatorSpec extends SpecBase with ScalaCheckPropertyChecks with
 
             navigator
               .nextPage(ConfirmBusinessPage, CheckMode, updatedAnswers)
-              .mustBe(routes.BusinessNotConfirmedController.onPageLoad())
+              .mustBe(routes.BusinessNotIdentifiedController.onPageLoad())
         }
       }
     }

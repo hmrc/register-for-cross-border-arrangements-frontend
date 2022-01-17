@@ -129,7 +129,7 @@ class Navigator @Inject() (appConfig: FrontendAppConfig) {
           case Some(_)                         => routes.ContactNameController.onPageLoad(mode)
           case None                            => routes.ContactEmailAddressController.onPageLoad(mode)
         }
-      case false => routes.BusinessNotConfirmedController.onPageLoad()
+      case false => routes.BusinessNotIdentifiedController.onPageLoad()
     }
 
   private def doYouHaveUTRRoutes(mode: Mode)(ua: UserAnswers): Option[Call] =

@@ -56,8 +56,6 @@ class ErrorHandler @Inject() (
 
   override def onServerError(request: RequestHeader, exception: Throwable): Future[Result] = {
 
-    implicit val rh: RequestHeader = request
-
     logError(request, exception)
     exception match {
       case e: SomeInformationIsMissingException =>

@@ -16,7 +16,7 @@
 
 package models.readSubscription
 
-import models.{PrimaryContact, ResponseCommon, SecondaryContact}
+import models.ResponseCommon
 import play.api.libs.json._
 
 case class ResponseDetailForReadSubscription(subscriptionID: String,

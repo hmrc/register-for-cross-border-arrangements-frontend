@@ -17,7 +17,6 @@
 package services
 
 import config.FrontendAppConfig
-import javax.inject.Inject
 import play.api.Logger
 import play.api.libs.json.JsValue
 import play.api.mvc.Request
@@ -27,12 +26,12 @@ import uk.gov.hmrc.play.audit.http.connector.AuditResult.{Disabled, Failure}
 import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
 import uk.gov.hmrc.play.audit.model.ExtendedDataEvent
 
+import javax.inject.Inject
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class AuditService @Inject() (appConfig: FrontendAppConfig, auditConnector: AuditConnector) {
-  private val refererHeaderKey = "Referer"
-  private val logger: Logger   = Logger(this.getClass)
+  private val logger: Logger = Logger(this.getClass)
 
   def sendAuditEvent(eventName: String, detail: JsValue, transactionName: String, path: String)(implicit
     hc: HeaderCarrier,

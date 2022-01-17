@@ -24,7 +24,7 @@ import helpers.WireMockServerHandler
 import models.error.RegisterError
 import models.error.RegisterError.{SomeInformationIsMissingError, UnableToCreateEMTPSubscriptionError}
 import models.readSubscription._
-import models.{Name, RegistrationType, ResponseCommon, UserAnswers}
+import models.{ResponseCommon, UserAnswers}
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import pages._

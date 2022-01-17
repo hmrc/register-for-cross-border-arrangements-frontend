@@ -100,7 +100,7 @@ class BusinessMatchingController @Inject() (
                     Future.successful(Redirect(routes.ConfirmBusinessController.onPageLoad(NormalMode)))
                   }
               }
-            case _ => Future.successful(Redirect(routes.BusinessNotConfirmedController.onPageLoad()))
+            case _ => Future.successful(Redirect(routes.BusinessNotIdentifiedController.onPageLoad()))
           } recover {
             case _ => Redirect(routes.ProblemWithServiceController.onPageLoad())
           }

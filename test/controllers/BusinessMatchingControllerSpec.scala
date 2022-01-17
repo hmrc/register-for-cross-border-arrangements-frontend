@@ -52,7 +52,7 @@ class BusinessMatchingControllerSpec extends SpecBase with NunjucksSupport with 
 
   lazy val individualMatchingRoute: String    = routes.BusinessMatchingController.matchIndividual(NormalMode).url
   lazy val businessMatchingRoute: String      = routes.BusinessMatchingController.matchBusiness().url
-  lazy val businessMatchNotFoundRoute: String = routes.BusinessNotConfirmedController.onPageLoad().url
+  lazy val businessMatchNotFoundRoute: String = routes.BusinessNotIdentifiedController.onPageLoad().url
   lazy val problemWithServiceRoute: String    = routes.ProblemWithServiceController.onPageLoad().url
   lazy val alreadyRegisteredRoute: String     = routes.ThisOrganisationHasAlreadyBeenRegisteredController.onPageLoad().url
 

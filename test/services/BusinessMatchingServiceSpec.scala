@@ -37,8 +37,8 @@ import models.{
   UniqueTaxpayerReference,
   UserAnswers
 }
-import org.scalacheck.Arbitrary.arbitrary
 import org.mockito.ArgumentMatchers.any
+import org.scalacheck.Arbitrary.arbitrary
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import pages._
 import play.api.Application
