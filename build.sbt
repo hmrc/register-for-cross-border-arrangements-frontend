@@ -18,7 +18,7 @@ lazy val root = (project in file("."))
     name := appName,
     scalaVersion := "2.12.12",
     SilencerSettings(),
-    scalafmtOnCompile in ThisBuild := true,
+    ThisBuild / scalafmtOnCompile := true,
     RoutesKeys.routesImport += "models._",
     PlayKeys.playDefaultPort := 9755,
     ScoverageKeys.coverageExcludedFiles := "<empty>;Reverse.*;.*handlers.*;.*repositories.*;" +
@@ -30,15 +30,15 @@ lazy val root = (project in file("."))
     scalacOptions ++= Seq("-feature"),
     libraryDependencies ++= AppDependencies(),
     retrieveManaged := true,
-    evictionWarningOptions in update :=
+    update / evictionWarningOptions :=
       EvictionWarningOptions.default.withWarnScalaVersionEviction(false),
     resolvers += Resolver.jcenterRepo,
     Concat.groups := Seq(
       "javascripts/application.js" -> group(Seq("lib/govuk-frontend/govuk/all.js","lib/hmrc-frontend/hmrc/all.js", "javascripts/dac.js"))
     ),
     uglifyCompressOptions := Seq("unused=false", "dead_code=false", "warnings=false"),
-    pipelineStages in Assets := Seq(concat,uglify),
-    useSuperShell in ThisBuild     := false
+    Assets / pipelineStages := Seq(concat,uglify),
+    ThisBuild / useSuperShell := false
   )
 
 lazy val testSettings: Seq[Def.Setting[_]] = Seq(
