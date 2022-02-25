@@ -15,7 +15,6 @@ object AppDependencies {
     "uk.gov.hmrc"       %% "play-frontend-hmrc"            % "3.0.0-play-28",
     "uk.gov.hmrc"       %% "emailaddress"                  % "3.5.0",
     "org.webjars.npm"   %  "govuk-frontend"                % "3.12.0",
-    "org.webjars.npm"   %  "hmrc-frontend"                 % "1.35.0",
     "org.typelevel"     %% "cats-core"                     % "2.1.1"
   )
 
