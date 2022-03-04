@@ -17,6 +17,7 @@
 package controllers
 
 import com.google.inject.Inject
+import config.FrontendAppConfig
 import connectors.SubscriptionConnector
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction, NotEnrolledForDAC6Action}
 import controllers.exceptions.SomeInformationIsMissingException
@@ -41,6 +42,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class CheckYourAnswersController @Inject() (
   override val messagesApi: MessagesApi,
+  config: FrontendAppConfig,
   sessionRepository: SessionRepository,
   identify: IdentifierAction,
   notEnrolled: NotEnrolledForDAC6Action,
@@ -282,7 +284,10 @@ class CheckYourAnswersController @Inject() (
                 Redirect(routes.RegistrationSuccessfulController.onPageLoad())
             }
             .recover {
-              case e: Exception => Redirect(routes.RegistrationSuccessfulController.onPageLoad())
+              case e: Exception =>
+                logger.warn(config.emailFailureAlertMessage)
+                logger.warn(e.getMessage)
+                Redirect(routes.RegistrationSuccessfulController.onPageLoad())
             }
         } else {
           Future(Redirect(routes.ProblemWithServiceController.onPageLoad()))
