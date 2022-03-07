@@ -47,8 +47,6 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   lazy val addressLookUpUrl: String           = configuration.get[Service]("microservice.services.address-lookup").baseUrl
   lazy val sendEmailUrl: String               = configuration.get[Service]("microservice.services.email").baseUrl
 
-  lazy val emailFailureAlertMessage = "The email could not be sent to the EMAIL service"
-
   lazy val dacSubmissionsUrl: String          = s"${configuration.get[String]("urls.dac-submissions.host")}${configuration.get[String]("urls.dac-submissions.startUrl")}"
   lazy val lostUTRUrl: String                 = configuration.get[String]("urls.lostUTR")
   lazy val corporationTaxEnquiriesUrl: String = configuration.get[String]("urls.corporationTaxEnquiries")
