@@ -42,7 +42,6 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class CheckYourAnswersController @Inject() (
   override val messagesApi: MessagesApi,
-  config: FrontendAppConfig,
   sessionRepository: SessionRepository,
   identify: IdentifierAction,
   notEnrolled: NotEnrolledForDAC6Action,
@@ -285,7 +284,7 @@ class CheckYourAnswersController @Inject() (
             }
             .recover {
               case e: Exception =>
-                logger.warn(config.emailFailureAlertMessage)
+                logger.warn("The email could not be sent to the EMAIL service")
                 logger.warn(e.getMessage)
                 Redirect(routes.RegistrationSuccessfulController.onPageLoad())
             }
