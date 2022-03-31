@@ -51,6 +51,7 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   lazy val lostUTRUrl: String                 = configuration.get[String]("urls.lostUTR")
   lazy val corporationTaxEnquiriesUrl: String = configuration.get[String]("urls.corporationTaxEnquiries")
   lazy val selfAssessmentEnquiriesUrl: String = configuration.get[String]("urls.selfAssessmentEnquiries")
+  lazy val emailEnquiries: String             = configuration.get[String]("urls.emailEnquiries")
 
   lazy val languageTranslationEnabled: Boolean =
     configuration.get[Boolean]("microservice.services.features.welsh-translation")

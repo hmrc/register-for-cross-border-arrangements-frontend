@@ -54,6 +54,7 @@ class BusinessNotIdentifiedController @Inject() (
 
       val json = Json.obj(
         "contactLink"  -> contactLink,
+        "emailAddress" -> appConfig.emailEnquiries,
         "lostUtrLink"  -> appConfig.lostUTRUrl,
         "tryAgainLink" -> routes.DoYouHaveUTRController.onSubmit(NormalMode).url
       )

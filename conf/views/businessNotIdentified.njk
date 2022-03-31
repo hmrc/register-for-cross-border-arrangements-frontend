@@ -30,7 +30,15 @@
             {{ messages("businessNotIdentified.subheading1") }}
         </h2>
 
-        <p class="govuk-body">{{ messages("businessNotIdentified.p2") }}</p>
+        <p class="govuk-body"> {{ messages("businessNotIdentified.p2")}}
+            <a href="{{lostUtrLink}}" class="govuk-link" target="_blank" rel="noopener noreferrer">{{ messages("businessNotIdentified.p2.link")}}</a>.
+        </p>
+
+        <h2 class="govuk-heading-m">
+            {{ messages("businessNotIdentified.subheading2") }}
+        </h2>
+
+        <p class="govuk-body">{{ messages("businessNotIdentified.p3") }}</p>
 
         <ul class="govuk-list govuk-list--bullet" style="padding-left:20px;list-style-type:disc">
             <li>{{ messages("businessNotIdentified.bullet1") }}</li>
@@ -38,27 +46,27 @@
             <li>{{ messages("businessNotIdentified.bullet3") }}</li>
         </ul>
 
-        <p class="govuk-body">{{ messages("businessNotIdentified.p3")}}
-            <a href="{{contactLink}}" class="govuk-link" target="_blank" rel="noopener noreferrer">{{ messages("businessNotIdentified.p3.link")}}</a>.
+        <p class="govuk-body">{{ messages("businessNotIdentified.p4")}}
+            <a href="{{contactLink}}" class="govuk-link" target="_blank" rel="noopener noreferrer">{{ messages("businessNotIdentified.p4.link")}}</a>.
         </p>
 
         <h2 class="govuk-heading-m">
-            {{ messages("businessNotIdentified.subheading2") }}
+            {{ messages("businessNotIdentified.subheading3") }}
         </h2>
 
-        <p class="govuk-body">{{ messages("businessNotIdentified.p4") }}</p>
-
         <p class="bottom-margin govuk-body"> {{ messages("businessNotIdentified.p5")}}
-            <a href="{{lostUtrLink}}" class="govuk-link" target="_blank" rel="noopener noreferrer">{{ messages("businessNotIdentified.p5.link")}}</a>.
+            <a href="mailto:{{emailAddress}}" class="govuk-link">{{ messages("businessNotIdentified.p5.link")}}</a>
+            {{ messages("businessNotIdentified.p5b")}}
         </p>
 
-        {{ govukButton({
-            text: messages("businessNotIdentified.button"),
-            href: tryAgainLink,
-            attributes: {"id": "tryAgainButton"}
-        }) }}
+        <p class="govuk-body">
+           {{ govukButton({
+              text: messages("businessNotIdentified.button"),
+              href: tryAgainLink,
+              attributes: {"id": "tryAgainButton"}
+           }) }}
+        </p>
 
       </div>
-    </div>
-
+   </div>
 {% endblock %}
