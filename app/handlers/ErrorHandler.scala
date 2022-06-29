@@ -16,6 +16,7 @@
 
 package handlers
 
+import config.FrontendAppConfig
 import controllers.exceptions.SomeInformationIsMissingException
 import play.api.http.HttpErrorHandler
 import play.api.http.Status._
@@ -34,7 +35,8 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class ErrorHandler @Inject() (
   renderer: Renderer,
-  val messagesApi: MessagesApi
+  val messagesApi: MessagesApi,
+  appConfig: FrontendAppConfig
 )(implicit ec: ExecutionContext)
     extends HttpErrorHandler
     with I18nSupport {
@@ -48,7 +50,10 @@ class ErrorHandler @Inject() (
       case BAD_REQUEST =>
         renderer.render("badRequest.njk").map(BadRequest(_))
       case NOT_FOUND =>
-        renderer.render("notFound.njk", Json.obj()).map(NotFound(_))
+        val json = Json.obj(
+          "emailAddress" -> appConfig.emailEnquiries
+        )
+        renderer.render("notFound.njk", json).map(NotFound(_))
       case _ =>
         Future.successful(Redirect(controllers.routes.ProblemWithServiceController.onPageLoad()))
     }
