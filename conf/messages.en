@@ -546,3 +546,11 @@ businessTradingName.checkYourAnswersLabel = Trading name of business
 businessTradingName.error.name.required = Enter the trading name of your business
 businessTradingName.error.name.invalid = Trading name must only include letters a to z, numbers 0-9, apostrophes, slashes, ampersands and spaces
 businessTradingName.error.name.length = Trading name must be 80 characters or less
+
+pageNotFound.title = Page not found
+pageNotFound.heading = Page not found
+pageNotFound.p1 = If you typed the web address, check it is correct.
+pageNotFound.p2 = If you pasted the web address, check you copied the entire address.
+pageNotFound.p3a = You can email
+pageNotFound.email = enquiries.aeoi@hmrc.gov.uk
+pageNotFound.p3b = if you have any questions about this service.

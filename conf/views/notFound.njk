@@ -1,3 +1,27 @@
-{% extends 'error.njk' %}
-{% set page = 'global.error.pageNotFound404' %}
-{% set message = 'global.error.pageNotFound404.message' %}
+{% extends "includes/layout.njk" %}
+
+{% from "macros/title.njk"                         import title %}
+
+{% block pageTitle %}
+  {{ title(messages("pageNotFound.title")) }}
+{% endblock %}
+
+{% block mainContent %}
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-two-thirds">
+
+          <h1 class="govuk-heading-l">{{ messages("pageNotFound.heading") }}</h1>
+
+          <p class="govuk-body">{{ messages("pageNotFound.p1") }}</p>
+
+          <p class="govuk-body">{{ messages("pageNotFound.p2") }}</p>
+
+          <p class="govuk-!-margin-bottom-9 govuk-body">
+            {{ messages("pageNotFound.p3a") }} <a href="mailto:{{ emailAddress }} " class="govuk-link"> {{ messages("pageNotFound.email")}} </a>
+            {{ messages("pageNotFound.p3b") }}
+            </p>
+
+      </div>
+    </div>
+
+{% endblock %}
