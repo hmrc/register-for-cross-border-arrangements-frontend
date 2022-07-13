@@ -48,8 +48,8 @@ class BusinessAddressControllerSpec extends SpecBase with NunjucksSupport with J
   val mockCountryFactory: CountryListFactory   = mock[CountryListFactory]
 
   val formProvider        = new BusinessAddressFormProvider()
-  val form: Form[Address] = formProvider(Seq(Country("valid", "GB", "United Kingdom")))
-  val address: Address    = Address("value 1", Some("value 2"), "value 3", Some("value 4"), Some("XX9 9XX"), Country("valid", "GB", "United Kingdom"))
+  val form: Form[Address] = formProvider(Seq(Country("valid", "GG", "Guernsey")))
+  val address: Address    = Address("value 1", Some("value 2"), "value 3", Some("value 4"), Some("XX9 9XX"), Country("valid", "GG", "Guernsey"))
 
   lazy val businessAddressRoute: String = routes.BusinessAddressController.onPageLoad(NormalMode).url
 
@@ -62,7 +62,7 @@ class BusinessAddressControllerSpec extends SpecBase with NunjucksSupport with J
 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).overrides(bind[CountryListFactory].toInstance(mockCountryFactory)).build()
 
-      when(mockCountryFactory.getCountryList).thenReturn(Some(Seq(Country("valid", "GB", "United Kingdom"))))
+      when(mockCountryFactory.countryListWithoutGB).thenReturn(Some(Seq(Country("valid", "GG", "Guernsey"))))
       val request        = FakeRequest(GET, businessAddressRoute)
       val templateCaptor = ArgumentCaptor.forClass(classOf[String])
       val jsonCaptor     = ArgumentCaptor.forClass(classOf[JsObject])
@@ -89,7 +89,7 @@ class BusinessAddressControllerSpec extends SpecBase with NunjucksSupport with J
       when(mockRenderer.render(any(), any())(any()))
         .thenReturn(Future.successful(Html("")))
 
-      when(mockCountryFactory.getCountryList).thenReturn(Some(Seq(Country("valid", "GB", "United Kingdom"), Country("valid", "ES", "Spain"))))
+      when(mockCountryFactory.countryListWithoutGB).thenReturn(Some(Seq(Country("valid", "GG", "Guernsey"), Country("valid", "ES", "Spain"))))
 
       val userAnswers = UserAnswers(userAnswersId).set(BusinessAddressPage, address).success.value
 
@@ -111,7 +111,7 @@ class BusinessAddressControllerSpec extends SpecBase with NunjucksSupport with J
           "addressLine3" -> "value 3",
           "addressLine4" -> "value 4",
           "postCode"     -> "XX9 9XX",
-          "country"      -> "GB"
+          "country"      -> "GG"
         )
       )
 
@@ -144,8 +144,8 @@ class BusinessAddressControllerSpec extends SpecBase with NunjucksSupport with J
                                   ("addressLine2", "value 2"),
                                   ("addressLine3", "value 3"),
                                   ("addressLine4", "value 4"),
-                                  ("postcode", "XX9 9XX"),
-                                  ("country", "GB")
+                                  ("postCode", "XX9 9XX"),
+                                  ("country", "GG")
           )
 
       val result = route(application, request).value
@@ -208,7 +208,7 @@ class BusinessAddressControllerSpec extends SpecBase with NunjucksSupport with J
             ("addressLine3", "value 3"),
             ("addressLine4", "value 4"),
             ("postCode", "XX9 9XX"),
-            ("country", "GB")
+            ("country", "GG")
           )
 
       val result = route(application, request).value

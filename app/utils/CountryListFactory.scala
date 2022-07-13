@@ -26,9 +26,17 @@ class CountryListFactory @Inject() (environment: Environment, appConfig: Fronten
 
   def uk: Country = Country("valid", "GB", "United Kingdom")
 
+  lazy val countryList: Option[Seq[Country]] = getCountryList
+
   def getCountryList: Option[Seq[Country]] = environment.resourceAsStream(appConfig.countryCodeJson) map Json.parse map {
     _.as[Seq[Country]].sortWith(
       (country, country2) => country.description < country2.description
+    )
+  }
+
+  lazy val countryListWithoutGB: Option[Seq[Country]] = countryList.map {
+    _.filter(
+      x => x.code != "GB"
     )
   }
 
