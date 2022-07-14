@@ -3,7 +3,7 @@
 {% from "macros/title.njk"                         import title %}
 
 {% block pageTitle %}
-  {{ title(messages("businessWithoutIdAlreadyRegistered.title")) }}
+  {{ title(messages("thisOrganisationHasAlreadyBeenRegistered.title")) }}
 {% endblock %}
 
 {% block mainContent %}
@@ -13,20 +13,19 @@
       <div class="govuk-grid-column-two-thirds">
 
         <h1 class="govuk-heading-xl">
-          {{ messages("businessWithoutIdAlreadyRegistered.heading") }}
+          {{ messages("individualAlreadyRegistered.heading") }}
         </h1>
 
         <p class="govuk-body">
-          {{ messages("businessWithoutIdAlreadyRegistered.p1") }}
+          {{ messages("individualAlreadyRegistered.p1") }}
         </p>
 
         <p class="govuk-body">
-        <a href={{signInLink}} class="govuk-link">{{ messages("businessWithoutIdAlreadyRegistered.link") }}</a>
+        <a href={{signInLink}} class="govuk-link">{{ messages("individualAlreadyRegistered.link") }}</a>
         </p>
 
-        <p class="bottom-margin govuk-body"> {{ messages("businessWithoutIdAlreadyRegistered.p2")}}
+        <p class="bottom-margin govuk-body"> {{ messages("individualAlreadyRegistered.p2")}}
           <a href="mailto:{{emailAddress}}" class="govuk-link">{{emailAddress}}</a>
-          {{ messages("businessWithoutIdAlreadyRegistered.p2b")}}
         </p>
 
       </div>

@@ -18,23 +18,12 @@ package controllers
 
 import base.SpecBase
 import connectors.SubscriptionConnector
+import generators.Generators
 import models.RegistrationType.{Business, Individual}
-import models.error.RegisterError.UnableToCreateEMTPSubscriptionError
-import models.{
-  Address,
-  BusinessType,
-  Country,
-  CreateSubscriptionForDACResponse,
-  Name,
-  RegistrationType,
-  ResponseCommon,
-  ResponseDetailForDACSubscription,
-  SubscriptionForDACResponse,
-  UserAnswers
-}
+import models.error.RegisterError.{DuplicateSubmissionError, UnableToCreateEMTPSubscriptionError}
+import models.{Address, BusinessType, Country, CreateSubscriptionForDACResponse, Name, RegistrationType, ResponseCommon, ResponseDetailForDACSubscription, SubscriptionForDACResponse, UserAnswers}
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
-import generators.Generators
 import org.scalatest.BeforeAndAfterEach
 import pages._
 import play.api.inject.bind
@@ -886,6 +875,189 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach wi
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result) mustBe Some("/register-for-cross-border-arrangements/register/some-information-is-missing")
+      }
+
+      "must redirect to Business already registered page when Duplicate Submission response received from registration for organisation with ID" in {
+
+        val userAnswers: UserAnswers = UserAnswers(userAnswersId)
+          .set(DoYouHaveUTRPage, true)
+          .success
+          .value
+          .set(SafeIDPage, "")
+          .success
+          .value
+          .set(ContactEmailAddressPage, "")
+          .success
+          .value
+          .set(ContactNamePage, "")
+          .success
+          .value
+          .set(TelephoneNumberQuestionPage, false)
+          .success
+          .value
+          .set(HaveSecondContactPage, false)
+          .success
+          .value
+
+        val application = applicationBuilder(userAnswers = Some(userAnswers))
+          .overrides(
+            bind[SubscriptionConnector].toInstance(mockSubscriptionConnector),
+            bind[SessionRepository].toInstance(mockSessionRepository)
+          )
+          .build()
+
+        when(mockSubscriptionConnector.createSubscription(any())(any(), any()))
+          .thenReturn(Future.successful(Left(DuplicateSubmissionError)))
+
+        val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit().url)
+        val result  = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result) mustBe Some("/register-for-cross-border-arrangements/register/organisation-with-utr-pre-registered")
+        application.stop()
+      }
+
+      "must redirect to Business already registered page when Duplicate Submission response received from registration for organisation without ID" in {
+
+        val userAnswers: UserAnswers = UserAnswers(userAnswersId)
+          .set(DoYouHaveUTRPage, false)
+          .success
+          .value
+          .set(RegistrationTypePage, Business)
+          .success
+          .value
+          .set(SafeIDPage, "")
+          .success
+          .value
+          .set(ContactEmailAddressPage, "")
+          .success
+          .value
+          .set(ContactNamePage, "")
+          .success
+          .value
+          .set(TelephoneNumberQuestionPage, false)
+          .success
+          .value
+          .set(HaveSecondContactPage, false)
+          .success
+          .value
+
+        val application = applicationBuilder(userAnswers = Some(userAnswers))
+          .overrides(
+            bind[RegistrationService].toInstance(mockRegistrationService),
+            bind[SubscriptionConnector].toInstance(mockSubscriptionConnector),
+            bind[SessionRepository].toInstance(mockSessionRepository)
+          )
+          .build()
+
+        when(mockSubscriptionConnector.createSubscription(any())(any(), any()))
+          .thenReturn(Future.successful(Left(DuplicateSubmissionError)))
+
+        when(mockRegistrationService.sendRegistration(any())(any(), any()))
+          .thenReturn(Future.successful(Some(HttpResponse(OK, registerWithoutIDResponse(safeID)))))
+
+        val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit().url)
+        val result  = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result) mustBe Some("/register-for-cross-border-arrangements/register/organisation-without-utr-pre-registered")
+        application.stop()
+      }
+
+      "must redirect to Business already registered page when Duplicate Submission response received from registration for individual with NINO" in {
+
+        val userAnswers: UserAnswers = UserAnswers(userAnswersId)
+          .set(DoYouHaveUTRPage, false)
+          .success
+          .value
+          .set(RegistrationTypePage, Individual)
+          .success
+          .value
+          .set(DoYouHaveANationalInsuranceNumberPage, true)
+          .success
+          .value
+          .set(SafeIDPage, "")
+          .success
+          .value
+          .set(ContactEmailAddressPage, "")
+          .success
+          .value
+          .set(NamePage, Name("", ""))
+          .success
+          .value
+          .set(TelephoneNumberQuestionPage, false)
+          .success
+          .value
+          .set(HaveSecondContactPage, false)
+          .success
+          .value
+
+        val application = applicationBuilder(userAnswers = Some(userAnswers))
+          .overrides(
+            bind[SubscriptionConnector].toInstance(mockSubscriptionConnector),
+            bind[SessionRepository] toInstance mockSessionRepository
+          )
+          .build()
+
+        when(mockSubscriptionConnector.createSubscription(any())(any(), any()))
+          .thenReturn(Future.successful(Left(DuplicateSubmissionError)))
+
+        val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit().url)
+        val result  = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result) mustBe Some("/register-for-cross-border-arrangements/register/individual-pre-registered")
+        application.stop()
+      }
+
+      "must redirect to Business already registered page when Duplicate Submission response received from registration for individual without NINO" in {
+
+        val userAnswers: UserAnswers = UserAnswers(userAnswersId)
+          .set(DoYouHaveUTRPage, false)
+          .success
+          .value
+          .set(RegistrationTypePage, Individual)
+          .success
+          .value
+          .set(DoYouHaveANationalInsuranceNumberPage, false)
+          .success
+          .value
+          .set(SafeIDPage, "")
+          .success
+          .value
+          .set(ContactEmailAddressPage, "")
+          .success
+          .value
+          .set(NamePage, Name("", ""))
+          .success
+          .value
+          .set(TelephoneNumberQuestionPage, false)
+          .success
+          .value
+          .set(HaveSecondContactPage, false)
+          .success
+          .value
+
+        val application = applicationBuilder(userAnswers = Some(userAnswers))
+          .overrides(
+            bind[RegistrationService].toInstance(mockRegistrationService),
+            bind[SubscriptionConnector].toInstance(mockSubscriptionConnector),
+            bind[SessionRepository].toInstance(mockSessionRepository)
+          )
+          .build()
+
+        when(mockRegistrationService.sendRegistration(any())(any(), any()))
+          .thenReturn(Future.successful(Some(HttpResponse(OK, registerWithoutIDResponse(safeID)))))
+
+        when(mockSubscriptionConnector.createSubscription(any())(any(), any()))
+          .thenReturn(Future.successful(Left(DuplicateSubmissionError)))
+
+        val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit().url)
+        val result  = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result) mustBe Some("/register-for-cross-border-arrangements/register/individual-pre-registered")
+        application.stop()
       }
 
       "must continue with registration when send email call fails" in {

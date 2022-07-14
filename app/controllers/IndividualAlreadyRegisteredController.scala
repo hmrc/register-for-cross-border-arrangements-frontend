@@ -27,7 +27,7 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 
-class BusinessWithoutIdAlreadyRegisteredController @Inject() (
+class IndividualAlreadyRegisteredController @Inject() (
   override val messagesApi: MessagesApi,
   identify: IdentifierAction,
   notEnrolled: NotEnrolledForDAC6Action,
@@ -47,6 +47,6 @@ class BusinessWithoutIdAlreadyRegisteredController @Inject() (
         "emailAddress" -> appConfig.emailEnquiries
       )
 
-      renderer.render("businessWithoutIdAlreadyRegistered.njk", json).map(Ok(_))
+      renderer.render("individualAlreadyRegistered.njk", json).map(Ok(_))
   }
 }

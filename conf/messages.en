@@ -525,10 +525,24 @@ secondaryContactTelephoneQuestion.heading = Does {0} have a telephone number?
 secondaryContactTelephoneQuestion.checkYourAnswersLabel = Does your additional contact have a telephone number?
 secondaryContactTelephoneQuestion.error.required = Select yes if your second contact has a telephone number
 
-thisOrganisationHasAlreadyBeenRegistered.title = This organisation has already been registered
-thisOrganisationHasAlreadyBeenRegistered.heading = This organisation has already been registered
-thisOrganisationHasAlreadyBeenRegistered.p1 = You need to check with your organisation which Government Gateway sign-in details have been used to disclose cross-border arrangements for DAC6.
-thisOrganisationHasAlreadyBeenRegistered.link = Contact the cross-border arrangements helpline if you need to speak to someone about your disclosures (opens in new tab).
+businessAlreadyRegistered.title = Your organisation is already registered
+businessAlreadyRegistered.heading = Your organisation is already registered
+businessAlreadyRegistered.p1 = You will need to contact your administrator to give you access via the ‘Manage account’ settings within their Business Tax Account.
+businessAlreadyRegistered.p2 = You can email
+businessAlreadyRegistered.p2b = if you’re having problems accessing the service.
+
+businessWithoutIdAlreadyRegistered.title = Your organisation is already registered
+businessWithoutIdAlreadyRegistered.heading = Your organisation is already registered
+businessWithoutIdAlreadyRegistered.p1 = You can access the service using the Government Gateway account you used to register.
+businessWithoutIdAlreadyRegistered.link = Sign in to your Government Gateway account (opens in new tab)
+businessWithoutIdAlreadyRegistered.p2 = You can email
+businessWithoutIdAlreadyRegistered.p2b = if you’re having problems accessing the service.
+
+individualAlreadyRegistered.title = You are already registered to use this service
+individualAlreadyRegistered.heading = You are already registered to use this service
+individualAlreadyRegistered.p1 = You can access the service using the same Government Gateway account that you used to register for DAC6.
+individualAlreadyRegistered.link = Sign in to your Government Gateway account (opens in new tab)
+individualAlreadyRegistered.p2 = If you’re having problems accessing the service, you can email
 
 someInformationIsMissing.title = Some information is missing
 someInformationIsMissing.heading = Some information is missing

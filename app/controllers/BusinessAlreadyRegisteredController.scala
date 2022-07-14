@@ -16,9 +16,13 @@
 
 package controllers
 
+import config.FrontendAppConfig
 import controllers.actions._
+import models.NormalMode
+
 import javax.inject.Inject
 import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import renderer.Renderer
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -31,6 +35,7 @@ class BusinessAlreadyRegisteredController @Inject() (
   notEnrolled: NotEnrolledForDAC6Action,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
+  appConfig: FrontendAppConfig,
   val controllerComponents: MessagesControllerComponents,
   renderer: Renderer
 )(implicit ec: ExecutionContext)
@@ -39,6 +44,8 @@ class BusinessAlreadyRegisteredController @Inject() (
 
   def onPageLoad: Action[AnyContent] = (identify andThen notEnrolled andThen getData andThen requireData).async {
     implicit request =>
-      renderer.render("businessAlreadyRegistered.njk").map(Ok(_))
+      val json = Json.obj("emailAddress" -> appConfig.emailEnquiries)
+
+      renderer.render("businessAlreadyRegistered.njk", json).map(Ok(_))
   }
 }

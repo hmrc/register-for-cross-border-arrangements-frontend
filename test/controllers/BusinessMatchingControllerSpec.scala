@@ -545,7 +545,7 @@ class BusinessMatchingControllerSpec extends SpecBase with NunjucksSupport with 
             val result = route(application, getRequest(businessMatchingRoute)).value
 
             status(result) mustEqual SEE_OTHER
-            redirectLocation(result) mustBe Some("/register-for-cross-border-arrangements/register/org-already-registered")
+            redirectLocation(result) mustBe Some("/register-for-cross-border-arrangements/register/organisation-with-utr-pre-registered")
         }
       }
 

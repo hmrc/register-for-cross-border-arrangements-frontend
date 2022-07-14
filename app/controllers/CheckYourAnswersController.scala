@@ -232,6 +232,8 @@ class CheckYourAnswersController @Inject() (
           error => {
             logger.warn("Unable to create subscription", error)
             error match {
+              case DuplicateSubmissionError if userAnswers.get(RegistrationTypePage).contains(Individual) =>
+                Future.successful(Redirect(routes.IndividualAlreadyRegisteredController.onPageLoad()))
               case DuplicateSubmissionError if businessWithId => Future.successful(Redirect(routes.BusinessAlreadyRegisteredController.onPageLoad()))
               case DuplicateSubmissionError                   => Future.successful(Redirect(routes.BusinessWithoutIdAlreadyRegisteredController.onPageLoad()))
               case SomeInformationIsMissingError              => Future.successful(Redirect(routes.SomeInformationIsMissingController.onPageLoad()))
