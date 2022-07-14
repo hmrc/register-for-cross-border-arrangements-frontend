@@ -17,15 +17,15 @@
 package controllers
 
 import controllers.actions._
-import javax.inject.Inject
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import renderer.Renderer
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
+import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 
-class ThisOrganisationHasAlreadyBeenRegisteredController @Inject() (
+class BusinessWithoutIdAlreadyRegisteredController @Inject() (
   override val messagesApi: MessagesApi,
   identify: IdentifierAction,
   notEnrolled: NotEnrolledForDAC6Action,
@@ -39,6 +39,6 @@ class ThisOrganisationHasAlreadyBeenRegisteredController @Inject() (
 
   def onPageLoad: Action[AnyContent] = (identify andThen notEnrolled andThen getData andThen requireData).async {
     implicit request =>
-      renderer.render("thisOrganisationHasAlreadyBeenRegistered.njk").map(Ok(_))
+      renderer.render("businessWithoutIdAlreadyRegistered.njk").map(Ok(_))
   }
 }

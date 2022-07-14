@@ -25,9 +25,9 @@ import play.twirl.api.Html
 
 import scala.concurrent.Future
 
-class ThisOrganisationHasAlreadyBeenRegisteredControllerSpec extends SpecBase {
+class BusinessWithoutIdAlreadyRegisteredControllerSpec extends SpecBase {
 
-  "ThisOrganisationHasAlreadyBeenRegistered Controller" - {
+  "BusinessWithoutIdAlreadyRegistered Controller" - {
 
     "return OK and the correct view for a GET" in {
 
@@ -35,7 +35,7 @@ class ThisOrganisationHasAlreadyBeenRegisteredControllerSpec extends SpecBase {
         .thenReturn(Future.successful(Html("")))
 
       val application    = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
-      val request        = FakeRequest(GET, routes.ThisOrganisationHasAlreadyBeenRegisteredController.onPageLoad().url)
+      val request        = FakeRequest(GET, routes.BusinessWithoutIdAlreadyRegisteredController.onPageLoad().url)
       val templateCaptor = ArgumentCaptor.forClass(classOf[String])
 
       val result = route(application, request).value
@@ -44,7 +44,7 @@ class ThisOrganisationHasAlreadyBeenRegisteredControllerSpec extends SpecBase {
 
       verify(mockRenderer, times(1)).render(templateCaptor.capture(), any())(any())
 
-      templateCaptor.getValue mustEqual "thisOrganisationHasAlreadyBeenRegistered.njk"
+      templateCaptor.getValue mustEqual "businessWithoutIdAlreadyRegistered.njk"
 
       application.stop()
     }

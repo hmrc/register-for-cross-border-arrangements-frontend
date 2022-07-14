@@ -54,7 +54,7 @@ class BusinessMatchingControllerSpec extends SpecBase with NunjucksSupport with 
   lazy val businessMatchingRoute: String      = routes.BusinessMatchingController.matchBusiness().url
   lazy val businessMatchNotFoundRoute: String = routes.BusinessNotIdentifiedController.onPageLoad().url
   lazy val problemWithServiceRoute: String    = routes.ProblemWithServiceController.onPageLoad().url
-  lazy val alreadyRegisteredRoute: String     = routes.ThisOrganisationHasAlreadyBeenRegisteredController.onPageLoad().url
+  lazy val alreadyRegisteredRoute: String     = routes.BusinessAlreadyRegisteredController.onPageLoad().url
 
   def getRequest(route: String): FakeRequest[AnyContentAsEmpty.type] =
     FakeRequest(GET, route)
