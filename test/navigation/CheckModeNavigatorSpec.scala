@@ -780,7 +780,7 @@ class CheckModeNavigatorSpec extends SpecBase with ScalaCheckPropertyChecks with
 
         navigator
           .nextPage(TelephoneNumberQuestionPage, CheckMode, userAnswers)
-          .mustBe(routes.CheckYourAnswersController.onPageLoad())
+          .mustBe(routes.CheckYourAnswersController.onPageLoad)
       }
     }
 
@@ -814,7 +814,7 @@ class CheckModeNavigatorSpec extends SpecBase with ScalaCheckPropertyChecks with
 
         navigator
           .nextPage(ContactTelephoneNumberPage, CheckMode, userAnswers)
-          .mustBe(routes.CheckYourAnswersController.onPageLoad())
+          .mustBe(routes.CheckYourAnswersController.onPageLoad)
       }
     }
 
@@ -845,7 +845,7 @@ class CheckModeNavigatorSpec extends SpecBase with ScalaCheckPropertyChecks with
 
             navigator
               .nextPage(HaveSecondContactPage, CheckMode, updatedAnswers)
-              .mustBe(routes.CheckYourAnswersController.onPageLoad())
+              .mustBe(routes.CheckYourAnswersController.onPageLoad)
         }
       }
     }
@@ -918,7 +918,7 @@ class CheckModeNavigatorSpec extends SpecBase with ScalaCheckPropertyChecks with
 
             navigator
               .nextPage(SecondaryContactTelephoneQuestionPage, CheckMode, updatedAnswers)
-              .mustBe(routes.CheckYourAnswersController.onPageLoad())
+              .mustBe(routes.CheckYourAnswersController.onPageLoad)
         }
       }
 
@@ -934,7 +934,7 @@ class CheckModeNavigatorSpec extends SpecBase with ScalaCheckPropertyChecks with
 
             navigator
               .nextPage(SecondaryContactTelephoneNumberPage, CheckMode, updatedAnswers)
-              .mustBe(routes.CheckYourAnswersController.onPageLoad())
+              .mustBe(routes.CheckYourAnswersController.onPageLoad)
         }
       }
     }
@@ -947,7 +947,7 @@ class CheckModeNavigatorSpec extends SpecBase with ScalaCheckPropertyChecks with
         answers =>
           navigator
             .nextPage(UnknownPage, CheckMode, answers)
-            .mustBe(routes.CheckYourAnswersController.onPageLoad())
+            .mustBe(routes.CheckYourAnswersController.onPageLoad)
       }
     }
   }

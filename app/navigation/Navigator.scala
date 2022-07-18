@@ -60,9 +60,9 @@ class Navigator @Inject() (appConfig: FrontendAppConfig) {
     case SecondaryContactNamePage              => _ => Some(routes.SecondaryContactEmailAddressController.onPageLoad(NormalMode))
     case SecondaryContactEmailAddressPage      => _ => Some(routes.SecondaryContactTelephoneQuestionController.onPageLoad(NormalMode))
     case SecondaryContactTelephoneQuestionPage => secondaryContactTelephoneQuestionRoute(NormalMode)
-    case SecondaryContactTelephoneNumberPage   => _ => Some(routes.CheckYourAnswersController.onPageLoad())
+    case SecondaryContactTelephoneNumberPage   => _ => Some(routes.CheckYourAnswersController.onPageLoad)
     case SomeInformationIsMissingPage          => _ => Some(routes.DoYouHaveUTRController.onPageLoad(NormalMode))
-    case _                                     => _ => Some(routes.IndexController.onPageLoad())
+    case _                                     => _ => Some(routes.IndexController.onPageLoad)
   }
 
   private val checkRouteMap: Page => UserAnswers => Option[Call] = {
@@ -96,8 +96,8 @@ class Navigator @Inject() (appConfig: FrontendAppConfig) {
     case SecondaryContactNamePage              => _ => Some(routes.SecondaryContactEmailAddressController.onPageLoad(CheckMode))
     case SecondaryContactEmailAddressPage      => _ => Some(routes.SecondaryContactTelephoneQuestionController.onPageLoad(CheckMode))
     case SecondaryContactTelephoneQuestionPage => secondaryContactTelephoneQuestionRoute(CheckMode)
-    case SecondaryContactTelephoneNumberPage   => _ => Some(routes.CheckYourAnswersController.onPageLoad())
-    case _                                     => _ => Some(routes.CheckYourAnswersController.onPageLoad())
+    case SecondaryContactTelephoneNumberPage   => _ => Some(routes.CheckYourAnswersController.onPageLoad)
+    case _                                     => _ => Some(routes.CheckYourAnswersController.onPageLoad)
 
   }
 
@@ -171,38 +171,38 @@ class Navigator @Inject() (appConfig: FrontendAppConfig) {
     ua.get(TelephoneNumberQuestionPage) map {
       case true                               => routes.ContactTelephoneNumberController.onPageLoad(mode)
       case false if isOrganisationJourney(ua) => routes.HaveSecondContactController.onPageLoad(mode)
-      case false                              => routes.CheckYourAnswersController.onPageLoad()
+      case false                              => routes.CheckYourAnswersController.onPageLoad
     }
 
   private def haveSecondContactRoutes(mode: Mode)(ua: UserAnswers): Option[Call] =
     ua.get(HaveSecondContactPage) map {
       case true  => routes.SecondaryContactNameController.onPageLoad(mode)
-      case false => routes.CheckYourAnswersController.onPageLoad()
+      case false => routes.CheckYourAnswersController.onPageLoad
     }
 
   private def contactTelephoneNumberRoutes(mode: Mode)(ua: UserAnswers): Option[Call] =
     if (isOrganisationJourney(ua)) {
       Some(routes.HaveSecondContactController.onPageLoad(mode))
     } else {
-      Some(routes.CheckYourAnswersController.onPageLoad())
+      Some(routes.CheckYourAnswersController.onPageLoad)
     }
 
   private def secondaryContactTelephoneQuestionRoute(mode: Mode)(ua: UserAnswers): Option[Call] =
     ua.get(SecondaryContactTelephoneQuestionPage) map {
       case true  => routes.SecondaryContactTelephoneNumberController.onPageLoad(mode)
-      case false => routes.CheckYourAnswersController.onPageLoad()
+      case false => routes.CheckYourAnswersController.onPageLoad
     }
 
   def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers): Call = mode match {
     case NormalMode =>
       normalRoutes(page)(userAnswers) match {
         case Some(call) => call
-        case None       => routes.SessionExpiredController.onPageLoad()
+        case None       => routes.SessionExpiredController.onPageLoad
       }
     case CheckMode =>
       checkRouteMap(page)(userAnswers) match {
         case Some(call) => call
-        case None       => routes.SessionExpiredController.onPageLoad()
+        case None       => routes.SessionExpiredController.onPageLoad
       }
   }
 }

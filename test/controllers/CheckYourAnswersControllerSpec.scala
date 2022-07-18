@@ -18,23 +18,12 @@ package controllers
 
 import base.SpecBase
 import connectors.SubscriptionConnector
+import generators.Generators
 import models.RegistrationType.{Business, Individual}
 import models.error.RegisterError.UnableToCreateEMTPSubscriptionError
-import models.{
-  Address,
-  BusinessType,
-  Country,
-  CreateSubscriptionForDACResponse,
-  Name,
-  RegistrationType,
-  ResponseCommon,
-  ResponseDetailForDACSubscription,
-  SubscriptionForDACResponse,
-  UserAnswers
-}
+import models._
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
-import generators.Generators
 import org.scalatest.BeforeAndAfterEach
 import pages._
 import play.api.inject.bind
@@ -150,7 +139,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach wi
         )
         .build()
 
-      val request = FakeRequest(GET, routes.CheckYourAnswersController.onPageLoad().url)
+      val request = FakeRequest(GET, routes.CheckYourAnswersController.onPageLoad.url)
 
       val result = route(application, request).value
 
@@ -218,7 +207,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach wi
         )
         .build()
 
-      val request = FakeRequest(GET, routes.CheckYourAnswersController.onPageLoad().url)
+      val request = FakeRequest(GET, routes.CheckYourAnswersController.onPageLoad.url)
 
       val result = route(application, request).value
 
@@ -288,7 +277,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach wi
         )
         .build()
 
-      val request = FakeRequest(GET, routes.CheckYourAnswersController.onPageLoad().url)
+      val request = FakeRequest(GET, routes.CheckYourAnswersController.onPageLoad.url)
 
       val result = route(application, request).value
 
@@ -356,7 +345,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach wi
         )
         .build()
 
-      val request = FakeRequest(GET, routes.CheckYourAnswersController.onPageLoad().url)
+      val request = FakeRequest(GET, routes.CheckYourAnswersController.onPageLoad.url)
 
       val result = route(application, request).value
 
@@ -394,13 +383,13 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach wi
         )
         .build()
 
-      val request = FakeRequest(GET, routes.CheckYourAnswersController.onPageLoad().url)
+      val request = FakeRequest(GET, routes.CheckYourAnswersController.onPageLoad.url)
 
       val result = route(application, request).value
 
       status(result) mustEqual SEE_OTHER
 
-      redirectLocation(result).value mustEqual routes.SessionExpiredController.onPageLoad().url
+      redirectLocation(result).value mustEqual routes.SessionExpiredController.onPageLoad.url
 
       application.stop()
     }
@@ -459,7 +448,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach wi
         when(mockAuditService.sendAuditEvent(any(), any(), any(), any())(any(), any()))
           .thenReturn(Future.successful(AuditResult.Success))
 
-        val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit().url)
+        val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit.url)
         val result  = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
@@ -525,7 +514,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach wi
           when(mockAuditService.sendAuditEvent(any(), any(), any(), any())(any(), any()))
             .thenReturn(Future.successful(AuditResult.Success))
 
-          val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit().url)
+          val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit.url)
           val result  = route(application, request).value
 
           status(result) mustEqual SEE_OTHER
@@ -565,7 +554,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach wi
         when(mockRegistrationService.sendRegistration(any())(any(), any()))
           .thenReturn(Future.successful(Some(HttpResponse(OK, registrationResponse))))
 
-        val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit().url)
+        val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit.url)
         val result  = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
@@ -604,7 +593,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach wi
         when(mockRegistrationService.sendRegistration(any())(any(), any()))
           .thenReturn(Future.successful(Some(HttpResponse(OK, invalidRegistrationResponse))))
 
-        val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit().url)
+        val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit.url)
         val result  = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
@@ -635,7 +624,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach wi
         when(mockSubscriptionConnector.cacheSubscription(any(), any())(any(), any()))
           .thenReturn(Future.successful(HttpResponse(OK, "")))
 
-        val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit().url)
+        val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit.url)
         val result  = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
@@ -664,7 +653,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach wi
         when(mockSubscriptionConnector.createSubscription(any())(any(), any()))
           .thenReturn(Future.successful(Left(UnableToCreateEMTPSubscriptionError)))
 
-        val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit().url)
+        val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit.url)
         val result  = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
@@ -721,7 +710,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach wi
         when(mockAuditService.sendAuditEvent(any(), any(), any(), any())(any(), any()))
           .thenReturn(Future.successful(AuditResult.Success))
 
-        val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit().url)
+        val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit.url)
         val result  = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
@@ -783,7 +772,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach wi
           when(mockAuditService.sendAuditEvent(any(), any(), any(), any())(any(), any()))
             .thenReturn(Future.successful(AuditResult.Success))
 
-          val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit().url)
+          val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit.url)
           val result  = route(application, request).value
 
           status(result) mustEqual SEE_OTHER
@@ -832,7 +821,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach wi
         when(mockRegistrationService.sendRegistration(any())(any(), any()))
           .thenReturn(Future.successful(Some(HttpResponse(NOT_FOUND, ""))))
 
-        val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit().url)
+        val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit.url)
         val result  = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
@@ -856,7 +845,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach wi
         when(mockSubscriptionConnector.createEnrolment(any())(any(), any()))
           .thenReturn(Future.successful(HttpResponse(NO_CONTENT, "")))
 
-        val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit().url)
+        val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit.url)
         val result  = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
@@ -881,7 +870,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach wi
         when(mockSubscriptionConnector.createEnrolment(any())(any(), any()))
           .thenReturn(Future.successful(HttpResponse(NO_CONTENT, "")))
 
-        val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit().url)
+        val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit.url)
         val result  = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
@@ -934,7 +923,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach wi
         when(mockEmailService.sendEmail(any())(any()))
           .thenReturn(Future.failed(new RuntimeException))
 
-        val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit().url)
+        val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit.url)
         val result  = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
@@ -951,7 +940,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach wi
         when(mockRegistrationService.sendRegistration(any())(any(), any()))
           .thenReturn(Future.successful(Some(HttpResponse(NOT_FOUND, ""))))
 
-        val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit().url)
+        val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit.url)
         val result  = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
@@ -971,7 +960,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach wi
         when(mockRegistrationService.sendRegistration(any())(any(), any()))
           .thenReturn(Future.successful(Some(HttpResponse(BAD_REQUEST, ""))))
 
-        val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit().url)
+        val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit.url)
         val result  = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
@@ -991,7 +980,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach wi
         when(mockRegistrationService.sendRegistration(any())(any(), any()))
           .thenReturn(Future.successful(None))
 
-        val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit().url)
+        val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit.url)
         val result  = route(application, request).value
 
         status(result) mustEqual SEE_OTHER

@@ -42,7 +42,7 @@ class RegistrationSuccessfulControllerSpec extends SpecBase {
         .value
 
       val application    = applicationBuilder(userAnswers = Some(userAnswers)).build()
-      val request        = FakeRequest(GET, routes.RegistrationSuccessfulController.onPageLoad().url)
+      val request        = FakeRequest(GET, routes.RegistrationSuccessfulController.onPageLoad.url)
       val templateCaptor = ArgumentCaptor.forClass(classOf[String])
 
       val result = route(application, request).value
@@ -62,7 +62,7 @@ class RegistrationSuccessfulControllerSpec extends SpecBase {
         .thenReturn(Future.successful(Html("")))
 
       val application    = applicationBuilder(userAnswers = None).build()
-      val request        = FakeRequest(GET, routes.RegistrationSuccessfulController.onPageLoad().url)
+      val request        = FakeRequest(GET, routes.RegistrationSuccessfulController.onPageLoad.url)
       val templateCaptor = ArgumentCaptor.forClass(classOf[String])
 
       val result = route(application, request).value

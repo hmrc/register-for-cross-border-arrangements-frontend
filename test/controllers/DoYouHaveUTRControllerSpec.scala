@@ -186,7 +186,7 @@ class DoYouHaveUTRControllerSpec extends SpecBase with NunjucksSupport with Json
 
       status(result) mustEqual SEE_OTHER
 
-      redirectLocation(result).value mustEqual routes.CheckYourAnswersController.onPageLoad().url
+      redirectLocation(result).value mustEqual routes.CheckYourAnswersController.onPageLoad.url
 
       application.stop()
     }

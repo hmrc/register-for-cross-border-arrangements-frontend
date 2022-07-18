@@ -220,7 +220,7 @@ class BusinessMatchingControllerSpec extends SpecBase with NunjucksSupport with 
             val result = route(application, getRequest(individualMatchingRoute)).value
 
             status(result) mustEqual SEE_OTHER
-            redirectLocation(result) mustBe Some(routes.RegistrationSuccessfulController.onPageLoad().url)
+            redirectLocation(result) mustBe Some(routes.RegistrationSuccessfulController.onPageLoad.url)
         }
       }
 
@@ -283,7 +283,7 @@ class BusinessMatchingControllerSpec extends SpecBase with NunjucksSupport with 
             val result = route(application, getRequest(individualMatchingRoute)).value
 
             status(result) mustEqual SEE_OTHER
-            redirectLocation(result) mustBe Some(routes.RegistrationSuccessfulController.onPageLoad().url)
+            redirectLocation(result) mustBe Some(routes.RegistrationSuccessfulController.onPageLoad.url)
         }
       }
 
