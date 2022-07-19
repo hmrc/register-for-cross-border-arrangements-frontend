@@ -138,7 +138,7 @@ class BusinessMatchingController @Inject() (
                       Redirect(routes.RegistrationSuccessfulController.onPageLoad())
                   }
               case _ if enrolmentResponse.body.contains("MULTIPLE_ENROLMENTS_INVALID") =>
-                Future(Redirect(routes.ThisOrganisationHasAlreadyBeenRegisteredController.onPageLoad()))
+                Future(Redirect(routes.BusinessAlreadyRegisteredController.onPageLoad()))
 
               case _ => Future(Redirect(routes.ProblemWithServiceController.onPageLoad()))
             }
