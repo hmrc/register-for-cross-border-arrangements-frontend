@@ -16,21 +16,24 @@
 
 package controllers
 
+import config.FrontendAppConfig
 import controllers.actions._
-import javax.inject.Inject
 import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import renderer.Renderer
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
+import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 
-class ThisOrganisationHasAlreadyBeenRegisteredController @Inject() (
+class IndividualAlreadyRegisteredController @Inject() (
   override val messagesApi: MessagesApi,
   identify: IdentifierAction,
   notEnrolled: NotEnrolledForDAC6Action,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
+  appConfig: FrontendAppConfig,
   val controllerComponents: MessagesControllerComponents,
   renderer: Renderer
 )(implicit ec: ExecutionContext)
@@ -39,6 +42,11 @@ class ThisOrganisationHasAlreadyBeenRegisteredController @Inject() (
 
   def onPageLoad: Action[AnyContent] = (identify andThen notEnrolled andThen getData andThen requireData).async {
     implicit request =>
-      renderer.render("thisOrganisationHasAlreadyBeenRegistered.njk").map(Ok(_))
+      val json = Json.obj(
+        "signInLink"   -> appConfig.loginUrl,
+        "emailAddress" -> appConfig.emailEnquiries
+      )
+
+      renderer.render("individualAlreadyRegistered.njk", json).map(Ok(_))
   }
 }

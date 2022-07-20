@@ -13,11 +13,19 @@
       <div class="govuk-grid-column-two-thirds">
 
         <h1 class="govuk-heading-xl">
-          {{ messages("thisOrganisationHasAlreadyBeenRegistered.heading") }}
+          {{ messages("individualAlreadyRegistered.heading") }}
         </h1>
 
         <p class="govuk-body">
-          {{ messages("thisOrganisationHasAlreadyBeenRegistered.p1") }}
+          {{ messages("individualAlreadyRegistered.p1") }}
+        </p>
+
+        <p class="govuk-body">
+        <a href={{signInLink}} class="govuk-link">{{ messages("individualAlreadyRegistered.link") }}</a>
+        </p>
+
+        <p class="bottom-margin govuk-body"> {{ messages("individualAlreadyRegistered.p2")}}
+          <a href="mailto:{{emailAddress}}" class="govuk-link">{{emailAddress}}</a>
         </p>
 
       </div>

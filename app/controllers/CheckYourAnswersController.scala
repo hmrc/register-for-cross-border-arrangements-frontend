@@ -205,14 +205,14 @@ class CheckYourAnswersController @Inject() (
     response.map(_.json.validate[PayloadRegistrationWithoutIDResponse]) match {
       case Some(JsSuccess(registerWithoutIDResponse, _)) if registerWithoutIDResponse.registerWithoutIDResponse.responseDetail.isDefined =>
         //Without id journeys
-        updateUserAnswersWithSafeID(userAnswers, registerWithoutIDResponse).flatMap(createSubscriptionThenEnrolment)
+        updateUserAnswersWithSafeID(userAnswers, registerWithoutIDResponse).flatMap(createSubscriptionThenEnrolment(_, businessWithId = false))
       case Some(JsSuccess(_, _)) =>
         logger.warn("Response detail is missing from PayloadRegistrationWithoutIDResponse")
         Future.successful(Redirect(routes.ProblemWithServiceController.onPageLoad()))
       case Some(JsError(errors)) =>
         logger.warn("Unable to deserialise into PayloadRegistrationWithoutIDResponse", errors)
         Future.successful(Redirect(routes.ProblemWithServiceController.onPageLoad()))
-      case None => createSubscriptionThenEnrolment(userAnswers)
+      case None => createSubscriptionThenEnrolment(userAnswers, businessWithId = true)
     }
 
   private def updateUserAnswersWithSafeID(userAnswers: UserAnswers, registerWithoutIDResponse: PayloadRegistrationWithoutIDResponse): Future[UserAnswers] = {
@@ -224,16 +224,19 @@ class CheckYourAnswersController @Inject() (
     } yield updatedUserAnswers
   }
 
-  private def createSubscriptionThenEnrolment(userAnswers: UserAnswers)(implicit request: Request[_]): Future[Result] =
+  private def createSubscriptionThenEnrolment(userAnswers: UserAnswers, businessWithId: Boolean)(implicit request: Request[_]): Future[Result] =
     createEISSubscription(userAnswers).flatMap {
       either =>
         either.fold(
           error => {
             logger.warn("Unable to create subscription", error)
             error match {
-              case DuplicateSubmissionError      => Future.successful(Redirect(routes.ThisOrganisationHasAlreadyBeenRegisteredController.onPageLoad()))
-              case SomeInformationIsMissingError => Future.successful(Redirect(routes.SomeInformationIsMissingController.onPageLoad()))
-              case _                             => Future.successful(Redirect(routes.ProblemWithServiceController.onPageLoad()))
+              case DuplicateSubmissionError if userAnswers.get(RegistrationTypePage).contains(Individual) =>
+                Future.successful(Redirect(routes.IndividualAlreadyRegisteredController.onPageLoad()))
+              case DuplicateSubmissionError if businessWithId => Future.successful(Redirect(routes.BusinessAlreadyRegisteredController.onPageLoad()))
+              case DuplicateSubmissionError                   => Future.successful(Redirect(routes.BusinessWithoutIdAlreadyRegisteredController.onPageLoad()))
+              case SomeInformationIsMissingError              => Future.successful(Redirect(routes.SomeInformationIsMissingController.onPageLoad()))
+              case _                                          => Future.successful(Redirect(routes.ProblemWithServiceController.onPageLoad()))
             }
           },
           userAnswers =>

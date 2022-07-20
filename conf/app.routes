@@ -201,7 +201,9 @@ POST       /register/second-contact-have-phone                          controll
 GET        /register/change-second-contact-have-phone                   controllers.SecondaryContactTelephoneQuestionController.onPageLoad(mode: Mode = CheckMode)
 POST       /register/change-second-contact-have-phone                   controllers.SecondaryContactTelephoneQuestionController.onSubmit(mode: Mode = CheckMode)
 
-GET        /register/org-already-registered                controllers.ThisOrganisationHasAlreadyBeenRegisteredController.onPageLoad()
+GET        /register/individual-pre-registered                          controllers.IndividualAlreadyRegisteredController.onPageLoad()
+GET        /register/organisation-with-utr-pre-registered               controllers.BusinessAlreadyRegisteredController.onPageLoad()
+GET        /register/organisation-without-utr-pre-registered            controllers.BusinessWithoutIdAlreadyRegisteredController.onPageLoad()
 
 GET        /register/some-information-is-missing                        controllers.SomeInformationIsMissingController.onPageLoad()
 POST       /register/some-information-is-missing                        controllers.SomeInformationIsMissingController.onSubmit()
