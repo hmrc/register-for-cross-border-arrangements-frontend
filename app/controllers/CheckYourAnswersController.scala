@@ -17,7 +17,6 @@
 package controllers
 
 import com.google.inject.Inject
-import config.FrontendAppConfig
 import connectors.SubscriptionConnector
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction, NotEnrolledForDAC6Action}
 import controllers.exceptions.SomeInformationIsMissingException
@@ -283,13 +282,13 @@ class CheckYourAnswersController @Inject() (
             .map {
               emailResponse =>
                 logEmailResponse(emailResponse)
-                Redirect(routes.RegistrationSuccessfulController.onPageLoad())
+                Redirect(routes.RegistrationSuccessfulController.onPageLoad)
             }
             .recover {
               case e: Exception =>
                 logger.warn("The email could not be sent to the EMAIL service")
                 logger.warn(e.getMessage)
-                Redirect(routes.RegistrationSuccessfulController.onPageLoad())
+                Redirect(routes.RegistrationSuccessfulController.onPageLoad)
             }
         } else {
           Future(Redirect(routes.ProblemWithServiceController.onPageLoad()))

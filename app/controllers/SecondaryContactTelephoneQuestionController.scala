@@ -105,7 +105,7 @@ class SecondaryContactTelephoneQuestionController @Inject() (
               _              <- sessionRepository.set(updatedAnswers)
             } yield
               if (redirectToSummary) {
-                Redirect(routes.CheckYourAnswersController.onPageLoad())
+                Redirect(routes.CheckYourAnswersController.onPageLoad)
               } else {
                 Redirect(navigator.nextPage(SecondaryContactTelephoneQuestionPage, mode, updatedAnswers))
               }

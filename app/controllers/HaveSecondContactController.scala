@@ -101,7 +101,7 @@ class HaveSecondContactController @Inject() (
               _              <- sessionRepository.set(updatedAnswers)
             } yield
               if (redirectUsers) {
-                Redirect(routes.CheckYourAnswersController.onPageLoad())
+                Redirect(routes.CheckYourAnswersController.onPageLoad)
               } else {
                 Redirect(navigator.nextPage(HaveSecondContactPage, mode, updatedAnswers))
               }

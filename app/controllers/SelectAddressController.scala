@@ -116,7 +116,7 @@ class SelectAddressController @Inject() (
                   _               <- sessionRepository.set(updatedAnswers2)
                 } yield
                   if (redirectUsers) {
-                    Redirect(routes.CheckYourAnswersController.onPageLoad())
+                    Redirect(routes.CheckYourAnswersController.onPageLoad)
                   } else {
                     Redirect(navigator.nextPage(SelectAddressPage, mode, updatedAnswers2))
                   }

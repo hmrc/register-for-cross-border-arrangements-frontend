@@ -184,7 +184,7 @@ class SecondaryContactEmailAddressControllerSpec extends SpecBase with NunjucksS
       val result = route(application, request).value
 
       status(result) mustEqual SEE_OTHER
-      redirectLocation(result).value mustEqual routes.CheckYourAnswersController.onPageLoad().url
+      redirectLocation(result).value mustEqual routes.CheckYourAnswersController.onPageLoad.url
 
       application.stop()
     }
@@ -199,7 +199,7 @@ class SecondaryContactEmailAddressControllerSpec extends SpecBase with NunjucksS
 
       status(result) mustEqual SEE_OTHER
 
-      redirectLocation(result).value mustEqual routes.SessionExpiredController.onPageLoad().url
+      redirectLocation(result).value mustEqual routes.SessionExpiredController.onPageLoad.url
 
       application.stop()
     }
@@ -216,7 +216,7 @@ class SecondaryContactEmailAddressControllerSpec extends SpecBase with NunjucksS
 
       status(result) mustEqual SEE_OTHER
 
-      redirectLocation(result).value mustEqual routes.SessionExpiredController.onPageLoad().url
+      redirectLocation(result).value mustEqual routes.SessionExpiredController.onPageLoad.url
 
       application.stop()
     }

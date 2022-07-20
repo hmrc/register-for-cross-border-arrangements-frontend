@@ -110,7 +110,7 @@ class BusinessAddressController @Inject() (override val messagesApi: MessagesApi
               _              <- sessionRepository.set(updatedAnswers)
             } yield
               if (redirectUsers) {
-                Redirect(routes.CheckYourAnswersController.onPageLoad())
+                Redirect(routes.CheckYourAnswersController.onPageLoad)
               } else {
                 Redirect(navigator.nextPage(BusinessAddressPage, mode, updatedAnswers))
               }

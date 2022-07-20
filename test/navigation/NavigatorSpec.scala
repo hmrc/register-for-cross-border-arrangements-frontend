@@ -44,7 +44,7 @@ class NavigatorSpec extends SpecBase with ScalaCheckPropertyChecks with Generato
           answers =>
             navigator
               .nextPage(UnknownPage, NormalMode, answers)
-              .mustBe(routes.IndexController.onPageLoad())
+              .mustBe(routes.IndexController.onPageLoad)
         }
       }
 
@@ -581,7 +581,7 @@ class NavigatorSpec extends SpecBase with ScalaCheckPropertyChecks with Generato
 
         navigator
           .nextPage(ContactTelephoneNumberPage, NormalMode, userAnswers)
-          .mustBe(routes.CheckYourAnswersController.onPageLoad())
+          .mustBe(routes.CheckYourAnswersController.onPageLoad)
       }
 
       "must go from the What is your telephone number page? to Check Your Answers page if business type is Sole trader" in {
@@ -595,7 +595,7 @@ class NavigatorSpec extends SpecBase with ScalaCheckPropertyChecks with Generato
 
         navigator
           .nextPage(ContactTelephoneNumberPage, NormalMode, userAnswers)
-          .mustBe(routes.CheckYourAnswersController.onPageLoad())
+          .mustBe(routes.CheckYourAnswersController.onPageLoad)
       }
 
       "must go from the Do you have telephone page to the What is the telephone number page when the answer is 'Yes'" in {
@@ -647,7 +647,7 @@ class NavigatorSpec extends SpecBase with ScalaCheckPropertyChecks with Generato
 
               navigator
                 .nextPage(TelephoneNumberQuestionPage, NormalMode, updatedAnswers)
-                .mustBe(routes.CheckYourAnswersController.onPageLoad())
+                .mustBe(routes.CheckYourAnswersController.onPageLoad)
           }
         }
 
@@ -658,7 +658,7 @@ class NavigatorSpec extends SpecBase with ScalaCheckPropertyChecks with Generato
 
           navigator
             .nextPage(TelephoneNumberQuestionPage, NormalMode, userAnswers)
-            .mustBe(routes.CheckYourAnswersController.onPageLoad())
+            .mustBe(routes.CheckYourAnswersController.onPageLoad)
         }
 
       "must go from Is there someone else we can contact if *name* is not available??" +
@@ -689,7 +689,7 @@ class NavigatorSpec extends SpecBase with ScalaCheckPropertyChecks with Generato
 
               navigator
                 .nextPage(HaveSecondContactPage, NormalMode, updatedAnswers)
-                .mustBe(routes.CheckYourAnswersController.onPageLoad())
+                .mustBe(routes.CheckYourAnswersController.onPageLoad)
           }
         }
 
@@ -759,7 +759,7 @@ class NavigatorSpec extends SpecBase with ScalaCheckPropertyChecks with Generato
 
               navigator
                 .nextPage(SecondaryContactTelephoneQuestionPage, NormalMode, updatedAnswers)
-                .mustBe(routes.CheckYourAnswersController.onPageLoad())
+                .mustBe(routes.CheckYourAnswersController.onPageLoad)
           }
         }
 
@@ -775,7 +775,7 @@ class NavigatorSpec extends SpecBase with ScalaCheckPropertyChecks with Generato
 
               navigator
                 .nextPage(SecondaryContactTelephoneNumberPage, NormalMode, updatedAnswers)
-                .mustBe(routes.CheckYourAnswersController.onPageLoad())
+                .mustBe(routes.CheckYourAnswersController.onPageLoad)
           }
         }
 

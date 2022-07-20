@@ -50,21 +50,21 @@ class AuthenticatedIdentifierAction @Inject() (
     authorised(AuthProviders(GovernmentGateway) and ConfidenceLevel.L50)
       .retrieve(Retrievals.internalId and Retrievals.allEnrolments and affinityGroup and credentialRole) {
         case _ ~ _ ~ Some(Agent) ~ _ =>
-          Future.successful(Redirect(routes.UnauthorisedAgentController.onPageLoad()))
+          Future.successful(Redirect(routes.UnauthorisedAgentController.onPageLoad))
         case _ ~ enrolments ~ _ ~ Some(Assistant) if !enrolments.enrolments.exists(_.key == "HMRC-DAC6-ORG") =>
-          Future.successful(Redirect(routes.UnauthorisedAssistantController.onPageLoad()))
+          Future.successful(Redirect(routes.UnauthorisedAssistantController.onPageLoad))
         case Some(internalID) ~ enrolments ~ _ ~ _ =>
           block(UserRequest(enrolments, internalID, request))
         case _ => throw new UnauthorizedException("Unable to retrieve internal Id")
       } recover {
       case _: NoActiveSession =>
         Redirect(config.loginUrl, Map("continue" -> Seq(config.loginContinueUrl)))
-      case _: InsufficientEnrolments      => Redirect(routes.UnauthorisedController.onPageLoad())
-      case _: InsufficientConfidenceLevel => Redirect(routes.UnauthorisedController.onPageLoad())
-      case _: UnsupportedAuthProvider     => Redirect(routes.UnauthorisedController.onPageLoad())
+      case _: InsufficientEnrolments      => Redirect(routes.UnauthorisedController.onPageLoad)
+      case _: InsufficientConfidenceLevel => Redirect(routes.UnauthorisedController.onPageLoad)
+      case _: UnsupportedAuthProvider     => Redirect(routes.UnauthorisedController.onPageLoad)
       case _: AuthorisationException =>
-        Redirect(routes.UnauthorisedController.onPageLoad())
-      case _: UnauthorizedException => Redirect(routes.UnauthorisedController.onPageLoad())
+        Redirect(routes.UnauthorisedController.onPageLoad)
+      case _: UnauthorizedException => Redirect(routes.UnauthorisedController.onPageLoad)
     }
   }
 }

@@ -69,7 +69,7 @@ class IdentifierActionSpec extends SpecBase with BeforeAndAfterEach {
       val result  = harness.onPageLoad()(FakeRequest("GET", "/"))
 
       status(result) mustBe SEE_OTHER
-      redirectLocation(result) mustBe Some(routes.UnauthorisedAgentController.onPageLoad().url)
+      redirectLocation(result) mustBe Some(routes.UnauthorisedAgentController.onPageLoad.url)
     }
   }
 
@@ -82,7 +82,7 @@ class IdentifierActionSpec extends SpecBase with BeforeAndAfterEach {
       val result  = harness.onPageLoad()(FakeRequest("GET", "/"))
 
       status(result) mustBe SEE_OTHER
-      redirectLocation(result) mustBe Some(routes.UnauthorisedAssistantController.onPageLoad().url)
+      redirectLocation(result) mustBe Some(routes.UnauthorisedAssistantController.onPageLoad.url)
     }
 
     "must be allowed through the refiner if they are enrolled" in {

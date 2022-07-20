@@ -189,7 +189,7 @@ class DoYouHaveANationalInsuranceNumberControllerSpec extends SpecBase with Nunj
 
       status(result) mustEqual SEE_OTHER
 
-      redirectLocation(result).value mustEqual routes.CheckYourAnswersController.onPageLoad().url
+      redirectLocation(result).value mustEqual routes.CheckYourAnswersController.onPageLoad.url
 
       application.stop()
     }
@@ -204,7 +204,7 @@ class DoYouHaveANationalInsuranceNumberControllerSpec extends SpecBase with Nunj
 
       status(result) mustEqual SEE_OTHER
 
-      redirectLocation(result).value mustEqual routes.SessionExpiredController.onPageLoad().url
+      redirectLocation(result).value mustEqual routes.SessionExpiredController.onPageLoad.url
 
       application.stop()
     }
@@ -221,7 +221,7 @@ class DoYouHaveANationalInsuranceNumberControllerSpec extends SpecBase with Nunj
 
       status(result) mustEqual SEE_OTHER
 
-      redirectLocation(result).value mustEqual routes.SessionExpiredController.onPageLoad().url
+      redirectLocation(result).value mustEqual routes.SessionExpiredController.onPageLoad.url
 
       application.stop()
     }

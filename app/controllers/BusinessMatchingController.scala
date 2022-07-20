@@ -130,12 +130,12 @@ class BusinessMatchingController @Inject() (
                   .map {
                     emailResponse =>
                       logEmailResponse(emailResponse)
-                      Redirect(routes.RegistrationSuccessfulController.onPageLoad())
+                      Redirect(routes.RegistrationSuccessfulController.onPageLoad)
                   }
                   .recover {
                     case e: Exception =>
                       logger.warn("email service failed - redirect to registration successful without email")
-                      Redirect(routes.RegistrationSuccessfulController.onPageLoad())
+                      Redirect(routes.RegistrationSuccessfulController.onPageLoad)
                   }
               case _ if enrolmentResponse.body.contains("MULTIPLE_ENROLMENTS_INVALID") =>
                 Future(Redirect(routes.BusinessAlreadyRegisteredController.onPageLoad()))
