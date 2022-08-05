@@ -17,13 +17,14 @@
 package controllers
 
 import com.google.inject.Inject
-import connectors.SubscriptionConnector
+import connectors.{EnrolmentStoreProxyConnector, SubscriptionConnector}
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction, NotEnrolledForDAC6Action}
 import controllers.exceptions.SomeInformationIsMissingException
 import models.RegistrationType.Individual
 import models.error.RegisterError
 import models.error.RegisterError.{DuplicateSubmissionError, SomeInformationIsMissingError}
-import models.{PayloadRegistrationWithoutIDResponse, RegistrationType, SubscriptionAudit, SubscriptionForDACRequest, UserAnswers}
+import models.readSubscription.DisplaySubscriptionForDACResponse
+import models.{NormalMode, PayloadRegistrationWithoutIDResponse, RegistrationType, SubscriptionAudit, SubscriptionForDACRequest, UserAnswers}
 import org.slf4j.LoggerFactory
 import pages._
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -50,6 +51,7 @@ class CheckYourAnswersController @Inject() (
   emailService: EmailService,
   registrationService: RegistrationService,
   subscriptionConnector: SubscriptionConnector,
+  enrolmentStoreProxyConnector: EnrolmentStoreProxyConnector,
   auditService: AuditService,
   renderer: Renderer
 )(implicit ec: ExecutionContext)
@@ -205,7 +207,18 @@ class CheckYourAnswersController @Inject() (
     response.map(_.json.validate[PayloadRegistrationWithoutIDResponse]) match {
       case Some(JsSuccess(registerWithoutIDResponse, _)) if registerWithoutIDResponse.registerWithoutIDResponse.responseDetail.isDefined =>
         //Without id journeys
-        updateUserAnswersWithSafeID(userAnswers, registerWithoutIDResponse).flatMap(createSubscriptionThenEnrolment(_, businessWithId = false))
+        registerWithoutIDResponse.registerWithoutIDResponse.responseDetail
+          .map {
+            res =>
+              subscriptionConnector.readSubscriptionDetails(res.SAFEID) flatMap {
+                displaySubscriptionResponse =>
+                  checkExistingEnrolmentThenCreateEnrolment(userAnswers, displaySubscriptionResponse)
+              }
+          }
+          .getOrElse {
+            updateUserAnswersWithSafeID(userAnswers, registerWithoutIDResponse).flatMap(createSubscriptionThenEnrolment(_, businessWithId = false))
+          }
+
       case Some(JsSuccess(_, _)) =>
         logger.warn("Response detail is missing from PayloadRegistrationWithoutIDResponse")
         Future.successful(Redirect(routes.ProblemWithServiceController.onPageLoad()))
@@ -214,6 +227,32 @@ class CheckYourAnswersController @Inject() (
         Future.successful(Redirect(routes.ProblemWithServiceController.onPageLoad()))
       case None => createSubscriptionThenEnrolment(userAnswers, businessWithId = true)
     }
+
+  private def checkExistingEnrolmentThenCreateEnrolment(userAnswers: UserAnswers, displaySubscriptionForDACResponse: Option[DisplaySubscriptionForDACResponse])(
+    implicit
+    headerCarrier: HeaderCarrier,
+    ec: ExecutionContext
+  ): Future[Result] =
+    displaySubscriptionForDACResponse
+      .map {
+        response =>
+          val subscriptionId = response.displaySubscriptionForDACResponse.responseDetail.subscriptionID
+          val result = {
+            for {
+              updatedUserAnswers <- Future.fromTry(userAnswers.set(SubscriptionIDPage, subscriptionId))
+              _                  <- sessionRepository.set(updatedUserAnswers)
+              enrolmentExits     <- enrolmentStoreProxyConnector.enrolmentExists(subscriptionId)
+            } yield (enrolmentExits, userAnswers.get(RegistrationTypePage).contains(Individual)) match {
+              case (true, true)  => Future.successful(Redirect(routes.IndividualAlreadyRegisteredController.onPageLoad()))
+              case (true, false) => Future.successful(Redirect(routes.BusinessAlreadyRegisteredController.onPageLoad()))
+              case (false, _)    => createEnrolment(userAnswers)
+            }
+          }
+          result.flatten
+      }
+      .getOrElse(
+        Future.successful(Redirect(routes.ConfirmBusinessController.onPageLoad(NormalMode)))
+      )
 
   private def updateUserAnswersWithSafeID(userAnswers: UserAnswers, registerWithoutIDResponse: PayloadRegistrationWithoutIDResponse): Future[UserAnswers] = {
     val safeID = registerWithoutIDResponse.registerWithoutIDResponse.responseDetail.get.SAFEID
