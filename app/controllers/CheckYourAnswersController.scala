@@ -24,7 +24,15 @@ import models.RegistrationType.Individual
 import models.error.RegisterError
 import models.error.RegisterError.{DuplicateSubmissionError, SomeInformationIsMissingError}
 import models.readSubscription.DisplaySubscriptionForDACResponse
-import models.{NormalMode, PayloadRegistrationWithoutIDResponse, RegistrationType, SubscriptionAudit, SubscriptionForDACRequest, UserAnswers}
+import models.{
+  NormalMode,
+  PayloadRegistrationWithoutIDResponse,
+  RegisterWithoutIDResponse,
+  RegistrationType,
+  SubscriptionAudit,
+  SubscriptionForDACRequest,
+  UserAnswers
+}
 import org.slf4j.LoggerFactory
 import pages._
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -212,7 +220,7 @@ class CheckYourAnswersController @Inject() (
             res =>
               subscriptionConnector.readSubscriptionDetails(res.SAFEID) flatMap {
                 displaySubscriptionResponse =>
-                  checkExistingEnrolmentThenCreateEnrolment(userAnswers, displaySubscriptionResponse)
+                  checkExistingEnrolmentThenCreateEnrolment(userAnswers, registerWithoutIDResponse, displaySubscriptionResponse)
               }
           }
           .getOrElse {
@@ -228,9 +236,11 @@ class CheckYourAnswersController @Inject() (
       case None => createSubscriptionThenEnrolment(userAnswers, businessWithId = true)
     }
 
-  private def checkExistingEnrolmentThenCreateEnrolment(userAnswers: UserAnswers, displaySubscriptionForDACResponse: Option[DisplaySubscriptionForDACResponse])(
-    implicit
-    headerCarrier: HeaderCarrier,
+  private def checkExistingEnrolmentThenCreateEnrolment(userAnswers: UserAnswers,
+                                                        registerWithoutIDResponse: PayloadRegistrationWithoutIDResponse,
+                                                        displaySubscriptionForDACResponse: Option[DisplaySubscriptionForDACResponse]
+  )(implicit
+    request: Request[_],
     ec: ExecutionContext
   ): Future[Result] =
     displaySubscriptionForDACResponse
@@ -250,9 +260,9 @@ class CheckYourAnswersController @Inject() (
           }
           result.flatten
       }
-      .getOrElse(
-        Future.successful(Redirect(routes.ConfirmBusinessController.onPageLoad(NormalMode)))
-      )
+      .getOrElse {
+        updateUserAnswersWithSafeID(userAnswers, registerWithoutIDResponse).flatMap(createSubscriptionThenEnrolment(_, businessWithId = false))
+      }
 
   private def updateUserAnswersWithSafeID(userAnswers: UserAnswers, registerWithoutIDResponse: PayloadRegistrationWithoutIDResponse): Future[UserAnswers] = {
     val safeID = registerWithoutIDResponse.registerWithoutIDResponse.responseDetail.get.SAFEID

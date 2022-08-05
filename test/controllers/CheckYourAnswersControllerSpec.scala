@@ -17,11 +17,22 @@
 package controllers
 
 import base.SpecBase
-import connectors.SubscriptionConnector
+import connectors.{EnrolmentStoreProxyConnector, SubscriptionConnector}
 import generators.Generators
 import models.RegistrationType.{Business, Individual}
 import models.error.RegisterError.{DuplicateSubmissionError, UnableToCreateEMTPSubscriptionError}
 import models._
+import models.readSubscription.{
+  ContactInformationForIndividual,
+  ContactInformationForOrganisation,
+  DisplaySubscriptionForDACResponse,
+  IndividualDetails,
+  OrganisationDetails,
+  PrimaryContact,
+  ReadSubscriptionForDACResponse,
+  ResponseDetailForReadSubscription,
+  SecondaryContact
+}
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
 import org.scalatest.BeforeAndAfterEach
@@ -34,11 +45,11 @@ import play.twirl.api.Html
 import repositories.SessionRepository
 import services.{AuditService, EmailService, RegistrationService}
 import uk.gov.hmrc.domain.{Generator, Nino}
-import uk.gov.hmrc.http.HttpResponse
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.play.audit.http.connector.AuditResult
 
 import java.time.LocalDate
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach with Generators {
 
@@ -54,11 +65,48 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach wi
     )
   )
 
-  val mockEmailService: EmailService                   = mock[EmailService]
-  val mockSubscriptionConnector: SubscriptionConnector = mock[SubscriptionConnector]
-  val mockRegistrationService: RegistrationService     = mock[RegistrationService]
-  val mockSessionRepository: SessionRepository         = mock[SessionRepository]
-  val mockAuditService: AuditService                   = mock[AuditService]
+  val primaryContact: PrimaryContact = PrimaryContact(
+    Seq(
+      ContactInformationForIndividual(
+        individual = IndividualDetails(firstName = "FirstName", lastName = "LastName", middleName = None),
+        email = "email@email.com",
+        phone = Some("07111222333"),
+        mobile = Some("07111222333")
+      )
+    )
+  )
+
+  val secondaryContact: SecondaryContact = SecondaryContact(
+    Seq(
+      ContactInformationForOrganisation(organisation = OrganisationDetails(organisationName = "Organisation Name"),
+                                        email = "email@email.com",
+                                        phone = None,
+                                        mobile = None
+      )
+    )
+  )
+
+  def createResponseDetail(id: String): ResponseDetailForReadSubscription = ResponseDetailForReadSubscription(subscriptionID = id,
+                                                                                                              tradingName = Some("Trading Name"),
+                                                                                                              isGBUser = true,
+                                                                                                              primaryContact = primaryContact,
+                                                                                                              secondaryContact = Some(secondaryContact)
+  )
+
+  val responseCommon: ResponseCommon                        = ResponseCommon(status = "OK", statusText = None, processingDate = "2020-08-09T11:23:45Z", returnParameters = None)
+  val responseDetailRead: ResponseDetailForReadSubscription = createResponseDetail("subscriptionId")
+
+  val displaySubscriptionForDACResponse: DisplaySubscriptionForDACResponse =
+    DisplaySubscriptionForDACResponse(
+      ReadSubscriptionForDACResponse(responseCommon = responseCommon, responseDetail = responseDetailRead)
+    )
+
+  val mockEmailService: EmailService                                 = mock[EmailService]
+  val mockSubscriptionConnector: SubscriptionConnector               = mock[SubscriptionConnector]
+  val mockRegistrationService: RegistrationService                   = mock[RegistrationService]
+  val mockSessionRepository: SessionRepository                       = mock[SessionRepository]
+  val mockAuditService: AuditService                                 = mock[AuditService]
+  val mockEnrolmentStoreProxyConnector: EnrolmentStoreProxyConnector = mock[EnrolmentStoreProxyConnector]
 
   val safeID = validSafeID.sample.get
 
@@ -83,10 +131,13 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach wi
       mockRenderer,
       mockEmailService,
       mockSubscriptionConnector,
-      mockRegistrationService
+      mockRegistrationService,
+      mockEnrolmentStoreProxyConnector
     )
 
   when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+  when(mockEnrolmentStoreProxyConnector.enrolmentExists(any[String]())(any[HeaderCarrier](), any[ExecutionContext]())) thenReturn Future.successful(false)
+  when(mockSubscriptionConnector.readSubscriptionDetails(any[String]())(any[HeaderCarrier](), any[ExecutionContext]())) thenReturn Future.successful(None)
 
   "Check Your Answers Controller" - {
 
@@ -428,10 +479,12 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach wi
           .overrides(
             bind[EmailService].toInstance(mockEmailService),
             bind[SubscriptionConnector].toInstance(mockSubscriptionConnector),
+            bind[EnrolmentStoreProxyConnector].toInstance(mockEnrolmentStoreProxyConnector),
             bind[SessionRepository] toInstance mockSessionRepository,
             bind[AuditService] toInstance mockAuditService
           )
           .build()
+        when(mockSubscriptionConnector.readSubscriptionDetails(any[String]())(any[HeaderCarrier](), any[ExecutionContext]())) thenReturn Future.successful(None)
 
         when(mockSubscriptionConnector.createSubscription(any())(any(), any()))
           .thenReturn(Future.successful(Right(safeID)))
@@ -485,6 +538,9 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach wi
             .set(HaveSecondContactPage, false)
             .success
             .value
+            .set(SubscriptionIDPage, "subscriptionId")
+            .success
+            .value
 
           val application = applicationBuilder(userAnswers = Some(userAnswers))
             .overrides(
@@ -492,9 +548,17 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach wi
               bind[EmailService].toInstance(mockEmailService),
               bind[SubscriptionConnector].toInstance(mockSubscriptionConnector),
               bind[SessionRepository].toInstance(mockSessionRepository),
+              bind[EnrolmentStoreProxyConnector].toInstance(mockEnrolmentStoreProxyConnector),
               bind[AuditService] toInstance mockAuditService
             )
             .build()
+
+          when(mockSubscriptionConnector.readSubscriptionDetails(any[String]())(any[HeaderCarrier](), any[ExecutionContext]())) thenReturn Future.successful(
+            None
+          )
+          when(mockEnrolmentStoreProxyConnector.enrolmentExists(any[String]())(any[HeaderCarrier](), any[ExecutionContext]())) thenReturn Future.successful(
+            false
+          )
 
           when(mockRegistrationService.sendRegistration(any())(any(), any()))
             .thenReturn(Future.successful(Some(HttpResponse(OK, registerWithoutIDResponse(safeID)))))
@@ -606,14 +670,21 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach wi
           .set(DoYouHaveUTRPage, false)
           .success
           .value
+          .set(SubscriptionIDPage, "subscriptionId")
+          .success
+          .value
 
         val application = applicationBuilder(userAnswers = Some(userAnswers))
           .overrides(
             bind[RegistrationService].toInstance(mockRegistrationService),
             bind[SubscriptionConnector].toInstance(mockSubscriptionConnector),
+            bind[EnrolmentStoreProxyConnector].toInstance(mockEnrolmentStoreProxyConnector),
             bind[SessionRepository].toInstance(mockSessionRepository)
           )
           .build()
+        when(mockEnrolmentStoreProxyConnector.enrolmentExists(any[String]())(any[HeaderCarrier](), any[ExecutionContext]())) thenReturn Future.successful(false)
+
+        when(mockSubscriptionConnector.readSubscriptionDetails(any[String]())(any[HeaderCarrier](), any[ExecutionContext]())) thenReturn Future.successful(None)
 
         when(mockRegistrationService.sendRegistration(any())(any(), any()))
           .thenReturn(Future.successful(Some(HttpResponse(OK, registerWithoutIDResponse(safeID)))))
@@ -643,12 +714,14 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach wi
           .overrides(
             bind[EmailService].toInstance(mockEmailService),
             bind[SubscriptionConnector].toInstance(mockSubscriptionConnector),
+            bind[EnrolmentStoreProxyConnector].toInstance(mockEnrolmentStoreProxyConnector),
             bind[SessionRepository].toInstance(mockSessionRepository)
           )
           .build()
 
         when(mockEmailService.sendEmail(any())(any()))
           .thenReturn(Future.successful(Some(HttpResponse(OK, ""))))
+        when(mockSubscriptionConnector.readSubscriptionDetails(any[String]())(any[HeaderCarrier](), any[ExecutionContext]())) thenReturn Future.successful(None)
 
         when(mockSubscriptionConnector.createSubscription(any())(any(), any()))
           .thenReturn(Future.successful(Left(UnableToCreateEMTPSubscriptionError)))
@@ -685,11 +758,15 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach wi
           .set(HaveSecondContactPage, false)
           .success
           .value
+          .set(SubscriptionIDPage, "subscriptionId")
+          .success
+          .value
 
         val application = applicationBuilder(userAnswers = Some(userAnswers))
           .overrides(
             bind[EmailService].toInstance(mockEmailService),
             bind[SubscriptionConnector].toInstance(mockSubscriptionConnector),
+            bind[EnrolmentStoreProxyConnector].toInstance(mockEnrolmentStoreProxyConnector),
             bind[SessionRepository].toInstance(mockSessionRepository),
             bind[AuditService] toInstance mockAuditService
           )
@@ -697,6 +774,8 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach wi
 
         when(mockSubscriptionConnector.createSubscription(any())(any(), any()))
           .thenReturn(Future.successful(Right(safeID)))
+        when(mockSubscriptionConnector.readSubscriptionDetails(any[String]())(any[HeaderCarrier](), any[ExecutionContext]())) thenReturn Future.successful(None)
+        when(mockEnrolmentStoreProxyConnector.enrolmentExists(any[String]())(any[HeaderCarrier](), any[ExecutionContext]())) thenReturn Future.successful(false)
 
         when(mockSubscriptionConnector.cacheSubscription(any(), any())(any(), any()))
           .thenReturn(Future.successful(HttpResponse(OK, "")))
@@ -750,12 +829,16 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach wi
               bind[EmailService].toInstance(mockEmailService),
               bind[SubscriptionConnector].toInstance(mockSubscriptionConnector),
               bind[SessionRepository].toInstance(mockSessionRepository),
+              bind[EnrolmentStoreProxyConnector].toInstance(mockEnrolmentStoreProxyConnector),
               bind[AuditService] toInstance mockAuditService
             )
             .build()
 
           when(mockSubscriptionConnector.createSubscription(any())(any(), any()))
             .thenReturn(Future.successful(Right(safeID)))
+          when(mockSubscriptionConnector.readSubscriptionDetails(any[String]())(any[HeaderCarrier](), any[ExecutionContext]())) thenReturn Future.successful(
+            None
+          )
 
           when(mockSubscriptionConnector.cacheSubscription(any(), any())(any(), any()))
             .thenReturn(Future.successful(HttpResponse(OK, "")))
@@ -814,6 +897,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach wi
         val application = applicationBuilder(userAnswers = Some(userAnswersValid))
           .overrides(
             bind[RegistrationService].toInstance(mockRegistrationService),
+            bind[EnrolmentStoreProxyConnector].toInstance(mockEnrolmentStoreProxyConnector),
             bind[SessionRepository].toInstance(mockSessionRepository)
           )
           .build()
@@ -835,12 +919,14 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach wi
           .overrides(
             bind[SubscriptionConnector].toInstance(mockSubscriptionConnector),
             bind[RegistrationService].toInstance(mockRegistrationService),
+            bind[EnrolmentStoreProxyConnector].toInstance(mockEnrolmentStoreProxyConnector),
             bind[SessionRepository].toInstance(mockSessionRepository)
           )
           .build()
 
         when(mockRegistrationService.sendRegistration(any())(any(), any()))
           .thenReturn(Future.successful(Some(HttpResponse(BAD_REQUEST, ""))))
+        when(mockSubscriptionConnector.readSubscriptionDetails(any[String]())(any[HeaderCarrier](), any[ExecutionContext]())) thenReturn Future.successful(None)
 
         when(mockSubscriptionConnector.createEnrolment(any())(any(), any()))
           .thenReturn(Future.successful(HttpResponse(NO_CONTENT, "")))
@@ -860,12 +946,14 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach wi
             bind[EmailService].toInstance(mockEmailService),
             bind[SubscriptionConnector].toInstance(mockSubscriptionConnector),
             bind[RegistrationService].toInstance(mockRegistrationService),
+            bind[EnrolmentStoreProxyConnector].toInstance(mockEnrolmentStoreProxyConnector),
             bind[SessionRepository].toInstance(mockSessionRepository)
           )
           .build()
 
         when(mockRegistrationService.sendRegistration(any())(any(), any()))
           .thenReturn(Future.successful(None))
+        when(mockSubscriptionConnector.readSubscriptionDetails(any[String]())(any[HeaderCarrier](), any[ExecutionContext]())) thenReturn Future.successful(None)
 
         when(mockSubscriptionConnector.createEnrolment(any())(any(), any()))
           .thenReturn(Future.successful(HttpResponse(NO_CONTENT, "")))
@@ -898,13 +986,19 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach wi
           .set(HaveSecondContactPage, false)
           .success
           .value
+          .set(SubscriptionIDPage, "subscriptionId")
+          .success
+          .value
 
         val application = applicationBuilder(userAnswers = Some(userAnswers))
           .overrides(
             bind[SubscriptionConnector].toInstance(mockSubscriptionConnector),
-            bind[SessionRepository].toInstance(mockSessionRepository)
+            bind[SessionRepository].toInstance(mockSessionRepository),
+            bind[EnrolmentStoreProxyConnector].toInstance(mockEnrolmentStoreProxyConnector)
           )
           .build()
+        when(mockSubscriptionConnector.readSubscriptionDetails(any[String]())(any[HeaderCarrier](), any[ExecutionContext]())) thenReturn Future.successful(None)
+        when(mockEnrolmentStoreProxyConnector.enrolmentExists(any[String]())(any[HeaderCarrier](), any[ExecutionContext]())) thenReturn Future.successful(false)
 
         when(mockSubscriptionConnector.createSubscription(any())(any(), any()))
           .thenReturn(Future.successful(Left(DuplicateSubmissionError)))
@@ -945,10 +1039,12 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach wi
         val application = applicationBuilder(userAnswers = Some(userAnswers))
           .overrides(
             bind[RegistrationService].toInstance(mockRegistrationService),
+            bind[EnrolmentStoreProxyConnector].toInstance(mockEnrolmentStoreProxyConnector),
             bind[SubscriptionConnector].toInstance(mockSubscriptionConnector),
             bind[SessionRepository].toInstance(mockSessionRepository)
           )
           .build()
+        when(mockSubscriptionConnector.readSubscriptionDetails(any[String]())(any[HeaderCarrier](), any[ExecutionContext]())) thenReturn Future.successful(None)
 
         when(mockSubscriptionConnector.createSubscription(any())(any(), any()))
           .thenReturn(Future.successful(Left(DuplicateSubmissionError)))
@@ -995,9 +1091,11 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach wi
         val application = applicationBuilder(userAnswers = Some(userAnswers))
           .overrides(
             bind[SubscriptionConnector].toInstance(mockSubscriptionConnector),
+            bind[EnrolmentStoreProxyConnector].toInstance(mockEnrolmentStoreProxyConnector),
             bind[SessionRepository] toInstance mockSessionRepository
           )
           .build()
+        when(mockSubscriptionConnector.readSubscriptionDetails(any[String]())(any[HeaderCarrier](), any[ExecutionContext]())) thenReturn Future.successful(None)
 
         when(mockSubscriptionConnector.createSubscription(any())(any(), any()))
           .thenReturn(Future.successful(Left(DuplicateSubmissionError)))
@@ -1037,14 +1135,21 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach wi
           .set(HaveSecondContactPage, false)
           .success
           .value
+          .set(SubscriptionIDPage, "subscriptionId")
+          .success
+          .value
 
         val application = applicationBuilder(userAnswers = Some(userAnswers))
           .overrides(
             bind[RegistrationService].toInstance(mockRegistrationService),
             bind[SubscriptionConnector].toInstance(mockSubscriptionConnector),
+            bind[EnrolmentStoreProxyConnector].toInstance(mockEnrolmentStoreProxyConnector),
             bind[SessionRepository].toInstance(mockSessionRepository)
           )
           .build()
+
+        when(mockSubscriptionConnector.readSubscriptionDetails(any[String]())(any[HeaderCarrier](), any[ExecutionContext]())) thenReturn Future.successful(None)
+        when(mockEnrolmentStoreProxyConnector.enrolmentExists(any[String]())(any[HeaderCarrier](), any[ExecutionContext]())) thenReturn Future.successful(false)
 
         when(mockRegistrationService.sendRegistration(any())(any(), any()))
           .thenReturn(Future.successful(Some(HttpResponse(OK, registerWithoutIDResponse(safeID)))))
@@ -1087,9 +1192,11 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach wi
             bind[EmailService].toInstance(mockEmailService),
             bind[SubscriptionConnector].toInstance(mockSubscriptionConnector),
             bind[RegistrationService].toInstance(mockRegistrationService),
+            bind[EnrolmentStoreProxyConnector].toInstance(mockEnrolmentStoreProxyConnector),
             bind[SessionRepository].toInstance(mockSessionRepository)
           )
           .build()
+        when(mockSubscriptionConnector.readSubscriptionDetails(any[String]())(any[HeaderCarrier](), any[ExecutionContext]())) thenReturn Future.successful(None)
 
         when(mockSubscriptionConnector.createSubscription(any())(any(), any()))
           .thenReturn(Future.successful(Right(safeID)))
@@ -1136,6 +1243,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach wi
         val application = applicationBuilder(userAnswers = Some(userAnswersValid))
           .overrides(
             bind[RegistrationService].toInstance(mockRegistrationService),
+            bind[EnrolmentStoreProxyConnector].toInstance(mockEnrolmentStoreProxyConnector),
             bind[SessionRepository].toInstance(mockSessionRepository)
           )
           .build()
@@ -1156,6 +1264,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach wi
         val application = applicationBuilder(userAnswers = Some(userAnswersValid))
           .overrides(
             bind[RegistrationService].toInstance(mockRegistrationService),
+            bind[EnrolmentStoreProxyConnector].toInstance(mockEnrolmentStoreProxyConnector),
             bind[SessionRepository].toInstance(mockSessionRepository)
           )
           .build()
