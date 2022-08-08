@@ -11,7 +11,7 @@ site.no = No
 site.yes = Yes
 site.continue = Continue
 site.saveAndContinue = Save and continue
-site.getHelpWithThisPage = Get help with this page (opens in a new tab)
+site.getHelpWithThisPage = Get help with this page
 site.service_name = Register to disclose cross-border arrangements for DAC6
 
 site.textarea.char_limit = (Limit is {0} characters)
@@ -342,12 +342,14 @@ registrationSuccessful.title = Registration successful
 registrationSuccessful.panel = Registration successful
 registrationSuccessful.panel.html = Your User ID
 registrationSuccessful.heading = What happens next
-registrationSuccessful.email = We have sent you a confirmation email.
-registrationSuccessful.subscriptionID.text = If you use the file upload service, you will need to provide your User ID in every file you submit to HMRC.
+registrationSuccessful.email = You will need to provide the User ID shown above in every file you send to HMRC. You may make a note of your User ID, however, it will be included in the confirmation email we will send you.
+registrationSuccessful.email2 = You do not need your User ID to send disclosures using the manual form.
+
+registrationSuccessful.subscriptionID.text = We will send you an email to confirm you have registered.
+
 registrationSuccessful.submission.text = You can now
 registrationSuccessful.submission.link = disclose cross-border arrangements.
-registrationSuccessful.survey.link = What did you think of this service?
-registrationSuccessful.survey.text = (opens in a new tab)
+registrationSuccessful.survey.link = What did you think of this service? (opens in a new tab)
 
 businessName.registered.hint = This is the registered name on your incorporation certificate.
 businessName.partnership.hint = This is the name that you registered with HMRC
