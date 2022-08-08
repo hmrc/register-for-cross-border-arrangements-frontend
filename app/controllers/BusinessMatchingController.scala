@@ -16,8 +16,9 @@
 
 package controllers
 
-import connectors.SubscriptionConnector
+import connectors.{EnrolmentStoreProxyConnector, SubscriptionConnector}
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction, NotEnrolledForDAC6Action}
+import models.readSubscription.{DisplaySubscriptionForDACResponse, ReadSubscriptionForDACResponse}
 import models.{BusinessDetails, Mode, NormalMode, UserAnswers}
 import navigation.Navigator
 import org.slf4j.LoggerFactory
@@ -46,6 +47,7 @@ class BusinessMatchingController @Inject() (
   val controllerComponents: MessagesControllerComponents,
   renderer: Renderer,
   subscriptionConnector: SubscriptionConnector,
+  enrolmentStoreProxyConnector: EnrolmentStoreProxyConnector,
   emailService: EmailService
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
@@ -54,17 +56,31 @@ class BusinessMatchingController @Inject() (
 
   private val logger = LoggerFactory.getLogger(getClass)
 
+  private def checkExistingEnrolmentForIndividualAndThenCreateEnrolment(userAnswers: UserAnswers,
+                                                                        displaySubscriptionForDACResponse: Option[DisplaySubscriptionForDACResponse]
+  )(implicit
+    headerCarrier: HeaderCarrier,
+    ec: ExecutionContext
+  ): Future[Result] =
+    displaySubscriptionForDACResponse
+      .map {
+        response =>
+          val subscriptionId = response.displaySubscriptionForDACResponse.responseDetail.subscriptionID
+          enrolmentStoreProxyConnector.enrolmentExists(subscriptionId) flatMap {
+            case true  => Future.successful(Redirect(routes.IndividualAlreadyRegisteredController.onPageLoad()))
+            case false => createEnrolment(userAnswers, subscriptionId)
+          }
+      }
+      .getOrElse(
+        Future.successful(Redirect(routes.IdentityConfirmedController.onPageLoad()))
+      )
+
   def matchIndividual(mode: Mode): Action[AnyContent] = (identify andThen notEnrolled andThen getData andThen requireData).async {
     implicit request =>
       businessMatchingService.sendIndividualMatchingInformation(request.userAnswers).flatMap {
         case Right((Some(_), Some(id), existingSubscriptionDetails)) =>
           updateIndividualAnswers(request.userAnswers, id).flatMap(
-            updatedUserAnswers =>
-              if (existingSubscriptionDetails.isDefined) {
-                createEnrolment(updatedUserAnswers, existingSubscriptionDetails.get.displaySubscriptionForDACResponse.responseDetail.subscriptionID)
-              } else {
-                Future(Redirect(routes.IdentityConfirmedController.onPageLoad()))
-              }
+            updatedUserAnswers => checkExistingEnrolmentForIndividualAndThenCreateEnrolment(updatedUserAnswers, existingSubscriptionDetails)
           )
         case Right(_) => Future.successful(Redirect(routes.IndividualNotConfirmedController.onPageLoad()))
         //we are missing a name or a date of birth take them back to fill it in
@@ -77,6 +93,25 @@ class BusinessMatchingController @Inject() (
       updatedAnswersWithSafeID <- Future.fromTry(userAnswers.set(SafeIDPage, safeId))
       _                        <- sessionRepository.set(updatedAnswersWithSafeID)
     } yield updatedAnswersWithSafeID
+
+  private def checkExistingEnrolmentForBusinessAndThenCreateEnrolment(userAnswers: UserAnswers,
+                                                                      displaySubscriptionForDACResponse: Option[DisplaySubscriptionForDACResponse]
+  )(implicit
+    headerCarrier: HeaderCarrier,
+    ec: ExecutionContext
+  ): Future[Result] =
+    displaySubscriptionForDACResponse
+      .map {
+        response =>
+          val subscriptionId = response.displaySubscriptionForDACResponse.responseDetail.subscriptionID
+          enrolmentStoreProxyConnector.enrolmentExists(subscriptionId) flatMap {
+            case true  => Future.successful(Redirect(routes.BusinessAlreadyRegisteredController.onPageLoad()))
+            case false => createEnrolment(userAnswers, subscriptionId)
+          }
+      }
+      .getOrElse(
+        Future.successful(Redirect(routes.ConfirmBusinessController.onPageLoad(NormalMode)))
+      )
 
   def matchBusiness(mode: Mode): Action[AnyContent] =
     (identify andThen notEnrolled andThen getData andThen requireData).async {
@@ -94,11 +129,7 @@ class BusinessMatchingController @Inject() (
             case (Some(details), Some(id), existingSubscriptionInfo) =>
               updateUserAnswers(request.userAnswers, details, id).flatMap {
                 updatedUserAnswers =>
-                  if (existingSubscriptionInfo.isDefined) {
-                    createEnrolment(updatedUserAnswers, existingSubscriptionInfo.get.displaySubscriptionForDACResponse.responseDetail.subscriptionID)
-                  } else {
-                    Future.successful(Redirect(routes.ConfirmBusinessController.onPageLoad(NormalMode)))
-                  }
+                  checkExistingEnrolmentForBusinessAndThenCreateEnrolment(updatedUserAnswers, existingSubscriptionInfo)
               }
             case _ => Future.successful(Redirect(routes.BusinessNotIdentifiedController.onPageLoad()))
           } recover {

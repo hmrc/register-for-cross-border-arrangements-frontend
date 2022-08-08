@@ -17,7 +17,7 @@
 package controllers
 
 import base.SpecBase
-import connectors.SubscriptionConnector
+import connectors.{EnrolmentStoreProxyConnector, SubscriptionConnector}
 import generators.Generators
 import matchers.JsonMatchers
 import models.readSubscription._
@@ -34,19 +34,19 @@ import models.{
   UserAnswers
 }
 import pages._
-import play.api.inject._
+import play.api.inject.{bind, _}
 import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import repositories.SessionRepository
 import services.{BusinessMatchingService, EmailService}
 import uk.gov.hmrc.domain.Generator
-import uk.gov.hmrc.http.HttpResponse
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.viewmodels.NunjucksSupport
 import org.mockito.ArgumentMatchers.any
 
 import java.time.LocalDate
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 class BusinessMatchingControllerSpec extends SpecBase with NunjucksSupport with JsonMatchers with Generators {
 
@@ -63,7 +63,8 @@ class BusinessMatchingControllerSpec extends SpecBase with NunjucksSupport with 
 
   val mockSubscriptionConnector: SubscriptionConnector = mock[SubscriptionConnector]
 
-  val mockEmailService: EmailService = mock[EmailService]
+  val mockEmailService: EmailService                                 = mock[EmailService]
+  val mockEnrolmentStoreProxyConnector: EnrolmentStoreProxyConnector = mock[EnrolmentStoreProxyConnector]
 
   val mockSessionRepository: SessionRepository = mock[SessionRepository]
 
@@ -109,6 +110,7 @@ class BusinessMatchingControllerSpec extends SpecBase with NunjucksSupport with 
   val responseCommon: ResponseCommon = ResponseCommon(status = "OK", statusText = None, processingDate = "2020-08-09T11:23:45Z", returnParameters = None)
 
   when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+  when(mockEnrolmentStoreProxyConnector.enrolmentExists(any[String]())(any[HeaderCarrier](), any[ExecutionContext]())) thenReturn Future.successful(false)
 
   "BusinessMatching Controller" - {
     "when a correct submission can be created and returns an individual match" - {
@@ -180,6 +182,7 @@ class BusinessMatchingControllerSpec extends SpecBase with NunjucksSupport with 
               .overrides(
                 bind[BusinessMatchingService].toInstance(mockBusinessMatchingService),
                 bind[SubscriptionConnector].toInstance(mockSubscriptionConnector),
+                bind[EnrolmentStoreProxyConnector].toInstance(mockEnrolmentStoreProxyConnector),
                 bind[EmailService].toInstance(mockEmailService),
                 bind[SessionRepository].toInstance(mockSessionRepository)
               )
@@ -244,6 +247,7 @@ class BusinessMatchingControllerSpec extends SpecBase with NunjucksSupport with 
                 bind[BusinessMatchingService].toInstance(mockBusinessMatchingService),
                 bind[SubscriptionConnector].toInstance(mockSubscriptionConnector),
                 bind[EmailService].toInstance(mockEmailService),
+                bind[EnrolmentStoreProxyConnector].toInstance(mockEnrolmentStoreProxyConnector),
                 bind[SessionRepository].toInstance(mockSessionRepository)
               )
               .build()
@@ -286,8 +290,7 @@ class BusinessMatchingControllerSpec extends SpecBase with NunjucksSupport with 
             redirectLocation(result) mustBe Some(routes.RegistrationSuccessfulController.onPageLoad.url)
         }
       }
-
-      "must redirect the user to tech difficulties page if user is already subscribed and create enrolments call fails" in {
+      "must redirect the user to  already registered page and when enrolments exits" in {
 
         forAll(validSubscriptionID, validSafeID) {
           (existingSubscriptionID, safeId) =>
@@ -306,6 +309,7 @@ class BusinessMatchingControllerSpec extends SpecBase with NunjucksSupport with 
               .overrides(
                 bind[BusinessMatchingService].toInstance(mockBusinessMatchingService),
                 bind[SubscriptionConnector].toInstance(mockSubscriptionConnector),
+                bind[EnrolmentStoreProxyConnector].toInstance(mockEnrolmentStoreProxyConnector),
                 bind[EmailService].toInstance(mockEmailService),
                 bind[SessionRepository].toInstance(mockSessionRepository)
               )
@@ -336,7 +340,70 @@ class BusinessMatchingControllerSpec extends SpecBase with NunjucksSupport with 
                   )
                 )
               )
+            when(mockEnrolmentStoreProxyConnector.enrolmentExists(any[String]())(any[HeaderCarrier](), any[ExecutionContext]())) thenReturn Future.successful(
+              true
+            )
 
+            val result = route(application, getRequest(individualMatchingRoute)).value
+
+            status(result) mustEqual SEE_OTHER
+            redirectLocation(result) mustBe Some("/register-for-cross-border-arrangements/register/individual-pre-registered")
+        }
+      }
+
+      "must redirect the user to tech difficulties page if user is already subscribed and create enrolments call fails" in {
+
+        forAll(validSubscriptionID, validSafeID) {
+          (existingSubscriptionID, safeId) =>
+            val userAnswers = UserAnswers(userAnswersId)
+              .set(DateOfBirthPage, LocalDate.now())
+              .success
+              .value
+              .set(NamePage, Name("", ""))
+              .success
+              .value
+              .set(NinoPage, (new Generator()).nextNino)
+              .success
+              .value
+
+            val application = applicationBuilder(userAnswers = Some(userAnswers))
+              .overrides(
+                bind[BusinessMatchingService].toInstance(mockBusinessMatchingService),
+                bind[SubscriptionConnector].toInstance(mockSubscriptionConnector),
+                bind[EnrolmentStoreProxyConnector].toInstance(mockEnrolmentStoreProxyConnector),
+                bind[EmailService].toInstance(mockEmailService),
+                bind[SessionRepository].toInstance(mockSessionRepository)
+              )
+              .build()
+
+            val responseDetailRead: ResponseDetailForReadSubscription = createResponseDetail(existingSubscriptionID)
+
+            val displaySubscriptionForDACResponse: DisplaySubscriptionForDACResponse =
+              DisplaySubscriptionForDACResponse(
+                ReadSubscriptionForDACResponse(responseCommon = responseCommon, responseDetail = responseDetailRead)
+              )
+
+            when(mockBusinessMatchingService.sendIndividualMatchingInformation(any())(any(), any()))
+              .thenReturn(
+                Future.successful(
+                  Right(
+                    (Some(
+                       PayloadRegistrationWithIDResponse(
+                         RegisterWithIDResponse(
+                           ResponseCommon("OK", None, "", None),
+                           None
+                         )
+                       )
+                     ),
+                     Some(safeId),
+                     Some(displaySubscriptionForDACResponse)
+                    )
+                  )
+                )
+              )
+            when(mockEnrolmentStoreProxyConnector.enrolmentExists(any[String]())(any[HeaderCarrier](), any[ExecutionContext]())) thenReturn Future.successful(
+              false
+            )
             when(mockSubscriptionConnector.createEnrolment(any())(any(), any()))
               .thenReturn(Future.successful(HttpResponse(BAD_REQUEST, "")))
 
@@ -412,6 +479,7 @@ class BusinessMatchingControllerSpec extends SpecBase with NunjucksSupport with 
                 bind[BusinessMatchingService].toInstance(mockBusinessMatchingService),
                 bind[SubscriptionConnector].toInstance(mockSubscriptionConnector),
                 bind[EmailService].toInstance(mockEmailService),
+                bind[EnrolmentStoreProxyConnector].toInstance(mockEnrolmentStoreProxyConnector),
                 bind[SessionRepository].toInstance(mockSessionRepository)
               )
               .build()
@@ -448,6 +516,7 @@ class BusinessMatchingControllerSpec extends SpecBase with NunjucksSupport with 
               .overrides(
                 bind[BusinessMatchingService].toInstance(mockBusinessMatchingService),
                 bind[SubscriptionConnector].toInstance(mockSubscriptionConnector),
+                bind[EnrolmentStoreProxyConnector].toInstance(mockEnrolmentStoreProxyConnector),
                 bind[EmailService].toInstance(mockEmailService),
                 bind[SessionRepository].toInstance(mockSessionRepository)
               )
@@ -477,7 +546,6 @@ class BusinessMatchingControllerSpec extends SpecBase with NunjucksSupport with 
             redirectLocation(result) mustBe Some("/register-for-cross-border-arrangements/register/confirm-registration")
         }
       }
-
       "must redirect to technical difficulties page if call to create the enrolment fails when user already subscribed" in {
         forAll(validSubscriptionID, validSafeID, validUtr) {
           (existingSubscriptionID, safeId, utr) =>
@@ -486,6 +554,7 @@ class BusinessMatchingControllerSpec extends SpecBase with NunjucksSupport with 
                 bind[BusinessMatchingService].toInstance(mockBusinessMatchingService),
                 bind[SubscriptionConnector].toInstance(mockSubscriptionConnector),
                 bind[EmailService].toInstance(mockEmailService),
+                bind[EnrolmentStoreProxyConnector].toInstance(mockEnrolmentStoreProxyConnector),
                 bind[SessionRepository].toInstance(mockSessionRepository)
               )
               .build()
@@ -512,6 +581,41 @@ class BusinessMatchingControllerSpec extends SpecBase with NunjucksSupport with 
         }
       }
 
+      "must redirect  Already registered  Page if enrolment already exists" in {
+        forAll(validSubscriptionID, validSafeID, validUtr) {
+          (existingSubscriptionID, safeId, utr) =>
+            val application = applicationBuilder(userAnswers = Some(createBusinessUserAnswers(utr)))
+              .overrides(
+                bind[BusinessMatchingService].toInstance(mockBusinessMatchingService),
+                bind[SubscriptionConnector].toInstance(mockSubscriptionConnector),
+                bind[EmailService].toInstance(mockEmailService),
+                bind[EnrolmentStoreProxyConnector].toInstance(mockEnrolmentStoreProxyConnector),
+                bind[SessionRepository].toInstance(mockSessionRepository)
+              )
+              .build()
+
+            val businessDetails = BusinessDetails(name = "My Company", address = BusinessAddress("1 Address Street", None, None, None, "NE11 1BB", "GB"))
+
+            val responseDetailRead: ResponseDetailForReadSubscription = createResponseDetail(existingSubscriptionID)
+
+            val displaySubscriptionForDACResponse: DisplaySubscriptionForDACResponse =
+              DisplaySubscriptionForDACResponse(
+                ReadSubscriptionForDACResponse(responseCommon = responseCommon, responseDetail = responseDetailRead)
+              )
+            when(mockEnrolmentStoreProxyConnector.enrolmentExists(any[String]())(any[HeaderCarrier](), any[ExecutionContext]())) thenReturn Future.successful(
+              true
+            )
+
+            when(mockBusinessMatchingService.sendBusinessMatchingInformation(any())(any(), any()))
+              .thenReturn(Future.successful((Some(businessDetails), Some(safeId), Some(displaySubscriptionForDACResponse))))
+
+            val result = route(application, getRequest(businessMatchingRoute)).value
+
+            status(result) mustEqual SEE_OTHER
+            redirectLocation(result) mustBe Some("/register-for-cross-border-arrangements/register/organisation-with-utr-pre-registered")
+        }
+      }
+
       "must redirect to technical difficulties page if call to create the enrolment fails when user already enrolled" in {
         forAll(validSubscriptionID, validSafeID, validUtr) {
           (existingSubscriptionID, safeId, utr) =>
@@ -520,6 +624,7 @@ class BusinessMatchingControllerSpec extends SpecBase with NunjucksSupport with 
                 bind[BusinessMatchingService].toInstance(mockBusinessMatchingService),
                 bind[SubscriptionConnector].toInstance(mockSubscriptionConnector),
                 bind[EmailService].toInstance(mockEmailService),
+                bind[EnrolmentStoreProxyConnector].toInstance(mockEnrolmentStoreProxyConnector),
                 bind[SessionRepository].toInstance(mockSessionRepository)
               )
               .build()
@@ -566,6 +671,7 @@ class BusinessMatchingControllerSpec extends SpecBase with NunjucksSupport with 
             val application = applicationBuilder(userAnswers = Some(businessUserAnswers))
               .overrides(
                 bind[BusinessMatchingService].toInstance(mockBusinessMatchingService),
+                bind[EnrolmentStoreProxyConnector].toInstance(mockEnrolmentStoreProxyConnector),
                 bind[SessionRepository].toInstance(mockSessionRepository)
               )
               .build()
@@ -614,7 +720,8 @@ class BusinessMatchingControllerSpec extends SpecBase with NunjucksSupport with 
             val application = applicationBuilder(userAnswers = Some(createBusinessUserAnswers(utr)))
               .overrides(
                 bind[BusinessMatchingService].toInstance(mockBusinessMatchingService),
-                bind[SessionRepository].toInstance(mockSessionRepository)
+                bind[SessionRepository].toInstance(mockSessionRepository),
+                bind[EnrolmentStoreProxyConnector].toInstance(mockEnrolmentStoreProxyConnector)
               )
               .build()
 
@@ -644,7 +751,8 @@ class BusinessMatchingControllerSpec extends SpecBase with NunjucksSupport with 
         val application = applicationBuilder(userAnswers = Some(businessUserAnswers))
           .overrides(
             bind[BusinessMatchingService].toInstance(mockBusinessMatchingService),
-            bind[SessionRepository].toInstance(mockSessionRepository)
+            bind[SessionRepository].toInstance(mockSessionRepository),
+            bind[EnrolmentStoreProxyConnector].toInstance(mockEnrolmentStoreProxyConnector)
           )
           .build()
 
