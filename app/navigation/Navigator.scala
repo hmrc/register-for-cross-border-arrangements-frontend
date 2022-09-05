@@ -46,7 +46,7 @@ class Navigator @Inject() (appConfig: FrontendAppConfig) {
     case IndividualUKPostcodePage              => _ => Some(routes.SelectAddressController.onPageLoad(NormalMode))
     case SelectAddressPage                     => _ => Some(routes.ContactEmailAddressController.onPageLoad(NormalMode))
     case NonUkNamePage                         => _ => Some(routes.DateOfBirthController.onPageLoad(NormalMode))
-    case BusinessAddressPage                   => _ => Some(routes.ContactNameController.onPageLoad(NormalMode))
+    case BusinessAddressPage                   => _ => Some(routes.YourContactDetailsController.onPageLoad)
     case BusinessWithoutIDNamePage             => _ => Some(routes.DoYouHaveBusinessTradingNameController.onPageLoad(NormalMode))
     case DoYouHaveBusinessTradingNamePage      => doYouHaveBusinessTradingNameRoutes(NormalMode)
     case BusinessTradingNamePage               => _ => Some(routes.BusinessAddressController.onPageLoad(NormalMode))
@@ -126,8 +126,12 @@ class Navigator @Inject() (appConfig: FrontendAppConfig) {
       case true =>
         ua.get(BusinessTypePage) match {
           case Some(BusinessType.NotSpecified) => routes.ContactEmailAddressController.onPageLoad(mode)
-          case Some(_)                         => routes.ContactNameController.onPageLoad(mode)
-          case None                            => routes.ContactEmailAddressController.onPageLoad(mode)
+          case Some(_) =>
+            mode match {
+              case NormalMode => routes.YourContactDetailsController.onPageLoad
+              case _          => routes.ContactNameController.onPageLoad(mode)
+            }
+          case None => routes.ContactEmailAddressController.onPageLoad(mode)
         }
       case false => routes.BusinessNotIdentifiedController.onPageLoad()
     }

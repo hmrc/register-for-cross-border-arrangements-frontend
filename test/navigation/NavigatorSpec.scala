@@ -201,12 +201,12 @@ class NavigatorSpec extends SpecBase with ScalaCheckPropertyChecks with Generato
         }
       }
 
-      "must go from businessAddress page to Check your answers page" in {
+      "must go from businessAddress page to your contact details page" in {
         forAll(arbitrary[UserAnswers]) {
           answers =>
             navigator
               .nextPage(BusinessAddressPage, NormalMode, answers)
-              .mustBe(routes.ContactNameController.onPageLoad(NormalMode))
+              .mustBe(routes.YourContactDetailsController.onPageLoad)
         }
       }
 
@@ -812,7 +812,7 @@ class NavigatorSpec extends SpecBase with ScalaCheckPropertyChecks with Generato
 
               navigator
                 .nextPage(ConfirmBusinessPage, NormalMode, updatedAnswers)
-                .mustBe(routes.ContactNameController.onPageLoad(NormalMode))
+                .mustBe(routes.YourContactDetailsController.onPageLoad)
           }
         }
 
