@@ -440,8 +440,8 @@ confirmBusiness.heading = Is this your business?
 confirmBusiness.checkYourAnswersLabel = Your business
 confirmBusiness.error.required = Select yes if this is your business
 
-contactName.title = Who should we contact if we have any questions about your disclosures?
-contactName.heading = Who should we contact if we have any questions about your disclosures?
+contactName.title = What is the name of the individual or team we should contact?
+contactName.heading = What is the name of the individual or team we should contact?
 contactName.hint = For example, ‘DAC team’ or ‘Ashley Smith’.
 contactName.checkYourAnswersLabel = Contact name
 contactName.error.required = Enter the name of the individual or team we should contact if we have any questions about your disclosures
