@@ -434,7 +434,7 @@ class CheckModeNavigatorSpec extends SpecBase with ScalaCheckPropertyChecks with
     }
 
     "must got from What is the main address of your business? page to" - {
-      "Who should we contact if we have any questions about your disclosures? page when answer is an address" in {
+      "What is the name of the individual or team we should contact? page when answer is an address" in {
         forAll(arbitrary[UserAnswers]) {
           answers =>
             val updatedAnswers =
