@@ -160,9 +160,8 @@ class Navigator @Inject() (appConfig: FrontendAppConfig) {
 
   private def doYouLiveInTheUKRoutes(mode: Mode)(ua: UserAnswers): Option[Call] =
     ua.get(DoYouLiveInTheUKPage) map {
-      case true if appConfig.addressLookupToggle => routes.IndividualUKPostcodeController.onPageLoad(mode)
-      case true                                  => routes.WhatIsYourAddressUkController.onPageLoad(mode)
-      case false                                 => routes.WhatIsYourAddressController.onPageLoad(mode)
+      case true  => routes.IndividualUKPostcodeController.onPageLoad(mode)
+      case false => routes.WhatIsYourAddressController.onPageLoad(mode)
     }
 
   private def registrationTypeRoutes(mode: Mode)(ua: UserAnswers): Option[Call] =
