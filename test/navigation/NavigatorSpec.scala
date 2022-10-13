@@ -378,9 +378,7 @@ class NavigatorSpec extends SpecBase with ScalaCheckPropertyChecks with Generato
         }
       }
 
-      "must go from the Do You Live in the UK page for people who answer yes to What is your postcode? - address lookup toggle is true" in {
-
-        when(mockFrontendConfig.addressLookupToggle).thenReturn(true)
+      "must go from the Do You Live in the UK page for people who answer yes to What is your postcode?" in {
 
         forAll(arbitrary[UserAnswers]) {
           answers =>
@@ -393,24 +391,6 @@ class NavigatorSpec extends SpecBase with ScalaCheckPropertyChecks with Generato
             navigator
               .nextPage(DoYouLiveInTheUKPage, NormalMode, updatedAnswers)
               .mustBe(routes.IndividualUKPostcodeController.onPageLoad(NormalMode))
-        }
-      }
-
-      "must go from the Do You Live in the UK page for people who answer yes to What is your address? - address lookup toggle is false" in {
-
-        when(mockFrontendConfig.addressLookupToggle).thenReturn(false)
-
-        forAll(arbitrary[UserAnswers]) {
-          answers =>
-            val updatedAnswers =
-              answers
-                .set(DoYouLiveInTheUKPage, true)
-                .success
-                .value
-
-            navigator
-              .nextPage(DoYouLiveInTheUKPage, NormalMode, updatedAnswers)
-              .mustBe(routes.WhatIsYourAddressUkController.onPageLoad(NormalMode))
         }
       }
 

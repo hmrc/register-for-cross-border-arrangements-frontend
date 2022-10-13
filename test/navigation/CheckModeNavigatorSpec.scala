@@ -579,9 +579,7 @@ class CheckModeNavigatorSpec extends SpecBase with ScalaCheckPropertyChecks with
     }
 
     "must go from Do you live in the UK? page to" - {
-      "What is your postcode? when answer is 'Yes' and address lookup toggle is true" in {
-
-        when(mockFrontendConfig.addressLookupToggle).thenReturn(true)
+      "What is your postcode? when answer is 'Yes'" in {
 
         forAll(arbitrary[UserAnswers]) {
           answers =>
@@ -594,24 +592,6 @@ class CheckModeNavigatorSpec extends SpecBase with ScalaCheckPropertyChecks with
             navigator
               .nextPage(DoYouLiveInTheUKPage, CheckMode, updatedAnswers)
               .mustBe(routes.IndividualUKPostcodeController.onPageLoad(CheckMode))
-        }
-      }
-
-      "What is your address? when answer is 'Yes' and address lookup toggle is false" in {
-
-        when(mockFrontendConfig.addressLookupToggle).thenReturn(false)
-
-        forAll(arbitrary[UserAnswers]) {
-          answers =>
-            val updatedAnswers =
-              answers
-                .set(DoYouLiveInTheUKPage, true)
-                .success
-                .value
-
-            navigator
-              .nextPage(DoYouLiveInTheUKPage, CheckMode, updatedAnswers)
-              .mustBe(routes.WhatIsYourAddressUkController.onPageLoad(CheckMode))
         }
       }
 
