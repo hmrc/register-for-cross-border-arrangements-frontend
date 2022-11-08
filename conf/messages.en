@@ -221,8 +221,10 @@ selfAssessmentUTR.error.invalid = Self Assessment Unique Taxpayer Reference must
 
 corporationTaxUTR.title.corporation = What is your Corporation Tax Unique Taxpayer Reference?
 corporationTaxUTR.heading.corporation = What is your Corporation Tax Unique Taxpayer Reference?
-corporationTaxUTR.hint = This is 10 numbers, for example 1234567890. It will be on tax returns and other letters about Corporation Tax. It may be called ‘reference’, ‘UTR’ or ‘official use’. You can
-corporationTaxUTR.link = find a lost UTR number (opens in new tab)
+corporationTaxUTR.p1 = You can
+corporationTaxUTR.link = find a lost UTR number.
+corporationTaxUTR.hint = This is 10 numbers, for example 1234567890. It will be on tax returns and other letters about Corporation Tax. It may be called ‘reference’, ‘UTR’ or ‘official use’.
+corporationTaxUTR.link = find a lost UTR number
 corporationTaxUTR.checkYourAnswersLabel = What is your Corporation Tax Unique Taxpayer Reference?
 corporationTaxUTR.error.required = Enter your Corporation Tax Unique Taxpayer Reference
 corporationTaxUTR.error.length = Corporation Tax Unique Taxpayer Reference must be 10 numbers
