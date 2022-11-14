@@ -37,11 +37,9 @@
                 {{ messages("selfAssessmentUTR.heading") }}
         </h1>
 
-        <div>
-              <p>{{ messages("selfAssessmentUTR.p1") }}</p>
+              <p class="govuk-body">{{ messages("selfAssessmentUTR.p1") }}
               <p class="govuk-hint" id="hint-text">{{ messages("selfAssessmentUTR.hint") }}
               <a href="{{lostUTRUrl}}" class="govuk-link" rel="noreferrer noopener" target="_blank">{{messages("selfAssessmentUTR.link")}}</a></p>
-        </div>
 
           {{ govukInput({
             id: "selfAssessmentUTR",
