@@ -16,8 +16,7 @@ lazy val root = (project in file("."))
   .settings(majorVersion := 0)
   .settings(
     name := appName,
-    scalaVersion := "2.12.12",
-    SilencerSettings(),
+    scalaVersion := "2.13.8",
     ThisBuild / scalafmtOnCompile := true,
     RoutesKeys.routesImport += "models._",
     PlayKeys.playDefaultPort := 9755,
@@ -38,7 +37,9 @@ lazy val root = (project in file("."))
     ),
     uglifyCompressOptions := Seq("unused=false", "dead_code=false", "warnings=false"),
     Assets / pipelineStages := Seq(concat,uglify),
-    ThisBuild / useSuperShell := false
+    ThisBuild / useSuperShell := false,
+    scalacOptions += "-Wconf:src=routes/.*:s",
+    scalacOptions += "-Wconf:cat=unused-imports&src=html/.*:s"
   )
 
 lazy val testSettings: Seq[Def.Setting[_]] = Seq(

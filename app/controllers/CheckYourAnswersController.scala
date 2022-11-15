@@ -270,7 +270,7 @@ class CheckYourAnswersController @Inject() (
     emailResponse match {
       case Some(HttpResponse(NOT_FOUND, _, _))   => logger.warn("The template cannot be found within the email service")
       case Some(HttpResponse(BAD_REQUEST, _, _)) => logger.warn("Missing email or name parameter")
-      case _                                     => Unit
+      case _                                     => ()
     }
 
   def createEnrolment(userAnswers: UserAnswers)(implicit hc: HeaderCarrier): Future[Result] =
