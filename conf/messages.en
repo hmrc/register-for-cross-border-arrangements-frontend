@@ -212,16 +212,18 @@ businessType.error.required = Select the type of business you have
 
 selfAssessmentUTR.title = What is your Self Assessment Unique Taxpayer Reference?
 selfAssessmentUTR.heading = What is your Self Assessment Unique Taxpayer Reference?
-selfAssessmentUTR.hint = This is 10 numbers, for example 1234567890. It will be on tax returns and other letters about Self Assessment. It may be called ‘reference’, ‘UTR’ or ‘official use’. You can
-selfAssessmentUTR.link = find a lost UTR number (opens in new tab)
+selfAssessmentUTR.p1 = You can
+selfAssessmentUTR.link = find a lost UTR
+selfAssessmentUTR.hint = This is 10 numbers, for example 1234567890. It will be on tax returns and other letters about Self Assessment. It may be called ‘reference’, ‘UTR’ or ‘official use’.
 selfAssessmentUTR.error.required = Enter your Self Assessment Unique Taxpayer Reference
 selfAssessmentUTR.error.length =  Self Assessment Unique Taxpayer Reference must be 10 numbers
 selfAssessmentUTR.error.invalid = Self Assessment Unique Taxpayer Reference must only include numbers 0 to 9
 
 corporationTaxUTR.title.corporation = What is your Corporation Tax Unique Taxpayer Reference?
 corporationTaxUTR.heading.corporation = What is your Corporation Tax Unique Taxpayer Reference?
-corporationTaxUTR.hint = This is 10 numbers, for example 1234567890. It will be on tax returns and other letters about Corporation Tax. It may be called ‘reference’, ‘UTR’ or ‘official use’. You can
-corporationTaxUTR.link = find a lost UTR number (opens in new tab)
+corporationTaxUTR.p1 = You can
+corporationTaxUTR.link = find a lost UTR number
+corporationTaxUTR.hint = This is 10 numbers, for example 1234567890. It will be on tax returns and other letters about Corporation Tax. It may be called ‘reference’, ‘UTR’ or ‘official use’.
 corporationTaxUTR.checkYourAnswersLabel = What is your Corporation Tax Unique Taxpayer Reference?
 corporationTaxUTR.error.required = Enter your Corporation Tax Unique Taxpayer Reference
 corporationTaxUTR.error.length = Corporation Tax Unique Taxpayer Reference must be 10 numbers

@@ -38,8 +38,9 @@
         </h1>
 
         <div>
+              <p class="govuk-body">{{ messages("corporationTaxUTR.p1") }}
+                <a href="{{lostUTRUrl}}" class="govuk-link" rel="noreferrer noopener">{{messages("corporationTaxUTR.link")}}</a>.</p>
               <p class="govuk-hint" id="hint-text">{{ messages("corporationTaxUTR.hint") }}
-              <a href="{{lostUTRUrl}}" class="govuk-link" rel="noreferrer noopener" target="_blank">{{messages("corporationTaxUTR.link")}}</a></p>
         </div>
 
           {{ govukInput({
