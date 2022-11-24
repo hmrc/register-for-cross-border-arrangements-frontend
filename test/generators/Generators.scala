@@ -201,4 +201,5 @@ trait Generators
   def validSafeID: Gen[String] = RegexpGen.from(safeIDRegex)
 
   def validSubscriptionID: Gen[String] = RegexpGen.from(subscriptionIDRegex)
+
 }

@@ -17,16 +17,17 @@
 package services
 
 import connectors.EmailConnector
+
 import javax.inject.{Inject, Singleton}
 import models.{EmailRequest, UserAnswers}
 import pages._
-import uk.gov.hmrc.emailaddress.EmailAddress
+import utils.RegexConstants
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class EmailService @Inject() (emailConnector: EmailConnector)(implicit executionContext: ExecutionContext) {
+class EmailService @Inject() (emailConnector: EmailConnector)(implicit executionContext: ExecutionContext) extends RegexConstants {
 
   def sendEmail(userAnswers: UserAnswers)(implicit hc: HeaderCarrier): Future[Option[HttpResponse]] = {
 
@@ -61,14 +62,14 @@ class EmailService @Inject() (emailConnector: EmailConnector)(implicit execution
 
     for {
       primaryResponse <- emailAddress
-        .filter(EmailAddress.isValid)
+        .filter(emailRegex.r.matches)
         .fold(Future.successful(Option.empty[HttpResponse])) {
           email =>
             emailConnector.sendEmail(EmailRequest.registration(email, contactName, dac6ID)).map(Some.apply)
         }
 
       _ <- secondaryEmailAddress
-        .filter(EmailAddress.isValid)
+        .filter(emailRegex.r.matches)
         .fold(Future.successful(Option.empty[HttpResponse])) {
           secondaryEmailAddress =>
             emailConnector.sendEmail(EmailRequest.registration(secondaryEmailAddress, secondaryName, dac6ID)).map(Some.apply)
