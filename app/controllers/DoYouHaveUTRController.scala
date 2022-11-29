@@ -16,6 +16,7 @@
 
 package controllers
 
+import config.FrontendAppConfig
 import controllers.actions._
 import forms.DoYouHaveUTRFormProvider
 import helpers.JourneyHelpers.redirectToSummary
@@ -36,6 +37,7 @@ import scala.concurrent.ExecutionContext
 class DoYouHaveUTRController @Inject() (
   override val messagesApi: MessagesApi,
   sessionRepository: SessionRepository,
+  appConfig: FrontendAppConfig,
   navigator: Navigator,
   identify: IdentifierAction,
   notEnrolled: NotEnrolledForDAC6Action,
@@ -59,9 +61,10 @@ class DoYouHaveUTRController @Inject() (
       }
 
       val json = Json.obj(
-        "form"   -> preparedForm,
-        "mode"   -> mode,
-        "radios" -> Radios.yesNo(preparedForm("confirm"))
+        "form"       -> preparedForm,
+        "mode"       -> mode,
+        "radios"     -> Radios.yesNo(preparedForm("confirm")),
+        "lostUTRUrl" -> appConfig.lostUTRUrl
       )
 
       renderer.render("doYouHaveUTR.njk", json).map(Ok(_))
@@ -75,9 +78,10 @@ class DoYouHaveUTRController @Inject() (
           formWithErrors => {
 
             val json = Json.obj(
-              "form"   -> formWithErrors,
-              "mode"   -> mode,
-              "radios" -> Radios.yesNo(formWithErrors("confirm"))
+              "form"       -> formWithErrors,
+              "mode"       -> mode,
+              "radios"     -> Radios.yesNo(formWithErrors("confirm")),
+              "lostUTRUrl" -> appConfig.lostUTRUrl
             )
 
             renderer.render("doYouHaveUTR.njk", json).map(BadRequest(_))
