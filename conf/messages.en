@@ -172,6 +172,8 @@ registrationType.error.required = Select what you are registering as
 ## UTR page
 doYouHaveUTR.title =  Do you have a UK Unique Taxpayer Reference (UTR)?
 doYouHaveUTR.heading = Do you have a UK Unique Taxpayer Reference (UTR)?
+doYouHaveUTR.p1 = You can
+doYouHaveUTR.p1.link = find a lost UTR
 doYouHaveUTR.guidance = This is a 10 digit number issued by HMRC and is used to identify individual taxpayers. It will be on tax returns and other letters about Self Assessment or Corporation Tax.
 doYouHaveUTR.checkYourAnswersLabel = Do you have a UK Unique Taxpayer Reference?
 doYouHaveUTR.error.required = Select yes if you have a UK Unique Taxpayer Reference (UTR)
