@@ -34,6 +34,8 @@
           {{ csrf() | safe }}
 
           <h1 class="govuk-heading-xl">{{ messages("doYouHaveUTR.heading") }}</h1>
+          <p class="govuk-body">{{ messages("doYouHaveUTR.p1") }}
+             <span> <a class='govuk-link text-overflow' href='{{lostUTRUrl}}' rel='noreferrer noopener'> {{ messages("doYouHaveUTR.p1.link") }}</a>.</span></p>
 
           {{ govukRadios({
             name: 'confirm',
