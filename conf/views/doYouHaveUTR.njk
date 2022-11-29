@@ -33,6 +33,8 @@
 
           {{ csrf() | safe }}
 
+          <h1 class="govuk-heading-xl">{{ messages("doYouHaveUTR.heading") }}</h1>
+
           {{ govukRadios({
             name: 'confirm',
             fieldset: {
