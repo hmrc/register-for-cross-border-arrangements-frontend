@@ -33,13 +33,16 @@
 
           {{ csrf() | safe }}
 
+          <h1 class="govuk-heading-xl">{{ messages("doYouHaveUTR.heading") }}</h1>
+          <p class="govuk-body">{{ messages("doYouHaveUTR.p1") }}
+             <span> <a class='govuk-link' href='{{lostUTRUrl}}' rel='noreferrer noopener'> {{ messages("doYouHaveUTR.p1.link") }}</a>.</span></p>
+
           {{ govukRadios({
             name: 'confirm',
             fieldset: {
               legend: {
-                text: messages('doYouHaveUTR.title'),
-                isPageHeading: true,
-                classes: "govuk-fieldset__legend--xl"
+                isPageHeading: false,
+                classes: "govuk-fieldset__legend--xl govuk-visually-hidden"
               }
             },
              hint: {
