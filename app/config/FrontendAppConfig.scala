@@ -24,8 +24,8 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
 
   lazy val appName: String = configuration.get[String]("appName")
 
-  private val contactHost                  = configuration.get[String]("contact-frontend.host")
-  private val contactFormServiceIdentifier = "DAC6"
+  val contactHost                  = configuration.get[String]("contact-frontend.host")
+  val contactFormServiceIdentifier = "DAC6"
 
   val reportAProblemPartialUrl            = s"$contactHost/contact/problem_reports_ajax?service=$contactFormServiceIdentifier"
   val reportAProblemNonJSUrl              = s"$contactHost/contact/problem_reports_nonjs?service=$contactFormServiceIdentifier"
