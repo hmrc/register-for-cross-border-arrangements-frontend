@@ -40,7 +40,7 @@ class Renderer @Inject() (appConfig: FrontendAppConfig, trackingConfig: Tracking
     renderTemplate(template, ctx)
 
   private def renderTemplate(template: String, ctx: JsObject)(implicit request: RequestHeader): Future[Html] =
-    renderer.render(template, ctx ++ Json.obj("config" -> config.+("nonce" -> JsString(CSPNonce.get.getOrElse("")))))
+    renderer.render(template, ctx ++ Json.obj("config" -> config.+("nonce" -> JsString(CSPNonce.attr.toString))))
 
   private lazy val config: JsObject =
     Json.obj(
