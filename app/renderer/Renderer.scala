@@ -17,12 +17,14 @@
 package renderer
 
 import config.FrontendAppConfig
+
 import javax.inject.Inject
-import play.api.libs.json.{JsObject, Json, OWrites}
+import play.api.libs.json.{JsObject, JsString, Json, OWrites}
 import play.api.mvc.RequestHeader
 import play.twirl.api.Html
 import uk.gov.hmrc.hmrcfrontend.config.TrackingConsentConfig
 import uk.gov.hmrc.nunjucks.NunjucksRenderer
+import views.html.helper.CSPNonce
 
 import scala.concurrent.Future
 
@@ -38,7 +40,7 @@ class Renderer @Inject() (appConfig: FrontendAppConfig, trackingConfig: Tracking
     renderTemplate(template, ctx)
 
   private def renderTemplate(template: String, ctx: JsObject)(implicit request: RequestHeader): Future[Html] =
-    renderer.render(template, ctx ++ Json.obj("config" -> config))
+    renderer.render(template, ctx ++ Json.obj("config" -> config.+("nonce" -> JsString(CSPNonce.get.getOrElse("")))))
 
   private lazy val config: JsObject =
     Json.obj(

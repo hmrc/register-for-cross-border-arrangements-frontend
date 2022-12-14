@@ -27,10 +27,9 @@ import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
 import uk.gov.hmrc.play.audit.model.ExtendedDataEvent
 
 import javax.inject.Inject
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
-class AuditService @Inject() (appConfig: FrontendAppConfig, auditConnector: AuditConnector) {
+class AuditService @Inject() (appConfig: FrontendAppConfig, auditConnector: AuditConnector)(implicit ec: ExecutionContext) {
   private val logger: Logger = Logger(this.getClass)
 
   def sendAuditEvent(eventName: String, detail: JsValue, transactionName: String, path: String)(implicit
