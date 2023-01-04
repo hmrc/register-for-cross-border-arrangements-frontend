@@ -218,7 +218,7 @@ object IndRegistration {
           lookUp.addressLine3.getOrElse(""),
           lookUp.addressLine4,
           Some(lookUp.postcode),
-          Country("valid", "UK", "United Kingdom")
+          Country("valid", "GB", "United Kingdom")
         )
     }
 }
