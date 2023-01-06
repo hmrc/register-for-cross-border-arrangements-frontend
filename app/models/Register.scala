@@ -215,7 +215,11 @@ object IndRegistration {
         Address(
           lookUp.addressLine1.getOrElse(""),
           lookUp.addressLine2,
-          lookUp.addressLine3.getOrElse(""),
+          lookUp.addressLine3
+            .map(
+              l => s"$l ${lookUp.town}"
+            )
+            .getOrElse(lookUp.town),
           lookUp.addressLine4,
           Some(lookUp.postcode),
           Country("valid", "GB", "United Kingdom")
