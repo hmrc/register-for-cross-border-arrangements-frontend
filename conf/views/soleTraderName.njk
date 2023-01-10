@@ -10,7 +10,14 @@
   {{ title(messages("soleTraderName.title"), form.errors) }}
 {% endblock %}
 
+
+
 {% block mainContent %}
+
+{{ govukBackLink({
+    text: messages("site.back"),
+     classes: "js-enabled"
+  }) }}
   <div class="govuk-main-wrapper">
     <div class="govuk-grid-row">
       <div class="govuk-grid-column-two-thirds">
