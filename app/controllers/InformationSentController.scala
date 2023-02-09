@@ -18,8 +18,9 @@ package controllers
 
 import controllers.actions._
 import forms.InformationSentFormProvider
+
 import javax.inject.Inject
-import models.Mode
+import models.{Mode, NormalMode}
 import navigation.Navigator
 import pages.InformationSentPage
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -58,8 +59,9 @@ class InformationSentController @Inject() (
       }
 
       val json = Json.obj(
-        "form" -> preparedForm,
-        "mode" -> mode
+        "startUrl" -> controllers.routes.DoYouHaveUTRController.onPageLoad(NormalMode).url,
+        "form"     -> preparedForm,
+        "mode"     -> mode
       )
 
       renderer.render("informationSent.njk", json).map(Ok(_))

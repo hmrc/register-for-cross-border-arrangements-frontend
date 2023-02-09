@@ -25,20 +25,14 @@ import play.api.mvc.{ActionRefiner, Result}
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class AgentCheckForSubmissionActionImpl @Inject() (implicit val executionContext: ExecutionContext) extends CheckForSubmissionAction {
+class CheckForSubmissionActionImpl @Inject() (implicit val executionContext: ExecutionContext) extends CheckForSubmissionAction {
 
-
-    override protected def refine[A](request: DataRequest[A]): Future[Either[Result, DataRequest[A]]] =
+  override protected def refine[A](request: DataRequest[A]): Future[Either[Result, DataRequest[A]]] =
     if (request.userAnswers.data == Json.obj()) {
       Future.successful(Left(Redirect(routes.InformationSentController.onPageLoad())))
     } else {
       Future.successful(Right(request))
     }
-
-  override def apply(): ActionRefiner[DataRequest, DataRequest] =
-    new CheckForSubmissionActionProvider()
 }
 
-trait CheckForSubmissionAction extends ActionRefiner[DataRequest, DataRequest]{
-  def apply(): ActionRefiner[DataRequest, DataRequest]
-}
+trait CheckForSubmissionAction extends ActionRefiner[DataRequest, DataRequest] {}

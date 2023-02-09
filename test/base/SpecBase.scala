@@ -75,6 +75,7 @@ trait SpecBase
       .overrides(
         bind[DataRequiredAction].to[DataRequiredActionImpl],
         bind[IdentifierAction].to[FakeIdentifierAction],
+        bind[CheckForSubmissionAction].to[FakeCheckForSubmissionAction],
         bind[DataRetrievalAction].toInstance(new FakeDataRetrievalAction(userAnswers)),
         bind[NunjucksRenderer].toInstance(mockRenderer)
       )

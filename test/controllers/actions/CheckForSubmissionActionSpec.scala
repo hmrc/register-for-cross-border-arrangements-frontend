@@ -16,16 +16,51 @@
 
 package controllers.actions
 
+import base.SpecBase
+import controllers.routes
 import models.requests.DataRequest
-import play.api.mvc.{Result}
+import org.scalatest.EitherValues
+import pages.ContactNamePage
+import play.api.http.Status.SEE_OTHER
+import play.api.mvc.Result
+import play.api.test.FakeRequest
+import play.api.test.Helpers._
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
-class FakeCheckForSubmissionAction extends CheckForSubmissionAction {
+class CheckForSubmissionActionSpec extends SpecBase with EitherValues {
 
-  override protected def refine[A](request: DataRequest[A]): Future[Either[Result, DataRequest[A]]] =
-    Future.successful(Right(request))
+  class Harness extends CheckForSubmissionActionImpl {
+    def callRefine[A](request: DataRequest[A]): Future[Either[Result, DataRequest[A]]] = super.refine(request)
+  }
 
-  implicit override protected val executionContext: ExecutionContext =
-    scala.concurrent.ExecutionContext.Implicits.global
+  "CheckForSubmission Action" - {
+
+    "when userAnswers is empty" - {
+
+      "must redirect to already submitted page" in {
+
+        val action = new Harness
+
+        val result = action.callRefine(DataRequest(FakeRequest(), "id", emptyUserAnswers)).map(_.left.value)
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustEqual routes.InformationSentController.onPageLoad().url
+      }
+    }
+
+    "when userAnswers is not empty" - {
+
+      "must allow the user to continue" in {
+
+        val action = new Harness
+
+        val userAnswers = emptyUserAnswers.set(ContactNamePage, "Name").success.value
+        val result      = action.callRefine(DataRequest(FakeRequest(), "id", userAnswers)).futureValue
+
+        result.isRight mustBe true
+      }
+    }
+  }
 }
