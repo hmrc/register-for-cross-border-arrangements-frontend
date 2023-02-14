@@ -18,12 +18,8 @@ package controllers
 
 import base.SpecBase
 import config.FrontendAppConfig
-import matchers.JsonMatchers.containJson
-import models.NormalMode
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
-import play.api.data.Form
-import play.api.libs.json.{JsObject, Json}
 import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
@@ -38,9 +34,6 @@ class InformationSentControllerSpec extends SpecBase {
 
   val mockSessionRepository: SessionRepository = mock[SessionRepository]
   val mockFrontendAppConfig: FrontendAppConfig = mock[FrontendAppConfig]
-
-  val formProvider       = new InformationSentFormProvider()
-  val form: Form[String] = formProvider()
 
   lazy val informationSentPageRoute: String = routes.InformationSentController.onPageLoad().url
 
