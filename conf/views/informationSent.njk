@@ -11,17 +11,27 @@
 {% endblock %}
 
 {% block mainContent %}
+<div class="govuk-main-wrapper">
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-two-thirds">
 
   <h1 class="govuk-heading-xl">
             {{ messages("informationSent.heading") }}
   </h1>
+
   <div>
   <p class="govuk-body">{{ messages("informationSent.p1") }}
   </div>
+
  <p class="govuk-body">
  <a id="startUrl" class="govuk-link" href="{{startUrl}}">
                {{ messages("session_expired.link") }}
  </a>
  </p>
+
+
+     </div>
+   </div>
+ </div>
 
 {% endblock %}

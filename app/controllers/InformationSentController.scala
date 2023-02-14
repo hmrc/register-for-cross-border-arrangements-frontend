@@ -17,8 +17,6 @@
 package controllers
 
 import controllers.actions._
-
-import javax.inject.Inject
 import models.{Mode, NormalMode}
 import navigation.Navigator
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -29,7 +27,8 @@ import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.viewmodels.NunjucksSupport
 
-import scala.concurrent.{ExecutionContext, Future}
+import javax.inject.Inject
+import scala.concurrent.ExecutionContext
 
 class InformationSentController @Inject() (
   override val messagesApi: MessagesApi,
@@ -39,7 +38,6 @@ class InformationSentController @Inject() (
   notEnrolled: NotEnrolledForDAC6Action,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
-  formProvider: InformationSentFormProvider,
   val controllerComponents: MessagesControllerComponents,
   renderer: Renderer
 )(implicit ec: ExecutionContext)
@@ -47,13 +45,11 @@ class InformationSentController @Inject() (
     with I18nSupport
     with NunjucksSupport {
 
-  private val form = formProvider()
-
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen notEnrolled andThen getData andThen requireData).async {
     implicit request =>
       val json = Json.obj(
         "startUrl" -> controllers.routes.DoYouHaveUTRController.onPageLoad(NormalMode).url,
-         "mode"     -> mode
+        "mode"     -> mode
       )
 
       renderer.render("informationSent.njk", json).map(Ok(_))
