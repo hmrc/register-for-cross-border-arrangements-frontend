@@ -18,7 +18,6 @@ package controllers
 
 import base.SpecBase
 import config.FrontendAppConfig
-import forms.InformationSentFormProvider
 import matchers.JsonMatchers.containJson
 import models.NormalMode
 import org.mockito.ArgumentCaptor

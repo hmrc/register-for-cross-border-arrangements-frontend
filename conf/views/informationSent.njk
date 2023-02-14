@@ -7,7 +7,7 @@
 {% from "macros/title.njk"                         import title %}
 
 {% block pageTitle %}
-  {{ title(messages("informationSent.title"), form.errors) }}
+  {{ title(messages("informationSent.title")) }}
 {% endblock %}
 
 {% block mainContent %}
@@ -23,20 +23,5 @@
                {{ messages("session_expired.link") }}
  </a>
  </p>
-
-
-  <div class="govuk-main-wrapper">
-    <div class="govuk-grid-row">
-      <div class="govuk-grid-column-two-thirds">
-
-        {% if form.errors.length > 0 %}
-          {{ govukErrorSummary({
-            "titleText": messages("error.summary.title"),
-            "errorList": form.errors
-          }) }}
-        {% endif %}
-      </div>
-    </div>
-  </div>
 
 {% endblock %}

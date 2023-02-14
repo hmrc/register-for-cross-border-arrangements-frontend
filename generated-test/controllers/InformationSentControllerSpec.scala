@@ -1,13 +1,11 @@
 package controllers
 
 import base.SpecBase
-import forms.InformationSentFormProvider
 import matchers.JsonMatchers
 import models.{NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
-import pages.InformationSentPage
 import play.api.inject.bind
 import play.api.libs.json.{JsObject, JsString, Json}
 import play.api.mvc.Call
@@ -22,9 +20,6 @@ import scala.concurrent.Future
 class InformationSentControllerSpec extends SpecBase with NunjucksSupport with JsonMatchers {
 
   def onwardRoute = Call("GET", "/foo")
-
-  val formProvider = new InformationSentFormProvider()
-  val form = formProvider()
 
   lazy val informationSentRoute = routes.InformationSentController.onPageLoad(NormalMode).url
 

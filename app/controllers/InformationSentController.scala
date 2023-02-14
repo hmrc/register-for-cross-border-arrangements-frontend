@@ -17,12 +17,10 @@
 package controllers
 
 import controllers.actions._
-import forms.InformationSentFormProvider
 
 import javax.inject.Inject
 import models.{Mode, NormalMode}
 import navigation.Navigator
-import pages.InformationSentPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -53,15 +51,9 @@ class InformationSentController @Inject() (
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen notEnrolled andThen getData andThen requireData).async {
     implicit request =>
-      val preparedForm = request.userAnswers.get(InformationSentPage) match {
-        case None        => form
-        case Some(value) => form.fill(value)
-      }
-
       val json = Json.obj(
         "startUrl" -> controllers.routes.DoYouHaveUTRController.onPageLoad(NormalMode).url,
-        "form"     -> preparedForm,
-        "mode"     -> mode
+         "mode"     -> mode
       )
 
       renderer.render("informationSent.njk", json).map(Ok(_))
