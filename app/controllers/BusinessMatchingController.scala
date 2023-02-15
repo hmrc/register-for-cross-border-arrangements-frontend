@@ -18,7 +18,7 @@ package controllers
 
 import connectors.{EnrolmentStoreProxyConnector, SubscriptionConnector}
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction, NotEnrolledForDAC6Action}
-import models.readSubscription.{DisplaySubscriptionForDACResponse, ReadSubscriptionForDACResponse}
+import models.readSubscription.DisplaySubscriptionForDACResponse
 import models.{BusinessDetails, Mode, NormalMode, UserAnswers}
 import navigation.Navigator
 import org.slf4j.LoggerFactory

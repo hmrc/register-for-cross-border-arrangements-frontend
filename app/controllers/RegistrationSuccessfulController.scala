@@ -19,12 +19,14 @@ package controllers
 import config.FrontendAppConfig
 import controllers.actions._
 import handlers.ErrorHandler
+
 import javax.inject.Inject
 import pages.SubscriptionIDPage
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import renderer.Renderer
+import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.viewmodels.Html
 
@@ -37,6 +39,7 @@ class RegistrationSuccessfulController @Inject() (
   ignoreSubscription: IgnoreSubscriptionAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
+  sessionRepository: SessionRepository,
   errorHandler: ErrorHandler,
   val controllerComponents: MessagesControllerComponents,
   renderer: Renderer
@@ -53,7 +56,11 @@ class RegistrationSuccessfulController @Inject() (
             "submissionUrl"      -> appConfig.dacSubmissionsUrl,
             "betaFeedbackSurvey" -> appConfig.betaFeedbackUrl
           )
-          renderer.render("registrationSuccessful.njk", json).map(Ok(_))
+          sessionRepository.reset(request.internalId) flatMap {
+            _ =>
+              renderer.render("registrationSuccessful.njk", json).map(Ok(_))
+          }
+
         case None =>
           errorHandler.onServerError(request, throw new RuntimeException("Subscription ID missing"))
       }

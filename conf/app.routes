@@ -222,3 +222,4 @@ POST       /register/without-id/change-trading-name                  controllers
 
 GET        /register/your-contact-details                controllers.YourContactDetailsController.onPageLoad
 
+GET        /register/problem/information-sent                   controllers.InformationSentController.onPageLoad(mode: Mode = NormalMode)

@@ -16,34 +16,42 @@
 
 package controllers
 
-import config.FrontendAppConfig
 import controllers.actions._
+import models.{Mode, NormalMode}
+import navigation.Navigator
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import renderer.Renderer
+import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import uk.gov.hmrc.viewmodels.NunjucksSupport
 
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 
-class BusinessAlreadyRegisteredController @Inject() (
+class InformationSentController @Inject() (
   override val messagesApi: MessagesApi,
+  sessionRepository: SessionRepository,
+  navigator: Navigator,
   identify: IdentifierAction,
   notEnrolled: NotEnrolledForDAC6Action,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
-  appConfig: FrontendAppConfig,
   val controllerComponents: MessagesControllerComponents,
   renderer: Renderer
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
-    with I18nSupport {
+    with I18nSupport
+    with NunjucksSupport {
 
-  def onPageLoad: Action[AnyContent] = (identify andThen notEnrolled andThen getData andThen requireData).async {
+  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen notEnrolled andThen getData andThen requireData).async {
     implicit request =>
-      val json = Json.obj("emailAddress" -> appConfig.emailEnquiries)
+      val json = Json.obj(
+        "startUrl" -> controllers.routes.DoYouHaveUTRController.onPageLoad(NormalMode).url,
+        "mode"     -> mode
+      )
 
-      renderer.render("businessAlreadyRegistered.njk", json).map(Ok(_))
+      renderer.render("informationSent.njk", json).map(Ok(_))
   }
 }

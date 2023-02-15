@@ -18,7 +18,7 @@ package controllers
 
 import com.google.inject.Inject
 import connectors.SubscriptionConnector
-import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction, NotEnrolledForDAC6Action}
+import controllers.actions.{CheckForSubmissionAction, DataRequiredAction, DataRetrievalAction, IdentifierAction, NotEnrolledForDAC6Action}
 import controllers.exceptions.SomeInformationIsMissingException
 import models.RegistrationType.Individual
 import models.error.RegisterError
@@ -50,6 +50,7 @@ class CheckYourAnswersController @Inject() (
   emailService: EmailService,
   registrationService: RegistrationService,
   subscriptionConnector: SubscriptionConnector,
+  checkForSubmission: CheckForSubmissionAction,
   auditService: AuditService,
   renderer: Renderer
 )(implicit ec: ExecutionContext)
@@ -59,7 +60,7 @@ class CheckYourAnswersController @Inject() (
 
   private val logger = LoggerFactory.getLogger(getClass)
 
-  def onPageLoad(): Action[AnyContent] = (identify andThen notEnrolled andThen getData andThen requireData).async {
+  def onPageLoad(): Action[AnyContent] = (identify andThen notEnrolled andThen getData andThen requireData andThen checkForSubmission).async {
     implicit request =>
       val helper                                = new CheckYourAnswersHelper(request.userAnswers)
       val businessDetails: Seq[SummaryList.Row] = buildDetails(helper)
@@ -85,7 +86,6 @@ class CheckYourAnswersController @Inject() (
   }
 
   private def buildDetails(helper: CheckYourAnswersHelper): Seq[SummaryList.Row] = {
-
     val pagesToCheck = Tuple5(
       helper.businessType,
       helper.nino,
@@ -93,14 +93,12 @@ class CheckYourAnswersController @Inject() (
       helper.businessTradingName,
       helper.nonUkName
     )
-
     pagesToCheck match {
       case (Some(_), None, None, None, None) =>
         //Business with ID (inc. Sole proprietor)
         Seq(
           helper.confirmBusiness
         ).flatten
-
       case (None, Some(_), None, None, None) =>
         //Individual with ID
         Seq(

@@ -1,0 +1,37 @@
+{% extends "includes/layout.njk" %}
+
+{% from "govuk/components/back-link/macro.njk"     import govukBackLink %}
+{% from "govuk/components/input/macro.njk"         import govukInput %}
+{% from "govuk/components/button/macro.njk"        import govukButton %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "macros/title.njk"                         import title %}
+
+{% block pageTitle %}
+  {{ title(messages("informationSent.title")) }}
+{% endblock %}
+
+{% block mainContent %}
+<div class="govuk-main-wrapper">
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-two-thirds">
+
+  <h1 class="govuk-heading-xl">
+            {{ messages("informationSent.heading") }}
+  </h1>
+
+  <div>
+  <p class="govuk-body">{{ messages("informationSent.p1") }}
+  </div>
+
+ <p class="govuk-body">
+ <a id="startUrl" class="govuk-link" href="{{startUrl}}">
+               {{ messages("session_expired.link") }}
+ </a>
+ </p>
+
+
+     </div>
+   </div>
+ </div>
+
+{% endblock %}
